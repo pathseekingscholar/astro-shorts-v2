@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-03-16T20:39:15.309169",
+  "top_performing_topics": [
+    {
+      "topic": "travel_time",
+      "avg_score": 1.05,
+      "videos_count": 1
+    },
+    {
+      "topic": "hypothetical",
+      "avg_score": 1.03,
+      "videos_count": 1
+    },
+    {
+      "topic": "general",
+      "avg_score": 0.866,
+      "videos_count": 18
+    }
+  ],
+  "avoid_topics": [],
+  "suggested_next": [
+    "travel_time",
+    "hypothetical",
+    "general"
+  ],
+  "insights": [
+    "'travel_time' is your best performing format (score: 1.05)",
+    "Analyzed 20 videos across 3 topic types"
+  ]
+}
