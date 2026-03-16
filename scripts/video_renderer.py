@@ -671,9 +671,11 @@ def create_video(script_data, output_path):
     print(f"🎬 Creating V2 video: {output_path}")
     
     scenes = script_data.get('scenes', [])
-    if not scenes:
-        print("❌ No scenes in script")
-        return False
+    # Handle nested script format from script_formatter
+    if 'script' in script_data and 'scenes' in script_data['script']:
+        scenes = script_data['script']['scenes']
+    else:
+        scenes = script_data.get('scenes', [])
     
     # Create consistent starfield
     print("  ✨ Generating starfield...")
