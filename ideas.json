@@ -21,5 +21,28 @@
     "status": "formatted",
     "strategy_based": true,
     "formatted_at": "2026-03-16T20:41:12.038775"
+  },
+  {
+    "topic": "Light Speed Travel Times",
+    "topic_family": "travel_time",
+    "hook": "You think traveling at light speed is fast?",
+    "facts": [
+      "Light takes ~1.3 seconds to reach the Moon.",
+      "It takes light ~3 minutes to reach Mars (at closest approach).",
+      "Reaching Pluto at light speed would take over 5.5 hours."
+    ],
+    "payoff": "But crossing the entire Milky Way galaxy would take over 100,000 YEARS even at light speed! The universe is VAST. \ud83e\udd2f",
+    "title": "How long does light speed travel take? \ud83e\udd2f\ud83d\ude80",
+    "hashtags": [
+      "#LightSpeed",
+      "#SpaceTravel",
+      "#Astrophysics",
+      "#Universe",
+      "#ScienceFacts"
+    ],
+    "generated_at": "2026-03-16T21:14:13.035822",
+    "status": "formatted",
+    "strategy_based": true,
+    "formatted_at": "2026-03-16T21:14:19.883003"
   }
 ]

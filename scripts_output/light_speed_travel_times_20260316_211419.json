@@ -1,0 +1,87 @@
+{
+  "idea": {
+    "topic": "Light Speed Travel Times",
+    "topic_family": "travel_time",
+    "hook": "You think traveling at light speed is fast?",
+    "facts": [
+      "Light takes ~1.3 seconds to reach the Moon.",
+      "It takes light ~3 minutes to reach Mars (at closest approach).",
+      "Reaching Pluto at light speed would take over 5.5 hours."
+    ],
+    "payoff": "But crossing the entire Milky Way galaxy would take over 100,000 YEARS even at light speed! The universe is VAST. \ud83e\udd2f",
+    "title": "How long does light speed travel take? \ud83e\udd2f\ud83d\ude80",
+    "hashtags": [
+      "#LightSpeed",
+      "#SpaceTravel",
+      "#Astrophysics",
+      "#Universe",
+      "#ScienceFacts"
+    ],
+    "generated_at": "2026-03-16T21:14:13.035822",
+    "status": "pending",
+    "strategy_based": true
+  },
+  "script": {
+    "total_duration": 20,
+    "scenes": [
+      {
+        "scene_number": 1,
+        "start_time": 0,
+        "duration": 3,
+        "text": "You think traveling at light speed is fast?",
+        "text_position": "center",
+        "text_size": "large",
+        "visual": "A stylized streak of light quickly crossing a dark, starry background, implying extreme speed.",
+        "animation": "fade_in"
+      },
+      {
+        "scene_number": 2,
+        "start_time": 3,
+        "duration": 4,
+        "text": "Light to the Moon: ~1.3 seconds",
+        "text_position": "center",
+        "text_size": "medium",
+        "visual": "Earth and Moon side-by-side, a rapid light beam animating between them.",
+        "animation": "zoom_in"
+      },
+      {
+        "scene_number": 3,
+        "start_time": 7,
+        "duration": 4,
+        "text": "Light to Mars: ~3 minutes",
+        "text_position": "center",
+        "text_size": "medium",
+        "visual": "Earth and Mars (appearing slightly further than Moon), light beam animation between them, showing a longer journey.",
+        "animation": "slide_left"
+      },
+      {
+        "scene_number": 4,
+        "start_time": 11,
+        "duration": 4,
+        "text": "Light to Pluto: 5.5+ hours",
+        "text_position": "center",
+        "text_size": "medium",
+        "visual": "Earth and a tiny Pluto far in the distance, a long light path animating across the screen.",
+        "animation": "slide_right"
+      },
+      {
+        "scene_number": 5,
+        "start_time": 15,
+        "duration": 5,
+        "text": "Milky Way: 100,000+ YEARS at LIGHT SPEED! The universe is VAST. \ud83e\udd2f",
+        "text_position": "center",
+        "text_size": "large",
+        "animation": "pulse",
+        "visual": "A breathtaking, slowly rotating, full view of the entire Milky Way galaxy, filled with stars and nebulae, emphasizing its immense scale.",
+        "background_style": "space_nebula"
+      }
+    ],
+    "thumbnail_text": "Light Speed is SLOW?!",
+    "background_style": "space_dark"
+  },
+  "formatted_at": "2026-03-16T21:14:19.882745",
+  "status": "ready_to_render",
+  "scenes": [],
+  "rendered": true,
+  "rendered_at": "2026-03-16T21:21:21.334404"
+}
