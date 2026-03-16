@@ -1,1 +1,25 @@
-[ ]
+[
+  {
+    "topic": "Interstellar Travel Time",
+    "topic_family": "travel_time",
+    "hook": "Want to visit our nearest star, Proxima Centauri?",
+    "facts": [
+      "It's 4.24 light-years away. That's over 40 TRILLION kilometers!",
+      "The fastest spacecraft EVER, NASA's Parker Solar Probe (690,000 km/h), would take over 6,600 years to get there.",
+      "Even traveling at the ultimate speed limit \u2013 the speed of light \u2013 it would still take 4.24 years."
+    ],
+    "payoff": "Interstellar tourism? Not even for your great-great-great-great-grandkids. We're still light-years away from true warp drive.",
+    "title": "Star Travel Reality Check! \ud83e\udd2f\ud83d\ude80",
+    "hashtags": [
+      "#Space",
+      "#Astrophysics",
+      "#Interstellar",
+      "#Travel",
+      "#ScienceFacts"
+    ],
+    "generated_at": "2026-03-16T20:41:01.793375",
+    "status": "formatted",
+    "strategy_based": true,
+    "formatted_at": "2026-03-16T20:41:12.038775"
+  }
+]
