@@ -1,0 +1,66 @@
+name: Generate Short Idea
+
+on:
+  schedule:
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg imagemagick
+          sudo sed -i 's/rights="none" pattern="@\*"/rights="read|write" pattern="@*"/' /etc/ImageMagick-6/policy.xml || true
+          sudo sed -i '/<policy domain="path" rights="none" pattern="@\*"/d' /etc/ImageMagick-6/policy.xml || true
+      
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install requests Pillow numpy
+          pip install moviepy==1.0.3
+          pip install google-auth google-auth-oauthlib google-api-python-client
+      
+      - name: Generate idea
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/idea_generator.py
+      
+      - name: Format script
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/script_formatter.py
+      
+      - name: Render video
+        run: python scripts/video_renderer.py
+      
+      - name: Upload to YouTube
+        env:
+          YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+        run: python scripts/youtube_uploader.py
+      
+      - name: Save to repository
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git diff --quiet && git diff --staged --quiet || (git commit -m "🚀 Generated + uploaded new Short" && git push)
+      
+      - name: Upload video artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-video
+          path: videos_output/*.mp4
+          retention-days: 30
