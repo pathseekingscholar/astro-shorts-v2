@@ -1,7 +1,8 @@
 """
-Idea Generator Agent - SMART VERSION
-Generates astrophysics YouTube Shorts ideas using Gemini API.
-Now uses analytics data to prioritize winning topic types!
+V5 Idea Generator - Smart Topic Selection
+==========================================
+Reads analytics/strategy to prioritize winning topics.
+Generates ideas using Gemini with detailed director scripts.
 """
 
 import os
@@ -11,241 +12,220 @@ import requests
 from datetime import datetime
 
 # =============================================================================
-# CONFIGURATION
+# CONFIG
 # =============================================================================
-STRATEGY_FILE = "data/strategy.json"
-PERFORMANCE_FILE = "data/performance_history.json"
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 IDEAS_FILE = "ideas.json"
+STRATEGY_FILE = "data/strategy.json"
 
-# Default topic families if no analytics data exists
-DEFAULT_TOPICS = [
-    "scale_comparison",
-    "travel_time", 
-    "planetary_facts",
-    "hypothetical",
-    "myth_busting"
-]
+# =============================================================================
+# DIRECTOR PROMPT
+# =============================================================================
+DIRECTOR_PROMPT = """You are a YouTube Shorts DIRECTOR creating viral astrophysics content.
 
-# Topic descriptions for the AI
-TOPIC_DESCRIPTIONS = {
-    "scale_comparison": "comparing sizes of cosmic objects (How many Earths fit in the Sun? How big is the Milky Way compared to...?)",
-    "travel_time": "how long it takes to travel to cosmic destinations at various speeds (How long to reach Mars at light speed?)",
-    "planetary_facts": "surprising facts about planets, moons, or other bodies (A day on Venus is longer than its year)",
-    "hypothetical": "what-if scenarios in space (What if you fell into a black hole? Could you survive on...?)",
-    "myth_busting": "correcting common misconceptions about space (Is the Sun actually yellow? Can you hear explosions in space?)",
-    "cosmic_mystery": "unexplained phenomena and mysteries of the universe (What is dark matter? Why is the universe expanding faster?)",
-    "extreme_conditions": "extreme environments and conditions in space (hottest planet, coldest place, strongest gravity)"
+{strategy_context}
+
+Create a DETAILED video script about: {topic_hint}
+
+Make it VISUALLY DYNAMIC:
+- Use 2+ planets in some scenes (side by side comparisons)
+- Match effects to emotions (shock = shake, huge = zoom)
+- Vary positions (don't always center)
+- Include BIG numbers that blow minds
+
+Return ONLY valid JSON:
+
+{{
+  "idea": {{
+    "topic": "specific topic name",
+    "hook": "Hook question that grabs attention",
+    "title": "YouTube title with numbers (under 50 chars)",
+    "description": "Short description for YouTube",
+    "tags": ["space", "astrophysics", "science"],
+    "topic_family": "category like black_holes, scale, distances, stars"
+  }},
+  "metadata": {{
+    "mood": "mind-blowing",
+    "music_style": "epic",
+    "background_search": "deep space galaxy nebula"
+  }},
+  "timeline": [
+    {{
+      "time_start": 0.0,
+      "time_end": 4.0,
+      "layers": [
+        {{"type": "planet", "name": "earth", "position": "center", "size": "large",
+         "expression": "thinking", "entry_animation": "pop_in", "effects": ["idle_bounce"]}}
+      ],
+      "text": {{"content": "Hook question?", "position": "top", "style": "word_by_word"}},
+      "screen_effects": [],
+      "dramatic_moment": false
+    }},
+    {{
+      "time_start": 4.0,
+      "time_end": 8.0,
+      "layers": [
+        {{"type": "planet", "name": "jupiter", "position": "right", "size": "large",
+         "expression": "smug", "entry_animation": "slide_from_right", "effects": ["pulse"]}},
+        {{"type": "planet", "name": "earth", "position": "left", "size": "small",
+         "expression": "looking_right", "entry_animation": "none", "effects": []}}
+      ],
+      "text": {{"content": "Comparison with NUMBER", "position": "top", "style": "word_by_word"}},
+      "screen_effects": [],
+      "dramatic_moment": false
+    }},
+    {{
+      "time_start": 8.0,
+      "time_end": 12.0,
+      "layers": [
+        {{"type": "planet", "name": "sun", "position": "center", "size": "huge",
+         "expression": "shocked", "entry_animation": "zoom_in", "effects": ["glow", "pulse"]}}
+      ],
+      "text": {{"content": "DRAMATIC reveal!", "position": "top", "style": "slam_in"}},
+      "screen_effects": ["camera_shake", "flash"],
+      "dramatic_moment": true
+    }},
+    {{
+      "time_start": 12.0,
+      "time_end": 16.0,
+      "layers": [
+        {{"type": "planet", "name": "black_hole", "position": "center", "size": "large",
+         "expression": "neutral", "entry_animation": "fade_in", "effects": ["pulse"]}},
+        {{"type": "planet", "name": "earth", "position": "bottom_right", "size": "tiny",
+         "expression": "scared", "entry_animation": "pop_in", "effects": ["shake"]}}
+      ],
+      "text": {{"content": "Mind-blowing comparison", "position": "top", "style": "word_by_word"}},
+      "screen_effects": ["vignette_pulse"],
+      "dramatic_moment": false
+    }},
+    {{
+      "time_start": 16.0,
+      "time_end": 20.0,
+      "layers": [
+        {{"type": "planet", "name": "earth", "position": "center", "size": "medium",
+         "expression": "excited", "entry_animation": "bounce_in", "effects": ["idle_bounce"]}}
+      ],
+      "text": {{"content": "Epic conclusion!", "position": "top", "style": "word_by_word"}},
+      "screen_effects": [],
+      "dramatic_moment": false
+    }}
+  ]
+}}
+
+OPTIONS:
+- Planets: earth, mars, jupiter, saturn, sun, moon, neptune, venus, mercury, black_hole, neutron_star
+- Expressions: neutral, happy, scared, shocked, excited, thinking, angry, smug, looking_left, looking_right, dead
+- Positions: center, left, right, top, bottom, top_left, top_right, bottom_left, bottom_right
+- Sizes: tiny, small, medium, large, huge
+- Entry: pop_in, slide_from_left, slide_from_right, fade_in, zoom_in, bounce_in, spin_in, none
+- Object Effects: idle_bounce, shake, pulse, glow, wobble, vibrate, float
+- Screen Effects: camera_shake, flash, vignette_pulse, chromatic_aberration, glitch
+- Text Styles: word_by_word, slam_in, typewriter
+- Moods: epic, dramatic, mind-blowing, intense, chill, horror
+- Music: epic, dramatic, cinematic, intense, chill
+
+RULES:
+1. 5 scenes, 4 seconds each = 20 seconds total
+2. At least 2 scenes with MULTIPLE planets (comparisons)
+3. Only 1-2 dramatic moments with heavy screen effects
+4. Include SPECIFIC numbers (millions, billions, light-years)
+5. Make it VIRAL - surprising, extreme, mind-blowing facts
+"""
+
+# =============================================================================
+# TOPIC FAMILIES
+# =============================================================================
+TOPIC_FAMILIES = {
+    "black_holes": [
+        "How big is the largest black hole?",
+        "What happens if you fall into a black hole?",
+        "Black hole vs neutron star density",
+        "Supermassive black hole at galaxy center",
+        "How fast do black holes spin?",
+    ],
+    "scale": [
+        "Size of Earth vs Jupiter vs Sun",
+        "How many Earths fit in the Sun?",
+        "Largest star ever discovered",
+        "Size of the observable universe",
+        "How small is Earth compared to the galaxy?",
+    ],
+    "distances": [
+        "How long to reach the nearest star?",
+        "Distance to the edge of the universe",
+        "How far is Voyager 1 now?",
+        "Speed of light travel times",
+        "How wide is the Milky Way?",
+    ],
+    "time": [
+        "Age of the universe",
+        "How long until the Sun dies?",
+        "Time dilation near black holes",
+        "How old are the oldest stars?",
+        "What will happen in 1 trillion years?",
+    ],
+    "extreme_physics": [
+        "Neutron star teaspoon weight",
+        "Temperature at the Sun's core",
+        "Speed of a pulsar rotation",
+        "Gravity on a neutron star",
+        "Magnetar magnetic field strength",
+    ],
+    "planets": [
+        "Raining diamonds on Neptune",
+        "Why is Venus hotter than Mercury?",
+        "Jupiter's Great Red Spot size",
+        "Saturn's density vs water",
+        "Mars vs Earth comparison",
+    ],
 }
 
-
 # =============================================================================
-# ANALYTICS INTEGRATION
+# FUNCTIONS
 # =============================================================================
 def load_strategy():
-    """Load the current strategy from analytics."""
+    """Load strategy from analytics."""
     if os.path.exists(STRATEGY_FILE):
         try:
             with open(STRATEGY_FILE, 'r') as f:
                 return json.load(f)
-        except Exception as e:
-            print(f"⚠️ Could not load strategy: {e}")
-    return None
+        except:
+            pass
+    return {}
 
 
-def load_performance_history():
-    """Load past video performance."""
-    if os.path.exists(PERFORMANCE_FILE):
-        try:
-            with open(PERFORMANCE_FILE, 'r') as f:
-                return json.load(f)
-        except Exception as e:
-            print(f"⚠️ Could not load performance history: {e}")
-    return []
-
-
-def get_recent_topics(history, limit=10):
-    """Get recently used topics to avoid repetition."""
-    recent = sorted(history, key=lambda x: x.get('published_at', ''), reverse=True)[:limit]
-    return [v.get('topic_family', 'general') for v in recent]
-
-
-def select_topic_family(strategy, history):
-    """
-    Select a topic family based on analytics data.
-    Prioritizes top performers while maintaining some variety.
-    """
+def get_topic_hint(strategy):
+    """Select topic based on strategy."""
     
-    # If no strategy yet, use defaults with randomness
-    if not strategy or not strategy.get('top_performing_topics'):
-        print("📊 No analytics data yet, using balanced selection")
-        return random.choice(DEFAULT_TOPICS)
-    
-    top_topics = strategy.get('top_performing_topics', [])
-    suggested = strategy.get('suggested_next', DEFAULT_TOPICS)
-    avoid = [t['topic'] for t in strategy.get('avoid_topics', [])]
-    
-    # Get recent topics to avoid repetition
-    recent_topics = get_recent_topics(history, limit=5)
+    # Get winning and suggested topics from strategy
+    top_families = strategy.get("top_performing_families", [])
+    suggested = strategy.get("suggested_topics", [])
+    avoid = strategy.get("underperforming_topics", [])
     
     # Build weighted selection
-    # 60% chance: pick from top performers
-    # 30% chance: pick from suggested
-    # 10% chance: try something new (exploration)
+    options = []
     
-    roll = random.random()
+    # 50% chance: Use a winning family
+    if top_families and random.random() < 0.5:
+        family = random.choice(top_families[:3])
+        if family in TOPIC_FAMILIES:
+            topic = random.choice(TOPIC_FAMILIES[family])
+            return topic, f"Focus on {family} - your top performer!"
     
-    if roll < 0.6 and top_topics:
-        # Pick from top performers
-        candidates = [t['topic'] for t in top_topics if t['topic'] not in recent_topics[-2:]]
-        if candidates:
-            selected = random.choice(candidates)
-            print(f"📊 Selected top performer: {selected}")
-            return selected
+    # 30% chance: Use a suggested topic
+    if suggested and random.random() < 0.6:
+        return random.choice(suggested), "Suggested by analytics"
     
-    if roll < 0.9 and suggested:
-        # Pick from suggested
-        candidates = [t for t in suggested if t not in recent_topics[-2:] and t not in avoid]
-        if candidates:
-            selected = random.choice(candidates)
-            print(f"📊 Selected from suggestions: {selected}")
-            return selected
+    # 20% chance: Explore new territory
+    all_families = list(TOPIC_FAMILIES.keys())
+    family = random.choice(all_families)
+    topic = random.choice(TOPIC_FAMILIES[family])
     
-    # Exploration: try something potentially new
-    all_topics = list(TOPIC_DESCRIPTIONS.keys())
-    candidates = [t for t in all_topics if t not in recent_topics[-3:] and t not in avoid]
-    if candidates:
-        selected = random.choice(candidates)
-        print(f"📊 Exploration pick: {selected}")
-        return selected
-    
-    # Fallback
-    return random.choice(DEFAULT_TOPICS)
+    return topic, f"Exploring {family}"
 
 
-def get_topic_guidance(topic_family):
-    """Get description for the selected topic family."""
-    return TOPIC_DESCRIPTIONS.get(topic_family, "interesting astrophysics facts")
-
-
-# =============================================================================
-# IDEA GENERATION
-# =============================================================================
-def generate_idea():
-    """Generate a single Short idea from Gemini, informed by analytics."""
-    
-    api_key = os.environ.get('GEMINI_API_KEY')
-    
-    if not api_key:
-        print("❌ Error: GEMINI_API_KEY not found in environment")
-        return None
-    
-    # Load analytics data
-    strategy = load_strategy()
-    history = load_performance_history()
-    
-    # Select topic family based on performance
-    topic_family = select_topic_family(strategy, history)
-    topic_guidance = get_topic_guidance(topic_family)
-    
-    print(f"🎯 Target topic family: {topic_family}")
-    
-    # Build the prompt with topic guidance
-    prompt = f"""You are a viral astrophysics YouTube Shorts content strategist.
-
-Generate ONE idea for a 20-second silent infographic Short about space or astrophysics.
-
-IMPORTANT: Focus on this topic type: {topic_family}
-This means: {topic_guidance}
-
-Requirements:
-- Hook must be attention-grabbing (question or surprising statement)
-- Facts must be scientifically accurate with specific numbers
-- Payoff should be surprising or thought-provoking
-- Make it feel fresh and not like something commonly posted
-
-Return ONLY this JSON format, no other text:
-{{
-    "topic": "brief topic name",
-    "topic_family": "{topic_family}",
-    "hook": "the opening question or statement",
-    "facts": [
-        "fact 1 with specific numbers",
-        "fact 2 with specific numbers",
-        "fact 3 with specific numbers"
-    ],
-    "payoff": "surprising conclusion",
-    "title": "YouTube title with emoji (max 60 chars)",
-    "hashtags": ["tag1", "tag2", "tag3", "tag4", "tag5"]
-}}"""
-
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
-    
-    payload = {
-        "contents": [{
-            "parts": [{"text": prompt}]
-        }]
-    }
-    
-    headers = {
-        "Content-Type": "application/json"
-    }
-    
-    # Retry logic for API calls
-    max_retries = 3
-    for attempt in range(max_retries):
-        try:
-            print(f"🚀 Calling Gemini API (attempt {attempt + 1})...")
-            response = requests.post(url, json=payload, headers=headers, timeout=30)
-            
-            if response.status_code == 503:
-                print(f"⚠️ Service unavailable, retrying in 5 seconds...")
-                import time
-                time.sleep(5)
-                continue
-                
-            response.raise_for_status()
-            
-            data = response.json()
-            text = data['candidates'][0]['content']['parts'][0]['text']
-            
-            # Clean up and parse
-            clean_text = text.replace('```json', '').replace('```', '').strip()
-            idea = json.loads(clean_text)
-            
-            # Add metadata
-            idea['generated_at'] = datetime.now().isoformat()
-            idea['status'] = 'pending'
-            idea['strategy_based'] = strategy is not None
-            
-            print("✅ Idea generated successfully!")
-            print(f"📝 Topic: {idea.get('topic')}")
-            print(f"🎣 Hook: {idea.get('hook')}")
-            
-            return idea
-            
-        except requests.exceptions.RequestException as e:
-            print(f"⚠️ API request failed (attempt {attempt + 1}): {e}")
-            if attempt < max_retries - 1:
-                import time
-                time.sleep(5)
-            else:
-                print("❌ All retries failed")
-                return None
-        except json.JSONDecodeError as e:
-            print(f"❌ Failed to parse response: {e}")
-            return None
-        except Exception as e:
-            print(f"❌ Unexpected error: {e}")
-            return None
-    
-    return None
-
-
-# =============================================================================
-# FILE MANAGEMENT
-# =============================================================================
-def load_ideas():
-    """Load existing ideas."""
+def load_existing_ideas():
+    """Load existing ideas to avoid duplicates."""
     if os.path.exists(IDEAS_FILE):
         try:
             with open(IDEAS_FILE, 'r') as f:
@@ -255,34 +235,97 @@ def load_ideas():
     return []
 
 
-def save_idea(idea):
-    """Save idea to the JSON file."""
-    ideas = load_ideas()
-    ideas.append(idea)
+def is_duplicate(new_topic, existing_ideas):
+    """Check if topic is too similar to existing."""
+    new_words = set(new_topic.lower().split())
     
-    with open(IDEAS_FILE, 'w') as f:
-        json.dump(ideas, f, indent=2)
-    
-    print(f"💾 Saved to {IDEAS_FILE} (total ideas: {len(ideas)})")
-    return IDEAS_FILE
-
-
-def check_duplicate(idea, existing_ideas, threshold=0.8):
-    """Check if idea is too similar to existing ones."""
-    new_topic = idea.get('topic', '').lower()
-    new_hook = idea.get('hook', '').lower()
-    
-    for existing in existing_ideas[-20:]:  # Check last 20 ideas
-        existing_topic = existing.get('topic', '').lower()
-        existing_hook = existing.get('hook', '').lower()
-        
-        # Simple similarity check
-        if new_topic == existing_topic:
-            return True
-        if new_hook == existing_hook:
-            return True
+    for idea in existing_ideas[-20:]:  # Check last 20
+        if idea.get("status") in ["pending", "formatted", "rendered"]:
+            existing_topic = idea.get("idea", {}).get("topic", "")
+            existing_words = set(existing_topic.lower().split())
+            
+            # If more than 60% overlap, it's a duplicate
+            overlap = len(new_words & existing_words) / max(len(new_words), 1)
+            if overlap > 0.6:
+                return True
     
     return False
+
+
+def generate_idea(topic_hint, strategy_context):
+    """Generate idea using Gemini."""
+    
+    if not GEMINI_API_KEY:
+        print("❌ No GEMINI_API_KEY")
+        return None
+    
+    prompt = DIRECTOR_PROMPT.format(
+        topic_hint=topic_hint,
+        strategy_context=strategy_context
+    )
+    
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
+    
+    for attempt in range(3):
+        try:
+            print(f"🧠 Generating idea (attempt {attempt + 1})...")
+            
+            response = requests.post(url, json={
+                "contents": [{"parts": [{"text": prompt}]}]
+            }, timeout=60)
+            
+            if response.status_code == 503:
+                print("⚠️ Gemini overloaded, retrying...")
+                import time
+                time.sleep(5)
+                continue
+            
+            if response.status_code == 200:
+                data = response.json()
+                text = data['candidates'][0]['content']['parts'][0]['text']
+                
+                # Extract JSON
+                if '```json' in text:
+                    text = text.split('```json')[1].split('```')[0]
+                elif '```' in text:
+                    text = text.split('```')[1].split('```')[0]
+                
+                script = json.loads(text.strip())
+                print("✅ Idea generated!")
+                return script
+            else:
+                print(f"❌ API error: {response.status_code}")
+                print(response.text[:500])
+                
+        except json.JSONDecodeError as e:
+            print(f"❌ JSON parse error: {e}")
+        except Exception as e:
+            print(f"❌ Error: {e}")
+    
+    return None
+
+
+def save_idea(idea_data, existing_ideas):
+    """Save idea to ideas.json."""
+    
+    idea_entry = {
+        "id": datetime.now().strftime("%Y%m%d_%H%M%S"),
+        "status": "pending",
+        "created_at": datetime.now().isoformat(),
+        **idea_data
+    }
+    
+    existing_ideas.append(idea_entry)
+    
+    # Keep only last 50 ideas
+    if len(existing_ideas) > 50:
+        existing_ideas = existing_ideas[-50:]
+    
+    with open(IDEAS_FILE, 'w') as f:
+        json.dump(existing_ideas, f, indent=2)
+    
+    print(f"💾 Saved idea: {idea_data.get('idea', {}).get('title', 'Untitled')}")
+    return idea_entry
 
 
 # =============================================================================
@@ -290,39 +333,68 @@ def check_duplicate(idea, existing_ideas, threshold=0.8):
 # =============================================================================
 def main():
     print("=" * 60)
-    print("🌌 ASTRO SHORTS ENGINE - Smart Idea Generator")
-    print("   Now powered by analytics! 📊")
+    print("🎬 V5 Idea Generator")
     print("=" * 60)
-    print()
     
-    # Check for strategy file
-    if os.path.exists(STRATEGY_FILE):
-        print("📊 Analytics data found - using smart selection")
+    # Load strategy
+    strategy = load_strategy()
+    if strategy:
+        print(f"📊 Strategy loaded: {len(strategy.get('top_performing_families', []))} top families")
     else:
-        print("📊 No analytics yet - using balanced selection")
+        print("📊 No strategy file, using default topics")
     
-    print()
+    # Get topic hint
+    topic_hint, reason = get_topic_hint(strategy)
+    print(f"💡 Topic: {topic_hint}")
+    print(f"   Reason: {reason}")
+    
+    # Build strategy context for prompt
+    strategy_context = ""
+    if strategy:
+        top = strategy.get("top_performing_families", [])
+        if top:
+            strategy_context = f"Your best performing topics are: {', '.join(top[:3])}. "
+        avoid = strategy.get("underperforming_topics", [])
+        if avoid:
+            strategy_context += f"Avoid topics like: {', '.join(avoid[:3])}."
+    
+    # Load existing ideas
+    existing_ideas = load_existing_ideas()
     
     # Generate idea
-    idea = generate_idea()
+    idea_data = generate_idea(topic_hint, strategy_context)
     
-    if idea:
-        # Check for duplicates
-        existing = load_ideas()
-        if check_duplicate(idea, existing):
-            print("⚠️ Similar idea exists, generating another...")
-            idea = generate_idea()
+    if not idea_data:
+        print("❌ Failed to generate idea")
+        return
+    
+    # Check for duplicates
+    new_topic = idea_data.get("idea", {}).get("topic", "")
+    if is_duplicate(new_topic, existing_ideas):
+        print(f"⚠️ Topic too similar to recent ideas, regenerating...")
+        # Try once more with different topic
+        topic_hint, reason = get_topic_hint(strategy)
+        idea_data = generate_idea(topic_hint, strategy_context)
         
-        if idea:
-            save_idea(idea)
-            print()
-            print("=" * 60)
-            print("🎬 Idea ready for script formatting!")
-            print("=" * 60)
-    else:
-        print()
-        print("❌ Failed to generate idea. Check errors above.")
-        exit(1)
+        if not idea_data:
+            print("❌ Failed to generate unique idea")
+            return
+    
+    # Save
+    save_idea(idea_data, existing_ideas)
+    
+    # Print summary
+    print()
+    print("📋 Generated Idea:")
+    print("-" * 50)
+    print(f"   Title: {idea_data.get('idea', {}).get('title', 'N/A')}")
+    print(f"   Topic: {idea_data.get('idea', {}).get('topic', 'N/A')}")
+    print(f"   Mood: {idea_data.get('metadata', {}).get('mood', 'N/A')}")
+    print(f"   Scenes: {len(idea_data.get('timeline', []))}")
+    print("-" * 50)
+    
+    print()
+    print("✅ Done!")
 
 
 if __name__ == "__main__":
