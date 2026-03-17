@@ -1,0 +1,88 @@
+{
+  "idea": {
+    "topic": "The Scale of Interstellar Travel",
+    "topic_family": "travel_time",
+    "hook": "Think Voyager 1 is leaving the Solar System fast?",
+    "facts": [
+      "Voyager 1, our fastest outgoing probe, travels at an incredible ~17 km/s (over 38,000 mph).",
+      "To truly exit our Solar System (reach the Oort Cloud's outer edge, ~100,000 AU away) would take Voyager 1 over 28,000 years.",
+      "At the speed of light, that same Oort Cloud journey takes under 1.6 years. Reaching the nearest star, Proxima Centauri (4.2 light-years), would take Voyager 1 over 75,000 years!"
+    ],
+    "payoff": "Interstellar travel at current speeds is a multi-generational quest, making light speed not just a goal, but a necessity for true exploration.",
+    "title": "Voyager's REAL Galactic Road Trip! \ud83d\ude80",
+    "hashtags": [
+      "#SpaceTravel",
+      "#Voyager1",
+      "#LightSpeed",
+      "#Interstellar",
+      "#Astrophysics"
+    ],
+    "generated_at": "2026-03-17T09:53:17.175516",
+    "status": "pending",
+    "strategy_based": true
+  },
+  "script": {
+    "total_duration": 20,
+    "scenes": [
+      {
+        "scene_number": 1,
+        "start_time": 0,
+        "duration": 3,
+        "text": "Think Voyager 1 is FAST?",
+        "text_position": "center",
+        "text_size": "large",
+        "visual": "Distant shot of Voyager 1 probe leaving Earth's vicinity, small dot against a starry background. A subtle arrow indicates its outward path.",
+        "animation": "fade_in"
+      },
+      {
+        "scene_number": 2,
+        "start_time": 3,
+        "duration": 4,
+        "text": "It travels ~17 km/s (38,000+ mph).",
+        "text_position": "center",
+        "text_size": "medium",
+        "visual": "Text appears over a graphic showing a stylized speedometer or speed lines with a small Voyager 1 icon, accelerating rapidly across the screen.",
+        "animation": "zoom_in"
+      },
+      {
+        "scene_number": 3,
+        "start_time": 7,
+        "duration": 4,
+        "text": "To Oort Cloud edge (~100k AU): 28,000+ years for Voyager 1.",
+        "text_position": "center",
+        "text_size": "medium",
+        "visual": "Infographic showing a vast expanse with a tiny, slow-moving dot representing Voyager 1 and a distant, faded ring representing the Oort Cloud. A digital timer graphic rapidly counts upwards.",
+        "animation": "slide_left"
+      },
+      {
+        "scene_number": 4,
+        "start_time": 11,
+        "duration": 4,
+        "text": "At light speed, Oort Cloud: <1.6 years. Nearest star (4.2 LY): 4.2 years.",
+        "text_position": "center",
+        "text_size": "medium",
+        "visual": "A brilliant, glowing beam of light streaks across the screen from left to right, quickly passing distant stars. Text appears quickly, emphasizing speed.",
+        "animation": "slide_right"
+      },
+      {
+        "scene_number": 5,
+        "start_time": 15,
+        "duration": 5,
+        "text": "Voyager 1 to Proxima Centauri: 75,000+ years! Light speed is a necessity.",
+        "text_position": "center",
+        "text_size": "large",
+        "animation": "pulse",
+        "visual": "A dramatic split screen. Left side: Faint, struggling Voyager 1 with a massive, daunting '75,000+ YEARS' ticker. Right side: A brilliant, inviting tunnel of light with 'LIGHT SPEED: A NECESSITY!' text. Both sides converge slightly.",
+        "text_color": "#FFFFFF",
+        "background_color": "#000000"
+      }
+    ],
+    "thumbnail_text": "Interstellar Travel: The TRUE Scale",
+    "background_style": "space_stars"
+  },
+  "formatted_at": "2026-03-17T09:53:31.975108",
+  "status": "ready_to_render",
+  "scenes": [],
+  "rendered": true,
+  "rendered_at": "2026-03-17T10:02:54.931648"
+}

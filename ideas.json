@@ -67,5 +67,28 @@
     "status": "formatted",
     "strategy_based": true,
     "formatted_at": "2026-03-17T01:08:55.658669"
+  },
+  {
+    "topic": "The Scale of Interstellar Travel",
+    "topic_family": "travel_time",
+    "hook": "Think Voyager 1 is leaving the Solar System fast?",
+    "facts": [
+      "Voyager 1, our fastest outgoing probe, travels at an incredible ~17 km/s (over 38,000 mph).",
+      "To truly exit our Solar System (reach the Oort Cloud's outer edge, ~100,000 AU away) would take Voyager 1 over 28,000 years.",
+      "At the speed of light, that same Oort Cloud journey takes under 1.6 years. Reaching the nearest star, Proxima Centauri (4.2 light-years), would take Voyager 1 over 75,000 years!"
+    ],
+    "payoff": "Interstellar travel at current speeds is a multi-generational quest, making light speed not just a goal, but a necessity for true exploration.",
+    "title": "Voyager's REAL Galactic Road Trip! \ud83d\ude80",
+    "hashtags": [
+      "#SpaceTravel",
+      "#Voyager1",
+      "#LightSpeed",
+      "#Interstellar",
+      "#Astrophysics"
+    ],
+    "generated_at": "2026-03-17T09:53:17.175516",
+    "status": "formatted",
+    "strategy_based": true,
+    "formatted_at": "2026-03-17T09:53:31.975328"
   }
 ]
