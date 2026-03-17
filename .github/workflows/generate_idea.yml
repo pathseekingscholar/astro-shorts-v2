@@ -43,6 +43,8 @@ jobs:
         run: python scripts/script_formatter.py
       
       - name: Render video
+        env:
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
         run: python scripts/video_renderer.py
       
       - name: Upload to YouTube
