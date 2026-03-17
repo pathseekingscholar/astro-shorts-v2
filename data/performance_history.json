@@ -10,7 +10,7 @@
       "comments": 0
     },
     "performance_score": 0.83,
-    "analyzed_at": "2026-03-16T20:39:12.676420"
+    "analyzed_at": "2026-03-17T07:00:59.095102"
   },
   {
     "video_id": "ESSVmyUwSyE",
@@ -23,7 +23,7 @@
       "comments": 0
     },
     "performance_score": 0.93,
-    "analyzed_at": "2026-03-16T20:39:12.832868"
+    "analyzed_at": "2026-03-17T07:00:59.244139"
   },
   {
     "video_id": "GB_oeU19ivg",
@@ -36,7 +36,7 @@
       "comments": 0
     },
     "performance_score": 0.85,
-    "analyzed_at": "2026-03-16T20:39:12.973192"
+    "analyzed_at": "2026-03-17T07:00:59.377261"
   },
   {
     "video_id": "qLuBehE4GU4",
@@ -49,7 +49,7 @@
       "comments": 1
     },
     "performance_score": 1.15,
-    "analyzed_at": "2026-03-16T20:39:13.137430"
+    "analyzed_at": "2026-03-17T07:00:59.503096"
   },
   {
     "video_id": "hP0Dc-hOuNs",
@@ -62,7 +62,7 @@
       "comments": 0
     },
     "performance_score": 1.05,
-    "analyzed_at": "2026-03-16T20:39:13.281166"
+    "analyzed_at": "2026-03-17T07:00:59.643479"
   },
   {
     "video_id": "XIGFcqjrKko",
@@ -75,7 +75,7 @@
       "comments": 0
     },
     "performance_score": 1.05,
-    "analyzed_at": "2026-03-16T20:39:13.427516"
+    "analyzed_at": "2026-03-17T07:00:59.783198"
   },
   {
     "video_id": "5aGx8BicCzw",
@@ -88,7 +88,7 @@
       "comments": 0
     },
     "performance_score": 1.05,
-    "analyzed_at": "2026-03-16T20:39:13.550153"
+    "analyzed_at": "2026-03-17T07:00:59.921380"
   },
   {
     "video_id": "ThnoD685ha4",
@@ -101,7 +101,7 @@
       "comments": 0
     },
     "performance_score": 0.89,
-    "analyzed_at": "2026-03-16T20:39:13.684808"
+    "analyzed_at": "2026-03-17T07:01:00.062548"
   },
   {
     "video_id": "Bm_aXj8dJzQ",
@@ -114,7 +114,7 @@
       "comments": 1
     },
     "performance_score": 1.03,
-    "analyzed_at": "2026-03-16T20:39:13.816859"
+    "analyzed_at": "2026-03-17T07:01:00.200639"
   },
   {
     "video_id": "AILFpBqXYLs",
@@ -127,7 +127,7 @@
       "comments": 3
     },
     "performance_score": 1.31,
-    "analyzed_at": "2026-03-16T20:39:13.944731"
+    "analyzed_at": "2026-03-17T07:01:00.341863"
   },
   {
     "video_id": "ZdZxU24nbd4",
@@ -140,7 +140,7 @@
       "comments": 1
     },
     "performance_score": 1.15,
-    "analyzed_at": "2026-03-16T20:39:14.074817"
+    "analyzed_at": "2026-03-17T07:01:00.481519"
   },
   {
     "video_id": "s431oCOfGVc",
@@ -153,7 +153,7 @@
       "comments": 1
     },
     "performance_score": 0.99,
-    "analyzed_at": "2026-03-16T20:39:14.206542"
+    "analyzed_at": "2026-03-17T07:01:00.620779"
   },
   {
     "video_id": "xk5zYNmX5WM",
@@ -166,7 +166,7 @@
       "comments": 1
     },
     "performance_score": 1.09,
-    "analyzed_at": "2026-03-16T20:39:14.322265"
+    "analyzed_at": "2026-03-17T07:01:00.763791"
   },
   {
     "video_id": "WsLulVyqGRc",
@@ -179,7 +179,7 @@
       "comments": 2
     },
     "performance_score": 1.13,
-    "analyzed_at": "2026-03-16T20:39:14.461023"
+    "analyzed_at": "2026-03-17T07:01:00.902104"
   },
   {
     "video_id": "m4pJELAxzNI",
@@ -192,7 +192,7 @@
       "comments": 0
     },
     "performance_score": 1.05,
-    "analyzed_at": "2026-03-16T20:39:14.608462"
+    "analyzed_at": "2026-03-17T07:01:01.043774"
   },
   {
     "video_id": "jfhhJDMMsb4",
@@ -200,12 +200,12 @@
     "published_at": "2025-12-29T15:10:27Z",
     "topic_family": "general",
     "metrics": {
-      "views": 1854,
+      "views": 1855,
       "likes": 34,
       "comments": 0
     },
     "performance_score": 1.05,
-    "analyzed_at": "2026-03-16T20:39:14.742751"
+    "analyzed_at": "2026-03-17T07:01:01.183580"
   },
   {
     "video_id": "JzP8C4NDQS8",
@@ -218,7 +218,7 @@
       "comments": 0
     },
     "performance_score": 0.0,
-    "analyzed_at": "2026-03-16T20:39:14.878311"
+    "analyzed_at": "2026-03-17T07:01:01.328743"
   },
   {
     "video_id": "GWyi2DeGw_s",
@@ -258,5 +258,44 @@
     },
     "performance_score": 0.013,
     "analyzed_at": "2026-03-16T20:39:15.309118"
+  },
+  {
+    "video_id": "FqA5Hr7kPng",
+    "title": "Astrophysics Facts #Shorts",
+    "published_at": "2026-03-17T05:35:47Z",
+    "topic_family": "planetary_facts",
+    "metrics": {
+      "views": 240,
+      "likes": 0,
+      "comments": 0
+    },
+    "performance_score": 0.6,
+    "analyzed_at": "2026-03-17T07:00:58.669808"
+  },
+  {
+    "video_id": "rg448PN96Zs",
+    "title": "Astrophysics Facts #Shorts",
+    "published_at": "2026-03-17T01:20:20Z",
+    "topic_family": "planetary_facts",
+    "metrics": {
+      "views": 271,
+      "likes": 0,
+      "comments": 0
+    },
+    "performance_score": 0.677,
+    "analyzed_at": "2026-03-17T07:00:58.807645"
+  },
+  {
+    "video_id": "KRHlp44zJq8",
+    "title": "Astrophysics Facts #Shorts",
+    "published_at": "2026-03-16T21:21:57Z",
+    "topic_family": "planetary_facts",
+    "metrics": {
+      "views": 248,
+      "likes": 2,
+      "comments": 0
+    },
+    "performance_score": 0.66,
+    "analyzed_at": "2026-03-17T07:00:58.950958"
   }
 ]
