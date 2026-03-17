@@ -292,5 +292,208 @@
       }
     ],
     "formatted_at": "2026-03-17T16:40:20.369272"
+  },
+  {
+    "id": "20260317_193158",
+    "status": "formatted",
+    "created_at": "2026-03-17T19:31:58.865968",
+    "idea": {
+      "topic": "Neutron star teaspoon weight",
+      "hook": "Ever wonder what a spoonful of pure IMPOSSIBLE feels like?",
+      "title": "Teaspoon of Neutron Star: HOW HEAVY?!",
+      "description": "Prepare for your mind to be blown! Discover the unimaginable density of a neutron star in just one tiny teaspoon. You won't believe the numbers!",
+      "tags": [
+        "space",
+        "astrophysics",
+        "science",
+        "neutron_star",
+        "gravity",
+        "extreme",
+        "density",
+        "universe",
+        "mind_blown"
+      ],
+      "topic_family": "stars"
+    },
+    "metadata": {
+      "mood": "mind-blowing",
+      "music_style": "epic",
+      "background_search": "deep space nebula starfield"
+    },
+    "timeline": [
+      {
+        "time_start": 0.0,
+        "time_end": 4.0,
+        "layers": [
+          {
+            "type": "earth",
+            "name": "earth",
+            "position": "center",
+            "size": "large",
+            "expression": "thinking",
+            "entry_animation": "pop_in",
+            "effects": [
+              "idle_bounce"
+            ]
+          }
+        ],
+        "text": {
+          "content": "What's the HEAVIEST thing you can IMAGINE?",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 4.0,
+        "time_end": 8.0,
+        "layers": [
+          {
+            "type": "earth",
+            "name": "earth",
+            "position": "left",
+            "size": "small",
+            "expression": "smug",
+            "entry_animation": "slide_from_left",
+            "effects": [
+              "idle_bounce"
+            ]
+          },
+          {
+            "type": "jupiter",
+            "name": "jupiter",
+            "position": "right",
+            "size": "large",
+            "expression": "looking_left",
+            "entry_animation": "slide_from_right",
+            "effects": [
+              "pulse"
+            ]
+          }
+        ],
+        "text": {
+          "content": "Even Jupiter's not THIS DENSE!",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 8.0,
+        "time_end": 12.0,
+        "layers": [
+          {
+            "type": "neutron_star",
+            "name": "neutron_star",
+            "position": "center",
+            "size": "huge",
+            "expression": "shocked",
+            "entry_animation": "zoom_in",
+            "effects": [
+              "glow",
+              "pulse"
+            ]
+          },
+          {
+            "type": "earth",
+            "name": "earth",
+            "position": "bottom_right",
+            "size": "tiny",
+            "expression": "scared",
+            "entry_animation": "pop_in",
+            "effects": [
+              "shake"
+            ]
+          }
+        ],
+        "text": {
+          "content": "A SINGLE TEASPOON weighs SIX BILLION TONS!",
+          "position": "top",
+          "style": "slam_in"
+        },
+        "screen_effects": [
+          "camera_shake",
+          "flash"
+        ],
+        "dramatic_moment": true
+      },
+      {
+        "time_start": 12.0,
+        "time_end": 16.0,
+        "layers": [
+          {
+            "type": "neutron_star",
+            "name": "neutron_star",
+            "position": "center",
+            "size": "large",
+            "expression": "neutral",
+            "entry_animation": "fade_in",
+            "effects": [
+              "pulse",
+              "glow"
+            ]
+          },
+          {
+            "type": "jupiter",
+            "name": "jupiter",
+            "position": "bottom_right",
+            "size": "small",
+            "expression": "shocked",
+            "entry_animation": "pop_in",
+            "effects": [
+              "shake"
+            ]
+          }
+        ],
+        "text": {
+          "content": "That's MORE than all the cars on Earth!",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [
+          "vignette_pulse"
+        ],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 16.0,
+        "time_end": 20.0,
+        "layers": [
+          {
+            "type": "neutron_star",
+            "name": "neutron_star",
+            "position": "center",
+            "size": "medium",
+            "expression": "glow",
+            "entry_animation": "bounce_in",
+            "effects": [
+              "glow",
+              "vibrate"
+            ]
+          },
+          {
+            "type": "mars",
+            "name": "mars",
+            "position": "bottom_left",
+            "size": "tiny",
+            "expression": "scared",
+            "entry_animation": "pop_in",
+            "effects": [
+              "shake"
+            ]
+          }
+        ],
+        "text": {
+          "content": "A dead star's remnant! Mind BLOWN!",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      }
+    ],
+    "formatted_at": "2026-03-17T19:31:59.028049"
   }
 ]
