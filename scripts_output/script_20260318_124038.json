@@ -1,24 +1,26 @@
 {
   "idea": {
-    "topic": "Temperature at the Sun's Core",
-    "hook": "How hot can things REALLY get?",
-    "title": "Sun's Core: 15 Million \u00b0C! \ud83d\udd25",
-    "description": "Ever wonder how hot the Sun's heart is? Prepare to have your mind blown by the extreme temperatures driving our star!",
+    "topic": "Mars vs Earth Comparison: The Harsh Reality",
+    "hook": "Ever wonder what makes Earth so special compared to Mars?",
+    "title": "Earth vs Mars: Mind-Blowing Facts!",
+    "description": "Mars looks cool, but Earth is a paradise! Discover the extreme differences in size, atmosphere, gravity, and temperature that make our home planet truly unique. Prepare to be shocked!",
     "tags": [
       "space",
       "astrophysics",
       "science",
-      "sun",
-      "stars",
-      "temperature",
+      "mars",
+      "earth",
+      "planets",
+      "comparison",
+      "facts",
       "mindblown"
     ],
-    "topic_family": "stars"
+    "topic_family": "scale"
   },
   "metadata": {
     "mood": "mind-blowing",
     "music_style": "epic",
-    "background_search": "deep space galaxy nebula"
+    "background_search": "deep space galaxy nebula with red tint"
   },
   "timeline": [
     {
@@ -38,7 +40,7 @@
         }
       ],
       "text": {
-        "content": "Ever wonder just how HOT 'hot' can get?",
+        "content": "Ever wonder how different Mars REALLY is?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -51,10 +53,10 @@
       "layers": [
         {
           "type": "planet",
-          "name": "venus",
+          "name": "mars",
           "position": "right",
-          "size": "large",
-          "expression": "smug",
+          "size": "medium",
+          "expression": "neutral",
           "entry_animation": "slide_from_right",
           "effects": [
             "pulse"
@@ -64,16 +66,16 @@
           "type": "planet",
           "name": "earth",
           "position": "left",
-          "size": "small",
-          "expression": "scared",
+          "size": "large",
+          "expression": "looking_right",
           "entry_animation": "none",
           "effects": []
         }
       ],
       "text": {
-        "content": "Hottest planet, Venus? 462\u00b0C. Toasty.",
+        "content": "Earth is 9X MORE MASSIVE!",
         "position": "top",
-        "style": "word_by_word"
+        "style": "slam_in"
       },
       "screen_effects": [],
       "dramatic_moment": false
@@ -84,41 +86,14 @@
       "layers": [
         {
           "type": "planet",
-          "name": "sun",
+          "name": "mars",
           "position": "center",
           "size": "huge",
-          "expression": "neutral",
+          "expression": "angry",
           "entry_animation": "zoom_in",
           "effects": [
             "glow",
-            "pulse"
-          ]
-        }
-      ],
-      "text": {
-        "content": "The Sun's surface? A scorching 5,500\u00b0C!",
-        "position": "top",
-        "style": "slam_in"
-      },
-      "screen_effects": [
-        "flash"
-      ],
-      "dramatic_moment": true
-    },
-    {
-      "time_start": 12.0,
-      "time_end": 16.0,
-      "layers": [
-        {
-          "type": "planet",
-          "name": "sun",
-          "position": "center",
-          "size": "huge",
-          "expression": "shocked",
-          "entry_animation": "none",
-          "effects": [
-            "glow",
-            "vibrate"
+            "shake"
           ]
         },
         {
@@ -134,15 +109,52 @@
         }
       ],
       "text": {
-        "content": "BUT ITS CORE? A WHOPPING 15,000,000\u00b0C!",
+        "content": "Its atmosphere is 100X THINNER!",
         "position": "top",
         "style": "slam_in"
       },
       "screen_effects": [
         "camera_shake",
-        "chromatic_aberration"
+        "flash"
       ],
       "dramatic_moment": true
+    },
+    {
+      "time_start": 12.0,
+      "time_end": 16.0,
+      "layers": [
+        {
+          "type": "planet",
+          "name": "mars",
+          "position": "center",
+          "size": "large",
+          "expression": "dead",
+          "entry_animation": "fade_in",
+          "effects": [
+            "wobble"
+          ]
+        },
+        {
+          "type": "planet",
+          "name": "earth",
+          "position": "bottom_left",
+          "size": "small",
+          "expression": "sad",
+          "entry_animation": "pop_in",
+          "effects": [
+            "idle_bounce"
+          ]
+        }
+      ],
+      "text": {
+        "content": "Global average temp: -63\u00b0C! BRRR!",
+        "position": "top",
+        "style": "word_by_word"
+      },
+      "screen_effects": [
+        "vignette_pulse"
+      ],
+      "dramatic_moment": false
     },
     {
       "time_start": 16.0,
@@ -153,37 +165,44 @@
           "name": "earth",
           "position": "center",
           "size": "medium",
-          "expression": "excited",
+          "expression": "happy",
           "entry_animation": "bounce_in",
           "effects": [
-            "idle_bounce"
+            "idle_bounce",
+            "glow"
           ]
         },
         {
           "type": "planet",
           "name": "mars",
-          "position": "bottom_left",
-          "size": "small",
-          "expression": "looking_right",
-          "entry_animation": "fade_in",
+          "position": "top_right",
+          "size": "tiny",
+          "expression": "neutral",
+          "entry_animation": "slide_from_right",
           "effects": [
             "float"
           ]
         }
       ],
       "text": {
-        "content": "That's hotter than 2,700,000 Venus's combined! Mind blown?!",
+        "content": "Appreciate Earth's WARM embrace!",
         "position": "top",
         "style": "word_by_word"
       },
-      "screen_effects": [
-        "vignette_pulse"
-      ],
+      "screen_effects": [],
       "dramatic_moment": false
     }
   ],
-  "formatted_at": "2026-03-18T05:57:23.125397",
+  "formatted_at": "2026-03-18T12:40:38.298084",
   "rendered": true,
-  "rendered_at": "2026-03-18T06:03:55.404691",
-  "video_path": "videos_output/script_20260318_055722.mp4"
+  "rendered_at": "2026-03-18T12:45:56.699839",
+  "video_path": "videos_output/script_20260318_124038.mp4",
+  "status": "uploaded",
+  "uploaded_at": "2026-03-18T12:45:58.843596",
+  "youtube": {
+    "video_id": "DESzDN8YREI",
+    "url": "https://youtube.com/shorts/DESzDN8YREI",
+    "title": "Earth vs Mars: Mind-Blowing Facts!",
+    "uploaded_at": "2026-03-18T12:45:58.843453"
+  }
 }
