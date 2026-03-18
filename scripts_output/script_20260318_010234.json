@@ -1,26 +1,25 @@
 {
   "idea": {
-    "topic": "Neutron star teaspoon weight",
-    "hook": "Ever wonder what a spoonful of pure IMPOSSIBLE feels like?",
-    "title": "Teaspoon of Neutron Star: HOW HEAVY?!",
-    "description": "Prepare for your mind to be blown! Discover the unimaginable density of a neutron star in just one tiny teaspoon. You won't believe the numbers!",
+    "topic": "Distance to the edge of the universe (observable)",
+    "hook": "How far is the edge of the universe?",
+    "title": "Edge of Universe: 93 Billion LY?",
+    "description": "\ud83e\udd2f How far is the *observable* universe? It's NOT 13.8 billion light-years! Get ready for mind-blowing scale!",
     "tags": [
       "space",
       "astrophysics",
       "science",
-      "neutron_star",
-      "gravity",
-      "extreme",
-      "density",
       "universe",
-      "mind_blown"
+      "cosmology",
+      "lightspeed",
+      "observableuniverse",
+      "bigbang"
     ],
-    "topic_family": "stars"
+    "topic_family": "distances"
   },
   "metadata": {
     "mood": "mind-blowing",
     "music_style": "epic",
-    "background_search": "deep space nebula starfield"
+    "background_search": "deep space galaxy nebula"
   },
   "timeline": [
     {
@@ -28,7 +27,7 @@
       "time_end": 4.0,
       "layers": [
         {
-          "type": "earth",
+          "type": "planet",
           "name": "earth",
           "position": "center",
           "size": "large",
@@ -40,7 +39,7 @@
         }
       ],
       "text": {
-        "content": "What's the HEAVIEST thing you can IMAGINE?",
+        "content": "How far is the edge of the universe?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -52,30 +51,28 @@
       "time_end": 8.0,
       "layers": [
         {
-          "type": "earth",
+          "type": "planet",
           "name": "earth",
           "position": "left",
-          "size": "small",
-          "expression": "smug",
+          "size": "medium",
+          "expression": "looking_right",
           "entry_animation": "slide_from_left",
           "effects": [
             "idle_bounce"
           ]
         },
         {
-          "type": "jupiter",
-          "name": "jupiter",
+          "type": "planet",
+          "name": "neptune",
           "position": "right",
-          "size": "large",
-          "expression": "looking_left",
+          "size": "medium",
+          "expression": "neutral",
           "entry_animation": "slide_from_right",
-          "effects": [
-            "pulse"
-          ]
+          "effects": []
         }
       ],
       "text": {
-        "content": "Even Jupiter's not THIS DENSE!",
+        "content": "Earth to Neptune: 4.5 BILLION km!",
         "position": "top",
         "style": "word_by_word"
       },
@@ -87,11 +84,11 @@
       "time_end": 12.0,
       "layers": [
         {
-          "type": "neutron_star",
-          "name": "neutron_star",
+          "type": "planet",
+          "name": "sun",
           "position": "center",
           "size": "huge",
-          "expression": "shocked",
+          "expression": "thinking",
           "entry_animation": "zoom_in",
           "effects": [
             "glow",
@@ -99,7 +96,7 @@
           ]
         },
         {
-          "type": "earth",
+          "type": "planet",
           "name": "earth",
           "position": "bottom_right",
           "size": "tiny",
@@ -111,7 +108,7 @@
         }
       ],
       "text": {
-        "content": "A SINGLE TEASPOON weighs SIX BILLION TONS!",
+        "content": "Universe is 13.8 BILLION years old... so that's its edge, right?",
         "position": "top",
         "style": "slam_in"
       },
@@ -126,36 +123,47 @@
       "time_end": 16.0,
       "layers": [
         {
-          "type": "neutron_star",
-          "name": "neutron_star",
+          "type": "planet",
+          "name": "black_hole",
           "position": "center",
-          "size": "large",
+          "size": "huge",
           "expression": "neutral",
           "entry_animation": "fade_in",
           "effects": [
-            "pulse",
-            "glow"
+            "pulse"
           ]
         },
         {
-          "type": "jupiter",
-          "name": "jupiter",
-          "position": "bottom_right",
-          "size": "small",
+          "type": "planet",
+          "name": "earth",
+          "position": "bottom_left",
+          "size": "tiny",
           "expression": "shocked",
           "entry_animation": "pop_in",
           "effects": [
             "shake"
           ]
+        },
+        {
+          "type": "planet",
+          "name": "mars",
+          "position": "top_right",
+          "size": "tiny",
+          "expression": "neutral",
+          "entry_animation": "fade_in",
+          "effects": [
+            "float"
+          ]
         }
       ],
       "text": {
-        "content": "That's MORE than all the cars on Earth!",
+        "content": "WRONG! Expansion means it's 93 BILLION light-years!",
         "position": "top",
-        "style": "word_by_word"
+        "style": "slam_in"
       },
       "screen_effects": [
-        "vignette_pulse"
+        "vignette_pulse",
+        "chromatic_aberration"
       ],
       "dramatic_moment": false
     },
@@ -164,31 +172,19 @@
       "time_end": 20.0,
       "layers": [
         {
-          "type": "neutron_star",
-          "name": "neutron_star",
+          "type": "planet",
+          "name": "earth",
           "position": "center",
           "size": "medium",
-          "expression": "glow",
+          "expression": "excited",
           "entry_animation": "bounce_in",
           "effects": [
-            "glow",
-            "vibrate"
-          ]
-        },
-        {
-          "type": "mars",
-          "name": "mars",
-          "position": "bottom_left",
-          "size": "tiny",
-          "expression": "scared",
-          "entry_animation": "pop_in",
-          "effects": [
-            "shake"
+            "idle_bounce"
           ]
         }
       ],
       "text": {
-        "content": "A dead star's remnant! Mind BLOWN!",
+        "content": "And it's expanding FASTER than light!",
         "position": "top",
         "style": "word_by_word"
       },
@@ -196,8 +192,8 @@
       "dramatic_moment": false
     }
   ],
-  "formatted_at": "2026-03-17T19:31:59.027254",
+  "formatted_at": "2026-03-18T01:02:34.858959",
   "rendered": true,
-  "rendered_at": "2026-03-17T19:37:39.353623",
-  "video_path": "videos_output/script_20260317_193158.mp4"
+  "rendered_at": "2026-03-18T01:10:20.108469",
+  "video_path": "videos_output/script_20260318_010234.mp4"
 }

@@ -495,5 +495,204 @@
       }
     ],
     "formatted_at": "2026-03-17T19:31:59.028049"
+  },
+  {
+    "id": "20260318_010234",
+    "status": "formatted",
+    "created_at": "2026-03-18T01:02:34.709962",
+    "idea": {
+      "topic": "Distance to the edge of the universe (observable)",
+      "hook": "How far is the edge of the universe?",
+      "title": "Edge of Universe: 93 Billion LY?",
+      "description": "\ud83e\udd2f How far is the *observable* universe? It's NOT 13.8 billion light-years! Get ready for mind-blowing scale!",
+      "tags": [
+        "space",
+        "astrophysics",
+        "science",
+        "universe",
+        "cosmology",
+        "lightspeed",
+        "observableuniverse",
+        "bigbang"
+      ],
+      "topic_family": "distances"
+    },
+    "metadata": {
+      "mood": "mind-blowing",
+      "music_style": "epic",
+      "background_search": "deep space galaxy nebula"
+    },
+    "timeline": [
+      {
+        "time_start": 0.0,
+        "time_end": 4.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "center",
+            "size": "large",
+            "expression": "thinking",
+            "entry_animation": "pop_in",
+            "effects": [
+              "idle_bounce"
+            ]
+          }
+        ],
+        "text": {
+          "content": "How far is the edge of the universe?",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 4.0,
+        "time_end": 8.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "left",
+            "size": "medium",
+            "expression": "looking_right",
+            "entry_animation": "slide_from_left",
+            "effects": [
+              "idle_bounce"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "neptune",
+            "position": "right",
+            "size": "medium",
+            "expression": "neutral",
+            "entry_animation": "slide_from_right",
+            "effects": []
+          }
+        ],
+        "text": {
+          "content": "Earth to Neptune: 4.5 BILLION km!",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 8.0,
+        "time_end": 12.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "sun",
+            "position": "center",
+            "size": "huge",
+            "expression": "thinking",
+            "entry_animation": "zoom_in",
+            "effects": [
+              "glow",
+              "pulse"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "bottom_right",
+            "size": "tiny",
+            "expression": "scared",
+            "entry_animation": "pop_in",
+            "effects": [
+              "shake"
+            ]
+          }
+        ],
+        "text": {
+          "content": "Universe is 13.8 BILLION years old... so that's its edge, right?",
+          "position": "top",
+          "style": "slam_in"
+        },
+        "screen_effects": [
+          "camera_shake",
+          "flash"
+        ],
+        "dramatic_moment": true
+      },
+      {
+        "time_start": 12.0,
+        "time_end": 16.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "black_hole",
+            "position": "center",
+            "size": "huge",
+            "expression": "neutral",
+            "entry_animation": "fade_in",
+            "effects": [
+              "pulse"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "bottom_left",
+            "size": "tiny",
+            "expression": "shocked",
+            "entry_animation": "pop_in",
+            "effects": [
+              "shake"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "mars",
+            "position": "top_right",
+            "size": "tiny",
+            "expression": "neutral",
+            "entry_animation": "fade_in",
+            "effects": [
+              "float"
+            ]
+          }
+        ],
+        "text": {
+          "content": "WRONG! Expansion means it's 93 BILLION light-years!",
+          "position": "top",
+          "style": "slam_in"
+        },
+        "screen_effects": [
+          "vignette_pulse",
+          "chromatic_aberration"
+        ],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 16.0,
+        "time_end": 20.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "center",
+            "size": "medium",
+            "expression": "excited",
+            "entry_animation": "bounce_in",
+            "effects": [
+              "idle_bounce"
+            ]
+          }
+        ],
+        "text": {
+          "content": "And it's expanding FASTER than light!",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      }
+    ],
+    "formatted_at": "2026-03-18T01:02:34.859497"
   }
 ]
