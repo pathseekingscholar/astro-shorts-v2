@@ -1083,5 +1083,227 @@
       }
     ],
     "formatted_at": "2026-03-18T12:40:38.298707"
+  },
+  {
+    "id": "20260318_184149",
+    "status": "formatted",
+    "created_at": "2026-03-18T18:41:49.553670",
+    "idea": {
+      "topic": "Jupiter's Great Red Spot Size",
+      "hook": "How big is Jupiter's Great Red Spot REALLY?",
+      "title": "Jupiter's Red Spot: Earth fits inside! \ud83e\udd2f",
+      "description": "The Great Red Spot isn't just a storm; it's a colossal vortex! Prepare to have your mind blown by its sheer scale and mind-boggling size. #Jupiter #GreatRedSpot #SpaceFacts #SolarSystem #Astrophysics",
+      "tags": [
+        "space",
+        "astrophysics",
+        "science",
+        "jupiter",
+        "redspot",
+        "scale",
+        "planets"
+      ],
+      "topic_family": "scale"
+    },
+    "metadata": {
+      "mood": "mind-blowing",
+      "music_style": "epic",
+      "background_search": "deep space galaxy nebula"
+    },
+    "timeline": [
+      {
+        "time_start": 0.0,
+        "time_end": 4.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "center",
+            "size": "large",
+            "expression": "thinking",
+            "entry_animation": "pop_in",
+            "effects": [
+              "idle_bounce"
+            ]
+          }
+        ],
+        "text": {
+          "content": "How big is Jupiter's Great Red Spot REALLY?",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 4.0,
+        "time_end": 8.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "jupiter",
+            "position": "right",
+            "size": "large",
+            "expression": "smug",
+            "entry_animation": "slide_from_right",
+            "effects": [
+              "pulse"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "left",
+            "size": "small",
+            "expression": "scared",
+            "entry_animation": "pop_in",
+            "effects": [
+              "shake"
+            ]
+          }
+        ],
+        "text": {
+          "content": "This storm is WIDER than our entire planet Earth!",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 8.0,
+        "time_end": 12.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "jupiter",
+            "position": "center",
+            "size": "huge",
+            "expression": "angry",
+            "entry_animation": "zoom_in",
+            "effects": [
+              "glow",
+              "pulse"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "bottom_right",
+            "size": "tiny",
+            "expression": "scared",
+            "entry_animation": "fade_in",
+            "effects": [
+              "shake"
+            ]
+          }
+        ],
+        "text": {
+          "content": "Over 16,000 KILOMETERS across!",
+          "position": "top",
+          "style": "slam_in"
+        },
+        "screen_effects": [
+          "camera_shake",
+          "flash",
+          "chromatic_aberration"
+        ],
+        "dramatic_moment": true
+      },
+      {
+        "time_start": 12.0,
+        "time_end": 16.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "jupiter",
+            "position": "left",
+            "size": "large",
+            "expression": "smug",
+            "entry_animation": "slide_from_left",
+            "effects": [
+              "pulse"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "center_right",
+            "size": "small",
+            "expression": "scared",
+            "entry_animation": "pop_in",
+            "effects": [
+              "shake"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "mars",
+            "position": "bottom_right",
+            "size": "tiny",
+            "expression": "scared",
+            "entry_animation": "pop_in",
+            "effects": [
+              "shake"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "venus",
+            "position": "top_right",
+            "size": "tiny",
+            "expression": "scared",
+            "entry_animation": "pop_in",
+            "effects": [
+              "shake"
+            ]
+          }
+        ],
+        "text": {
+          "content": "At its peak, it could SWALLOW 3 Earths!",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [
+          "vignette_pulse"
+        ],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 16.0,
+        "time_end": 20.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "jupiter",
+            "position": "center",
+            "size": "medium",
+            "expression": "neutral",
+            "entry_animation": "bounce_in",
+            "effects": [
+              "idle_bounce"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "sun",
+            "position": "top_right",
+            "size": "small",
+            "expression": "neutral",
+            "entry_animation": "fade_in",
+            "effects": [
+              "glow"
+            ]
+          }
+        ],
+        "text": {
+          "content": "Raging for 350+ YEARS! Mind BLOWN? \ud83e\udd2f",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      }
+    ],
+    "formatted_at": "2026-03-18T18:41:49.718846"
   }
 ]

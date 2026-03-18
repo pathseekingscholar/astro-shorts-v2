@@ -1,26 +1,24 @@
 {
   "idea": {
-    "topic": "Mars vs Earth Comparison: The Harsh Reality",
-    "hook": "Ever wonder what makes Earth so special compared to Mars?",
-    "title": "Earth vs Mars: Mind-Blowing Facts!",
-    "description": "Mars looks cool, but Earth is a paradise! Discover the extreme differences in size, atmosphere, gravity, and temperature that make our home planet truly unique. Prepare to be shocked!",
+    "topic": "Jupiter's Great Red Spot Size",
+    "hook": "How big is Jupiter's Great Red Spot REALLY?",
+    "title": "Jupiter's Red Spot: Earth fits inside! \ud83e\udd2f",
+    "description": "The Great Red Spot isn't just a storm; it's a colossal vortex! Prepare to have your mind blown by its sheer scale and mind-boggling size. #Jupiter #GreatRedSpot #SpaceFacts #SolarSystem #Astrophysics",
     "tags": [
       "space",
       "astrophysics",
       "science",
-      "mars",
-      "earth",
-      "planets",
-      "comparison",
-      "facts",
-      "mindblown"
+      "jupiter",
+      "redspot",
+      "scale",
+      "planets"
     ],
     "topic_family": "scale"
   },
   "metadata": {
     "mood": "mind-blowing",
     "music_style": "epic",
-    "background_search": "deep space galaxy nebula with red tint"
+    "background_search": "deep space galaxy nebula"
   },
   "timeline": [
     {
@@ -40,7 +38,7 @@
         }
       ],
       "text": {
-        "content": "Ever wonder how different Mars REALLY is?",
+        "content": "How big is Jupiter's Great Red Spot REALLY?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -53,10 +51,10 @@
       "layers": [
         {
           "type": "planet",
-          "name": "mars",
+          "name": "jupiter",
           "position": "right",
-          "size": "medium",
-          "expression": "neutral",
+          "size": "large",
+          "expression": "smug",
           "entry_animation": "slide_from_right",
           "effects": [
             "pulse"
@@ -66,16 +64,18 @@
           "type": "planet",
           "name": "earth",
           "position": "left",
-          "size": "large",
-          "expression": "looking_right",
-          "entry_animation": "none",
-          "effects": []
+          "size": "small",
+          "expression": "scared",
+          "entry_animation": "pop_in",
+          "effects": [
+            "shake"
+          ]
         }
       ],
       "text": {
-        "content": "Earth is 9X MORE MASSIVE!",
+        "content": "This storm is WIDER than our entire planet Earth!",
         "position": "top",
-        "style": "slam_in"
+        "style": "word_by_word"
       },
       "screen_effects": [],
       "dramatic_moment": false
@@ -86,14 +86,14 @@
       "layers": [
         {
           "type": "planet",
-          "name": "mars",
+          "name": "jupiter",
           "position": "center",
           "size": "huge",
           "expression": "angry",
           "entry_animation": "zoom_in",
           "effects": [
             "glow",
-            "shake"
+            "pulse"
           ]
         },
         {
@@ -102,20 +102,21 @@
           "position": "bottom_right",
           "size": "tiny",
           "expression": "scared",
-          "entry_animation": "pop_in",
+          "entry_animation": "fade_in",
           "effects": [
             "shake"
           ]
         }
       ],
       "text": {
-        "content": "Its atmosphere is 100X THINNER!",
+        "content": "Over 16,000 KILOMETERS across!",
         "position": "top",
         "style": "slam_in"
       },
       "screen_effects": [
         "camera_shake",
-        "flash"
+        "flash",
+        "chromatic_aberration"
       ],
       "dramatic_moment": true
     },
@@ -125,29 +126,51 @@
       "layers": [
         {
           "type": "planet",
-          "name": "mars",
-          "position": "center",
+          "name": "jupiter",
+          "position": "left",
           "size": "large",
-          "expression": "dead",
-          "entry_animation": "fade_in",
+          "expression": "smug",
+          "entry_animation": "slide_from_left",
           "effects": [
-            "wobble"
+            "pulse"
           ]
         },
         {
           "type": "planet",
           "name": "earth",
-          "position": "bottom_left",
+          "position": "center_right",
           "size": "small",
-          "expression": "sad",
+          "expression": "scared",
           "entry_animation": "pop_in",
           "effects": [
-            "idle_bounce"
+            "shake"
+          ]
+        },
+        {
+          "type": "planet",
+          "name": "mars",
+          "position": "bottom_right",
+          "size": "tiny",
+          "expression": "scared",
+          "entry_animation": "pop_in",
+          "effects": [
+            "shake"
+          ]
+        },
+        {
+          "type": "planet",
+          "name": "venus",
+          "position": "top_right",
+          "size": "tiny",
+          "expression": "scared",
+          "entry_animation": "pop_in",
+          "effects": [
+            "shake"
           ]
         }
       ],
       "text": {
-        "content": "Global average temp: -63\u00b0C! BRRR!",
+        "content": "At its peak, it could SWALLOW 3 Earths!",
         "position": "top",
         "style": "word_by_word"
       },
@@ -162,30 +185,29 @@
       "layers": [
         {
           "type": "planet",
-          "name": "earth",
+          "name": "jupiter",
           "position": "center",
           "size": "medium",
-          "expression": "happy",
+          "expression": "neutral",
           "entry_animation": "bounce_in",
           "effects": [
-            "idle_bounce",
-            "glow"
+            "idle_bounce"
           ]
         },
         {
           "type": "planet",
-          "name": "mars",
+          "name": "sun",
           "position": "top_right",
-          "size": "tiny",
+          "size": "small",
           "expression": "neutral",
-          "entry_animation": "slide_from_right",
+          "entry_animation": "fade_in",
           "effects": [
-            "float"
+            "glow"
           ]
         }
       ],
       "text": {
-        "content": "Appreciate Earth's WARM embrace!",
+        "content": "Raging for 350+ YEARS! Mind BLOWN? \ud83e\udd2f",
         "position": "top",
         "style": "word_by_word"
       },
@@ -193,16 +215,8 @@
       "dramatic_moment": false
     }
   ],
-  "formatted_at": "2026-03-18T12:40:38.298084",
+  "formatted_at": "2026-03-18T18:41:49.718219",
   "rendered": true,
-  "rendered_at": "2026-03-18T12:45:56.699839",
-  "video_path": "videos_output/script_20260318_124038.mp4",
-  "status": "uploaded",
-  "uploaded_at": "2026-03-18T12:45:58.843596",
-  "youtube": {
-    "video_id": "DESzDN8YREI",
-    "url": "https://youtube.com/shorts/DESzDN8YREI",
-    "title": "Earth vs Mars: Mind-Blowing Facts!",
-    "uploaded_at": "2026-03-18T12:45:58.843453"
-  }
+  "rendered_at": "2026-03-18T18:47:39.182974",
+  "video_path": "videos_output/script_20260318_184149.mp4"
 }
