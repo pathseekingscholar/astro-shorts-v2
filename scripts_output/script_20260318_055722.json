@@ -1,20 +1,19 @@
 {
   "idea": {
-    "topic": "Distance to the edge of the universe (observable)",
-    "hook": "How far is the edge of the universe?",
-    "title": "Edge of Universe: 93 Billion LY?",
-    "description": "\ud83e\udd2f How far is the *observable* universe? It's NOT 13.8 billion light-years! Get ready for mind-blowing scale!",
+    "topic": "Temperature at the Sun's Core",
+    "hook": "How hot can things REALLY get?",
+    "title": "Sun's Core: 15 Million \u00b0C! \ud83d\udd25",
+    "description": "Ever wonder how hot the Sun's heart is? Prepare to have your mind blown by the extreme temperatures driving our star!",
     "tags": [
       "space",
       "astrophysics",
       "science",
-      "universe",
-      "cosmology",
-      "lightspeed",
-      "observableuniverse",
-      "bigbang"
+      "sun",
+      "stars",
+      "temperature",
+      "mindblown"
     ],
-    "topic_family": "distances"
+    "topic_family": "stars"
   },
   "metadata": {
     "mood": "mind-blowing",
@@ -39,7 +38,7 @@
         }
       ],
       "text": {
-        "content": "How far is the edge of the universe?",
+        "content": "Ever wonder just how HOT 'hot' can get?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -52,27 +51,27 @@
       "layers": [
         {
           "type": "planet",
-          "name": "earth",
-          "position": "left",
-          "size": "medium",
-          "expression": "looking_right",
-          "entry_animation": "slide_from_left",
+          "name": "venus",
+          "position": "right",
+          "size": "large",
+          "expression": "smug",
+          "entry_animation": "slide_from_right",
           "effects": [
-            "idle_bounce"
+            "pulse"
           ]
         },
         {
           "type": "planet",
-          "name": "neptune",
-          "position": "right",
-          "size": "medium",
-          "expression": "neutral",
-          "entry_animation": "slide_from_right",
+          "name": "earth",
+          "position": "left",
+          "size": "small",
+          "expression": "scared",
+          "entry_animation": "none",
           "effects": []
         }
       ],
       "text": {
-        "content": "Earth to Neptune: 4.5 BILLION km!",
+        "content": "Hottest planet, Venus? 462\u00b0C. Toasty.",
         "position": "top",
         "style": "word_by_word"
       },
@@ -88,11 +87,38 @@
           "name": "sun",
           "position": "center",
           "size": "huge",
-          "expression": "thinking",
+          "expression": "neutral",
           "entry_animation": "zoom_in",
           "effects": [
             "glow",
             "pulse"
+          ]
+        }
+      ],
+      "text": {
+        "content": "The Sun's surface? A scorching 5,500\u00b0C!",
+        "position": "top",
+        "style": "slam_in"
+      },
+      "screen_effects": [
+        "flash"
+      ],
+      "dramatic_moment": true
+    },
+    {
+      "time_start": 12.0,
+      "time_end": 16.0,
+      "layers": [
+        {
+          "type": "planet",
+          "name": "sun",
+          "position": "center",
+          "size": "huge",
+          "expression": "shocked",
+          "entry_animation": "none",
+          "effects": [
+            "glow",
+            "vibrate"
           ]
         },
         {
@@ -108,64 +134,15 @@
         }
       ],
       "text": {
-        "content": "Universe is 13.8 BILLION years old... so that's its edge, right?",
+        "content": "BUT ITS CORE? A WHOPPING 15,000,000\u00b0C!",
         "position": "top",
         "style": "slam_in"
       },
       "screen_effects": [
         "camera_shake",
-        "flash"
-      ],
-      "dramatic_moment": true
-    },
-    {
-      "time_start": 12.0,
-      "time_end": 16.0,
-      "layers": [
-        {
-          "type": "planet",
-          "name": "black_hole",
-          "position": "center",
-          "size": "huge",
-          "expression": "neutral",
-          "entry_animation": "fade_in",
-          "effects": [
-            "pulse"
-          ]
-        },
-        {
-          "type": "planet",
-          "name": "earth",
-          "position": "bottom_left",
-          "size": "tiny",
-          "expression": "shocked",
-          "entry_animation": "pop_in",
-          "effects": [
-            "shake"
-          ]
-        },
-        {
-          "type": "planet",
-          "name": "mars",
-          "position": "top_right",
-          "size": "tiny",
-          "expression": "neutral",
-          "entry_animation": "fade_in",
-          "effects": [
-            "float"
-          ]
-        }
-      ],
-      "text": {
-        "content": "WRONG! Expansion means it's 93 BILLION light-years!",
-        "position": "top",
-        "style": "slam_in"
-      },
-      "screen_effects": [
-        "vignette_pulse",
         "chromatic_aberration"
       ],
-      "dramatic_moment": false
+      "dramatic_moment": true
     },
     {
       "time_start": 16.0,
@@ -181,19 +158,32 @@
           "effects": [
             "idle_bounce"
           ]
+        },
+        {
+          "type": "planet",
+          "name": "mars",
+          "position": "bottom_left",
+          "size": "small",
+          "expression": "looking_right",
+          "entry_animation": "fade_in",
+          "effects": [
+            "float"
+          ]
         }
       ],
       "text": {
-        "content": "And it's expanding FASTER than light!",
+        "content": "That's hotter than 2,700,000 Venus's combined! Mind blown?!",
         "position": "top",
         "style": "word_by_word"
       },
-      "screen_effects": [],
+      "screen_effects": [
+        "vignette_pulse"
+      ],
       "dramatic_moment": false
     }
   ],
-  "formatted_at": "2026-03-18T01:02:34.858959",
+  "formatted_at": "2026-03-18T05:57:23.125397",
   "rendered": true,
-  "rendered_at": "2026-03-18T01:10:20.108469",
-  "video_path": "videos_output/script_20260318_010234.mp4"
+  "rendered_at": "2026-03-18T06:03:55.404691",
+  "video_path": "videos_output/script_20260318_055722.mp4"
 }
