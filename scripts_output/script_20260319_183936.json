@@ -1,16 +1,18 @@
 {
   "idea": {
-    "topic": "Gravity on a Neutron Star",
-    "hook": "How strong do you think gravity can get?",
-    "title": "Neutron Star Gravity is INSANE! (2 Billion X)",
-    "description": "Ever wondered about the most extreme gravity in the universe? Get ready to have your mind blown by neutron stars!",
+    "topic": "Neutron Star Teaspoon Weight",
+    "hook": "What weighs 6 BILLION tons but fits in your hand?",
+    "title": "Teaspoon = 6 BILLION TONS?! \ud83e\udd2f",
+    "description": "Discover the mind-blowing density of a neutron star! A single teaspoon of its material weighs more than 1,000 Great Pyramids! #Space #Astrophysics #Science #NeutronStar #Density",
     "tags": [
       "space",
       "astrophysics",
       "science",
       "neutron_star",
+      "density",
       "gravity",
-      "extreme_universe"
+      "universe",
+      "extreme_facts"
     ],
     "topic_family": "stars"
   },
@@ -28,7 +30,7 @@
           "type": "planet",
           "name": "earth",
           "position": "center",
-          "size": "large",
+          "size": "medium",
           "expression": "thinking",
           "entry_animation": "pop_in",
           "effects": [
@@ -37,7 +39,7 @@
         }
       ],
       "text": {
-        "content": "How strong is gravity?",
+        "content": "What weighs 6 BILLION tons...",
         "position": "top",
         "style": "word_by_word"
       },
@@ -53,18 +55,18 @@
           "name": "earth",
           "position": "left",
           "size": "small",
-          "expression": "scared",
-          "entry_animation": "none",
+          "expression": "looking_right",
+          "entry_animation": "slide_from_left",
           "effects": [
-            "shake"
+            "wobble"
           ]
         },
         {
           "type": "planet",
-          "name": "sun",
+          "name": "neutron_star",
           "position": "right",
-          "size": "large",
-          "expression": "smug",
+          "size": "medium",
+          "expression": "neutral",
           "entry_animation": "slide_from_right",
           "effects": [
             "glow",
@@ -73,7 +75,7 @@
         }
       ],
       "text": {
-        "content": "The Sun's is 28 times stronger!",
+        "content": "...and fits in a TEASPOON?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -89,40 +91,12 @@
           "name": "neutron_star",
           "position": "center",
           "size": "huge",
-          "expression": "neutral",
+          "expression": "shocked",
           "entry_animation": "zoom_in",
           "effects": [
             "glow",
             "pulse",
             "vibrate"
-          ]
-        }
-      ],
-      "text": {
-        "content": "But meet a Neutron Star!",
-        "position": "top",
-        "style": "slam_in"
-      },
-      "screen_effects": [
-        "camera_shake",
-        "flash",
-        "chromatic_aberration"
-      ],
-      "dramatic_moment": true
-    },
-    {
-      "time_start": 12.0,
-      "time_end": 16.0,
-      "layers": [
-        {
-          "type": "planet",
-          "name": "neutron_star",
-          "position": "center",
-          "size": "large",
-          "expression": "neutral",
-          "entry_animation": "none",
-          "effects": [
-            "pulse"
           ]
         },
         {
@@ -133,19 +107,55 @@
           "expression": "scared",
           "entry_animation": "pop_in",
           "effects": [
-            "shake",
+            "shake"
+          ]
+        }
+      ],
+      "text": {
+        "content": "It's a NEUTRON STAR! \ud83e\udd2f",
+        "position": "top",
+        "style": "slam_in"
+      },
+      "screen_effects": [
+        "camera_shake",
+        "flash",
+        "vignette_pulse"
+      ],
+      "dramatic_moment": true
+    },
+    {
+      "time_start": 12.0,
+      "time_end": 16.0,
+      "layers": [
+        {
+          "type": "planet",
+          "name": "earth",
+          "position": "center",
+          "size": "large",
+          "expression": "neutral",
+          "entry_animation": "bounce_in",
+          "effects": [
+            "idle_bounce"
+          ]
+        },
+        {
+          "type": "planet",
+          "name": "mars",
+          "position": "top_right",
+          "size": "small",
+          "expression": "shocked",
+          "entry_animation": "slide_from_right",
+          "effects": [
             "wobble"
           ]
         }
       ],
       "text": {
-        "content": "It's 2 BILLION times Earth's!",
+        "content": "More than 1,000 Great Pyramids!",
         "position": "top",
         "style": "word_by_word"
       },
-      "screen_effects": [
-        "vignette_pulse"
-      ],
+      "screen_effects": [],
       "dramatic_moment": false
     },
     {
@@ -156,19 +166,20 @@
           "type": "planet",
           "name": "neutron_star",
           "position": "center",
-          "size": "medium",
+          "size": "huge",
           "expression": "neutral",
-          "entry_animation": "fade_in",
+          "entry_animation": "spin_in",
           "effects": [
-            "idle_bounce"
+            "glow",
+            "pulse"
           ]
         },
         {
           "type": "planet",
-          "name": "mars",
-          "position": "top_left",
+          "name": "earth",
+          "position": "bottom_left",
           "size": "tiny",
-          "expression": "dead",
+          "expression": "scared",
           "entry_animation": "slide_from_left",
           "effects": [
             "shake"
@@ -176,18 +187,18 @@
         }
       ],
       "text": {
-        "content": "So dense, it'll crush YOU!",
+        "content": "That's REAL cosmic density! \ud83e\udd2f",
         "position": "top",
         "style": "slam_in"
       },
       "screen_effects": [
-        "glitch"
+        "chromatic_aberration"
       ],
       "dramatic_moment": false
     }
   ],
-  "formatted_at": "2026-03-19T12:34:32.626005",
+  "formatted_at": "2026-03-19T18:39:36.400555",
   "rendered": true,
-  "rendered_at": "2026-03-19T12:39:24.848513",
-  "video_path": "videos_output/script_20260319_123432.mp4"
+  "rendered_at": "2026-03-19T18:44:35.798623",
+  "video_path": "videos_output/script_20260319_183936.mp4"
 }
