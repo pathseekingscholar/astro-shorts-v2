@@ -1,26 +1,26 @@
 {
   "idea": {
-    "topic": "Raining Diamonds on Neptune",
-    "hook": "What if rain wasn't water?",
-    "title": "Neptune: Where it Rains DIAMONDS!\ud83d\udc8e",
-    "description": "Imagine a planet where rain isn't water, but billions of carats of pure diamond! Journey to Neptune and discover its extreme weather.",
+    "topic": "Size Comparison: Earth vs Jupiter vs Sun",
+    "hook": "Prepare to feel TINY. Like, REALLY tiny.",
+    "title": "Earth vs Jupiter vs Sun: SHOCKING Scale!",
+    "description": "Ever wondered how small Earth really is? Get ready for a mind-blowing cosmic comparison with Jupiter and our colossal Sun! The numbers will astound you.",
     "tags": [
       "space",
       "astrophysics",
       "science",
-      "neptune",
-      "diamonds",
-      "planets",
-      "solar_system",
-      "extreme_weather",
-      "mind_blown"
+      "earth",
+      "jupiter",
+      "sun",
+      "scale",
+      "universe",
+      "mindblown"
     ],
-    "topic_family": "extreme_environments"
+    "topic_family": "scale"
   },
   "metadata": {
     "mood": "mind-blowing",
     "music_style": "epic",
-    "background_search": "deep space gas giant rings"
+    "background_search": "deep space galaxy nebula"
   },
   "timeline": [
     {
@@ -31,7 +31,7 @@
           "type": "planet",
           "name": "earth",
           "position": "center",
-          "size": "medium",
+          "size": "large",
           "expression": "thinking",
           "entry_animation": "pop_in",
           "effects": [
@@ -40,7 +40,7 @@
         }
       ],
       "text": {
-        "content": "What if rain wasn't water?",
+        "content": "Ever feel big?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -53,30 +53,30 @@
       "layers": [
         {
           "type": "planet",
-          "name": "earth",
-          "position": "bottom_left",
-          "size": "small",
-          "expression": "scared",
-          "entry_animation": "none",
+          "name": "jupiter",
+          "position": "right",
+          "size": "huge",
+          "expression": "smug",
+          "entry_animation": "slide_from_right",
           "effects": [
-            "shake"
+            "pulse"
           ]
         },
         {
           "type": "planet",
-          "name": "neptune",
-          "position": "top_right",
-          "size": "large",
-          "expression": "neutral",
-          "entry_animation": "slide_from_right",
+          "name": "earth",
+          "position": "left",
+          "size": "tiny",
+          "expression": "looking_right",
+          "entry_animation": "none",
           "effects": [
-            "float"
+            "shake"
           ]
         }
       ],
       "text": {
-        "content": "On Neptune, pressure is MILLIONS of times Earth's!",
-        "position": "center",
+        "content": "Jupiter is 11X wider than Earth!",
+        "position": "top",
         "style": "word_by_word"
       },
       "screen_effects": [],
@@ -88,20 +88,31 @@
       "layers": [
         {
           "type": "planet",
-          "name": "neptune",
+          "name": "sun",
           "position": "center",
           "size": "huge",
           "expression": "shocked",
           "entry_animation": "zoom_in",
           "effects": [
-            "pulse",
-            "glow"
+            "glow",
+            "pulse"
+          ]
+        },
+        {
+          "type": "planet",
+          "name": "jupiter",
+          "position": "bottom_left",
+          "size": "tiny",
+          "expression": "scared",
+          "entry_animation": "fade_in",
+          "effects": [
+            "wobble"
           ]
         }
       ],
       "text": {
-        "content": "Methane turns to PURE DIAMOND!",
-        "position": "center",
+        "content": "The SUN could hold 1,300 JUPITERS!",
+        "position": "top",
         "style": "slam_in"
       },
       "screen_effects": [
@@ -116,21 +127,22 @@
       "layers": [
         {
           "type": "planet",
-          "name": "neptune",
-          "position": "left",
-          "size": "large",
-          "expression": "smug",
-          "entry_animation": "slide_from_left",
+          "name": "sun",
+          "position": "center",
+          "size": "huge",
+          "expression": "neutral",
+          "entry_animation": "none",
           "effects": [
-            "float"
+            "glow",
+            "pulse"
           ]
         },
         {
           "type": "planet",
           "name": "earth",
-          "position": "right",
-          "size": "small",
-          "expression": "shocked",
+          "position": "bottom_right",
+          "size": "tiny",
+          "expression": "scared",
           "entry_animation": "pop_in",
           "effects": [
             "shake"
@@ -138,7 +150,7 @@
         }
       ],
       "text": {
-        "content": "Diamonds up to 1000s of KILOS in weight!",
+        "content": "1.3 MILLION Earths fit inside!",
         "position": "top",
         "style": "word_by_word"
       },
@@ -161,28 +173,19 @@
           "effects": [
             "idle_bounce"
           ]
-        },
-        {
-          "type": "planet",
-          "name": "neptune",
-          "position": "top_right",
-          "size": "tiny",
-          "expression": "smug",
-          "entry_animation": "fade_in",
-          "effects": []
         }
       ],
       "text": {
-        "content": "Imagine that shower! Like and follow for more space facts!",
-        "position": "bottom",
+        "content": "Mind. Blown. Follow for more space!",
+        "position": "top",
         "style": "word_by_word"
       },
       "screen_effects": [],
       "dramatic_moment": false
     }
   ],
-  "formatted_at": "2026-03-19T01:04:49.182394",
+  "formatted_at": "2026-03-19T06:43:07.753468",
   "rendered": true,
-  "rendered_at": "2026-03-19T01:10:45.429814",
-  "video_path": "videos_output/script_20260319_010449.mp4"
+  "rendered_at": "2026-03-19T06:47:48.211893",
+  "video_path": "videos_output/script_20260319_064307.mp4"
 }
