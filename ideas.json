@@ -1305,5 +1305,193 @@
       }
     ],
     "formatted_at": "2026-03-18T18:41:49.718846"
+  },
+  {
+    "id": "20260319_010449",
+    "status": "formatted",
+    "created_at": "2026-03-19T01:04:49.017514",
+    "idea": {
+      "topic": "Raining Diamonds on Neptune",
+      "hook": "What if rain wasn't water?",
+      "title": "Neptune: Where it Rains DIAMONDS!\ud83d\udc8e",
+      "description": "Imagine a planet where rain isn't water, but billions of carats of pure diamond! Journey to Neptune and discover its extreme weather.",
+      "tags": [
+        "space",
+        "astrophysics",
+        "science",
+        "neptune",
+        "diamonds",
+        "planets",
+        "solar_system",
+        "extreme_weather",
+        "mind_blown"
+      ],
+      "topic_family": "extreme_environments"
+    },
+    "metadata": {
+      "mood": "mind-blowing",
+      "music_style": "epic",
+      "background_search": "deep space gas giant rings"
+    },
+    "timeline": [
+      {
+        "time_start": 0.0,
+        "time_end": 4.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "center",
+            "size": "medium",
+            "expression": "thinking",
+            "entry_animation": "pop_in",
+            "effects": [
+              "idle_bounce"
+            ]
+          }
+        ],
+        "text": {
+          "content": "What if rain wasn't water?",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 4.0,
+        "time_end": 8.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "bottom_left",
+            "size": "small",
+            "expression": "scared",
+            "entry_animation": "none",
+            "effects": [
+              "shake"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "neptune",
+            "position": "top_right",
+            "size": "large",
+            "expression": "neutral",
+            "entry_animation": "slide_from_right",
+            "effects": [
+              "float"
+            ]
+          }
+        ],
+        "text": {
+          "content": "On Neptune, pressure is MILLIONS of times Earth's!",
+          "position": "center",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 8.0,
+        "time_end": 12.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "neptune",
+            "position": "center",
+            "size": "huge",
+            "expression": "shocked",
+            "entry_animation": "zoom_in",
+            "effects": [
+              "pulse",
+              "glow"
+            ]
+          }
+        ],
+        "text": {
+          "content": "Methane turns to PURE DIAMOND!",
+          "position": "center",
+          "style": "slam_in"
+        },
+        "screen_effects": [
+          "camera_shake",
+          "flash"
+        ],
+        "dramatic_moment": true
+      },
+      {
+        "time_start": 12.0,
+        "time_end": 16.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "neptune",
+            "position": "left",
+            "size": "large",
+            "expression": "smug",
+            "entry_animation": "slide_from_left",
+            "effects": [
+              "float"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "right",
+            "size": "small",
+            "expression": "shocked",
+            "entry_animation": "pop_in",
+            "effects": [
+              "shake"
+            ]
+          }
+        ],
+        "text": {
+          "content": "Diamonds up to 1000s of KILOS in weight!",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [
+          "vignette_pulse"
+        ],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 16.0,
+        "time_end": 20.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "center",
+            "size": "medium",
+            "expression": "excited",
+            "entry_animation": "bounce_in",
+            "effects": [
+              "idle_bounce"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "neptune",
+            "position": "top_right",
+            "size": "tiny",
+            "expression": "smug",
+            "entry_animation": "fade_in",
+            "effects": []
+          }
+        ],
+        "text": {
+          "content": "Imagine that shower! Like and follow for more space facts!",
+          "position": "bottom",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      }
+    ],
+    "formatted_at": "2026-03-19T01:04:49.182914"
   }
 ]
