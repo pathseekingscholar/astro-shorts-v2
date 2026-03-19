@@ -1684,5 +1684,198 @@
       }
     ],
     "formatted_at": "2026-03-19T06:43:08.077635"
+  },
+  {
+    "id": "20260319_123432",
+    "status": "formatted",
+    "created_at": "2026-03-19T12:34:32.460115",
+    "idea": {
+      "topic": "Gravity on a Neutron Star",
+      "hook": "How strong do you think gravity can get?",
+      "title": "Neutron Star Gravity is INSANE! (2 Billion X)",
+      "description": "Ever wondered about the most extreme gravity in the universe? Get ready to have your mind blown by neutron stars!",
+      "tags": [
+        "space",
+        "astrophysics",
+        "science",
+        "neutron_star",
+        "gravity",
+        "extreme_universe"
+      ],
+      "topic_family": "stars"
+    },
+    "metadata": {
+      "mood": "mind-blowing",
+      "music_style": "epic",
+      "background_search": "deep space galaxy nebula"
+    },
+    "timeline": [
+      {
+        "time_start": 0.0,
+        "time_end": 4.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "center",
+            "size": "large",
+            "expression": "thinking",
+            "entry_animation": "pop_in",
+            "effects": [
+              "idle_bounce"
+            ]
+          }
+        ],
+        "text": {
+          "content": "How strong is gravity?",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 4.0,
+        "time_end": 8.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "left",
+            "size": "small",
+            "expression": "scared",
+            "entry_animation": "none",
+            "effects": [
+              "shake"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "sun",
+            "position": "right",
+            "size": "large",
+            "expression": "smug",
+            "entry_animation": "slide_from_right",
+            "effects": [
+              "glow",
+              "pulse"
+            ]
+          }
+        ],
+        "text": {
+          "content": "The Sun's is 28 times stronger!",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 8.0,
+        "time_end": 12.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "neutron_star",
+            "position": "center",
+            "size": "huge",
+            "expression": "neutral",
+            "entry_animation": "zoom_in",
+            "effects": [
+              "glow",
+              "pulse",
+              "vibrate"
+            ]
+          }
+        ],
+        "text": {
+          "content": "But meet a Neutron Star!",
+          "position": "top",
+          "style": "slam_in"
+        },
+        "screen_effects": [
+          "camera_shake",
+          "flash",
+          "chromatic_aberration"
+        ],
+        "dramatic_moment": true
+      },
+      {
+        "time_start": 12.0,
+        "time_end": 16.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "neutron_star",
+            "position": "center",
+            "size": "large",
+            "expression": "neutral",
+            "entry_animation": "none",
+            "effects": [
+              "pulse"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "bottom_right",
+            "size": "tiny",
+            "expression": "scared",
+            "entry_animation": "pop_in",
+            "effects": [
+              "shake",
+              "wobble"
+            ]
+          }
+        ],
+        "text": {
+          "content": "It's 2 BILLION times Earth's!",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [
+          "vignette_pulse"
+        ],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 16.0,
+        "time_end": 20.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "neutron_star",
+            "position": "center",
+            "size": "medium",
+            "expression": "neutral",
+            "entry_animation": "fade_in",
+            "effects": [
+              "idle_bounce"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "mars",
+            "position": "top_left",
+            "size": "tiny",
+            "expression": "dead",
+            "entry_animation": "slide_from_left",
+            "effects": [
+              "shake"
+            ]
+          }
+        ],
+        "text": {
+          "content": "So dense, it'll crush YOU!",
+          "position": "top",
+          "style": "slam_in"
+        },
+        "screen_effects": [
+          "glitch"
+        ],
+        "dramatic_moment": false
+      }
+    ],
+    "formatted_at": "2026-03-19T12:34:32.626593"
   }
 ]

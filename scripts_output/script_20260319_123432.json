@@ -1,21 +1,18 @@
 {
   "idea": {
-    "topic": "Size Comparison: Earth vs Jupiter vs Sun",
-    "hook": "Prepare to feel TINY. Like, REALLY tiny.",
-    "title": "Earth vs Jupiter vs Sun: SHOCKING Scale!",
-    "description": "Ever wondered how small Earth really is? Get ready for a mind-blowing cosmic comparison with Jupiter and our colossal Sun! The numbers will astound you.",
+    "topic": "Gravity on a Neutron Star",
+    "hook": "How strong do you think gravity can get?",
+    "title": "Neutron Star Gravity is INSANE! (2 Billion X)",
+    "description": "Ever wondered about the most extreme gravity in the universe? Get ready to have your mind blown by neutron stars!",
     "tags": [
       "space",
       "astrophysics",
       "science",
-      "earth",
-      "jupiter",
-      "sun",
-      "scale",
-      "universe",
-      "mindblown"
+      "neutron_star",
+      "gravity",
+      "extreme_universe"
     ],
-    "topic_family": "scale"
+    "topic_family": "stars"
   },
   "metadata": {
     "mood": "mind-blowing",
@@ -40,7 +37,7 @@
         }
       ],
       "text": {
-        "content": "Ever feel big?",
+        "content": "How strong is gravity?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -53,29 +50,30 @@
       "layers": [
         {
           "type": "planet",
-          "name": "jupiter",
-          "position": "right",
-          "size": "huge",
-          "expression": "smug",
-          "entry_animation": "slide_from_right",
-          "effects": [
-            "pulse"
-          ]
-        },
-        {
-          "type": "planet",
           "name": "earth",
           "position": "left",
-          "size": "tiny",
-          "expression": "looking_right",
+          "size": "small",
+          "expression": "scared",
           "entry_animation": "none",
           "effects": [
             "shake"
           ]
+        },
+        {
+          "type": "planet",
+          "name": "sun",
+          "position": "right",
+          "size": "large",
+          "expression": "smug",
+          "entry_animation": "slide_from_right",
+          "effects": [
+            "glow",
+            "pulse"
+          ]
         }
       ],
       "text": {
-        "content": "Jupiter is 11X wider than Earth!",
+        "content": "The Sun's is 28 times stronger!",
         "position": "top",
         "style": "word_by_word"
       },
@@ -88,36 +86,27 @@
       "layers": [
         {
           "type": "planet",
-          "name": "sun",
+          "name": "neutron_star",
           "position": "center",
           "size": "huge",
-          "expression": "shocked",
+          "expression": "neutral",
           "entry_animation": "zoom_in",
           "effects": [
             "glow",
-            "pulse"
-          ]
-        },
-        {
-          "type": "planet",
-          "name": "jupiter",
-          "position": "bottom_left",
-          "size": "tiny",
-          "expression": "scared",
-          "entry_animation": "fade_in",
-          "effects": [
-            "wobble"
+            "pulse",
+            "vibrate"
           ]
         }
       ],
       "text": {
-        "content": "The SUN could hold 1,300 JUPITERS!",
+        "content": "But meet a Neutron Star!",
         "position": "top",
         "style": "slam_in"
       },
       "screen_effects": [
         "camera_shake",
-        "flash"
+        "flash",
+        "chromatic_aberration"
       ],
       "dramatic_moment": true
     },
@@ -127,13 +116,12 @@
       "layers": [
         {
           "type": "planet",
-          "name": "sun",
+          "name": "neutron_star",
           "position": "center",
-          "size": "huge",
+          "size": "large",
           "expression": "neutral",
           "entry_animation": "none",
           "effects": [
-            "glow",
             "pulse"
           ]
         },
@@ -145,12 +133,13 @@
           "expression": "scared",
           "entry_animation": "pop_in",
           "effects": [
-            "shake"
+            "shake",
+            "wobble"
           ]
         }
       ],
       "text": {
-        "content": "1.3 MILLION Earths fit inside!",
+        "content": "It's 2 BILLION times Earth's!",
         "position": "top",
         "style": "word_by_word"
       },
@@ -165,27 +154,40 @@
       "layers": [
         {
           "type": "planet",
-          "name": "earth",
+          "name": "neutron_star",
           "position": "center",
           "size": "medium",
-          "expression": "excited",
-          "entry_animation": "bounce_in",
+          "expression": "neutral",
+          "entry_animation": "fade_in",
           "effects": [
             "idle_bounce"
+          ]
+        },
+        {
+          "type": "planet",
+          "name": "mars",
+          "position": "top_left",
+          "size": "tiny",
+          "expression": "dead",
+          "entry_animation": "slide_from_left",
+          "effects": [
+            "shake"
           ]
         }
       ],
       "text": {
-        "content": "Mind. Blown. Follow for more space!",
+        "content": "So dense, it'll crush YOU!",
         "position": "top",
-        "style": "word_by_word"
+        "style": "slam_in"
       },
-      "screen_effects": [],
+      "screen_effects": [
+        "glitch"
+      ],
       "dramatic_moment": false
     }
   ],
-  "formatted_at": "2026-03-19T06:43:07.753468",
+  "formatted_at": "2026-03-19T12:34:32.626005",
   "rendered": true,
-  "rendered_at": "2026-03-19T06:47:48.211893",
-  "video_path": "videos_output/script_20260319_064307.mp4"
+  "rendered_at": "2026-03-19T12:39:24.848513",
+  "video_path": "videos_output/script_20260319_123432.mp4"
 }
