@@ -1,18 +1,17 @@
 {
   "idea": {
-    "topic": "Lifespan and death of the Sun",
-    "hook": "How much longer will our Sun live?",
-    "title": "Sun Death: 5 BILLION Years Left?",
-    "description": "Discover the incredible lifespan of our Sun, how much longer it has, and its dramatic, universe-altering end!",
+    "topic": "Magnetar magnetic field strength",
+    "hook": "What's the STRONGEST magnet you know?",
+    "title": "Magnetar: 100 BILLION Tesla!",
+    "description": "Discover the mind-bending power of Magnetar magnetic fields compared to Earth and the Sun! Prepare to be shocked.",
     "tags": [
       "space",
       "astrophysics",
       "science",
-      "sun",
-      "stars",
-      "cosmos",
-      "future",
-      "universe"
+      "magnetar",
+      "magnetic_field",
+      "neutron_star",
+      "extreme_space"
     ],
     "topic_family": "stars"
   },
@@ -39,7 +38,7 @@
         }
       ],
       "text": {
-        "content": "How long until *our* Sun dies?",
+        "content": "What's the STRONGEST magnet you know?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -51,32 +50,32 @@
       "time_end": 8.0,
       "layers": [
         {
-          "type": "sun",
-          "name": "sun",
-          "position": "center_left",
-          "size": "large",
-          "expression": "neutral",
+          "type": "earth",
+          "name": "earth",
+          "position": "left",
+          "size": "medium",
+          "expression": "looking_right",
           "entry_animation": "slide_from_left",
           "effects": [
-            "glow"
+            "idle_bounce"
           ]
         },
         {
-          "type": "earth",
-          "name": "earth",
-          "position": "bottom_right",
+          "type": "mars",
+          "name": "mars",
+          "position": "right",
           "size": "small",
-          "expression": "looking_left",
-          "entry_animation": "pop_in",
+          "expression": "smug",
+          "entry_animation": "slide_from_right",
           "effects": [
-            "idle_bounce"
+            "pulse"
           ]
         }
       ],
       "text": {
-        "content": "It's already lived for 4.6 BILLION years!",
+        "content": "Earth's tiny 0.00005 Tesla!",
         "position": "top",
-        "style": "slam_in"
+        "style": "word_by_word"
       },
       "screen_effects": [],
       "dramatic_moment": false
@@ -90,16 +89,27 @@
           "name": "sun",
           "position": "center",
           "size": "huge",
-          "expression": "smug",
+          "expression": "shocked",
           "entry_animation": "zoom_in",
           "effects": [
             "glow",
             "pulse"
           ]
+        },
+        {
+          "type": "earth",
+          "name": "earth",
+          "position": "bottom_left",
+          "size": "tiny",
+          "expression": "scared",
+          "entry_animation": "pop_in",
+          "effects": [
+            "shake"
+          ]
         }
       ],
       "text": {
-        "content": "But it still has 5 BILLION more years!",
+        "content": "The Sun? Up to 0.3 Tesla near sunspots!",
         "position": "top",
         "style": "slam_in"
       },
@@ -114,33 +124,33 @@
       "time_end": 16.0,
       "layers": [
         {
-          "type": "sun",
-          "name": "red_giant_sun",
+          "type": "neutron_star",
+          "name": "magnetar",
           "position": "center",
           "size": "huge",
-          "expression": "angry",
-          "entry_animation": "zoom_in",
+          "expression": "neutral",
+          "entry_animation": "spin_in",
           "effects": [
-            "pulse",
-            "wobble"
+            "glow",
+            "pulse"
           ]
         },
         {
-          "type": "mercury",
-          "name": "mercury",
-          "position": "top_right",
-          "size": "tiny",
-          "expression": "scared",
-          "entry_animation": "pop_in",
+          "type": "sun",
+          "name": "sun",
+          "position": "top_left",
+          "size": "small",
+          "expression": "shocked",
+          "entry_animation": "fade_in",
           "effects": [
             "shake"
           ]
         },
         {
-          "type": "venus",
-          "name": "venus",
-          "position": "bottom_left",
-          "size": "small",
+          "type": "earth",
+          "name": "earth",
+          "position": "bottom_right",
+          "size": "tiny",
           "expression": "scared",
           "entry_animation": "pop_in",
           "effects": [
@@ -149,9 +159,9 @@
         }
       ],
       "text": {
-        "content": "Then it swells, engulfing Mercury & Venus!",
+        "content": "A MAGNETAR'S field? 100 BILLION Tesla!",
         "position": "top",
-        "style": "word_by_word"
+        "style": "slam_in"
       },
       "screen_effects": [
         "vignette_pulse",
@@ -164,40 +174,42 @@
       "time_end": 20.0,
       "layers": [
         {
-          "type": "sun",
-          "name": "white_dwarf",
-          "position": "center_right",
-          "size": "tiny",
+          "type": "neutron_star",
+          "name": "magnetar_zoom",
+          "position": "center",
+          "size": "large",
           "expression": "neutral",
           "entry_animation": "fade_in",
           "effects": [
-            "glow",
+            "wobble",
             "pulse"
           ]
         },
         {
           "type": "earth",
-          "name": "earth",
-          "position": "center_left",
-          "size": "medium",
-          "expression": "surprised",
-          "entry_animation": "bounce_in",
+          "name": "earth_scared",
+          "position": "bottom_right",
+          "size": "tiny",
+          "expression": "scared",
+          "entry_animation": "pop_in",
           "effects": [
-            "idle_bounce"
+            "shake"
           ]
         }
       ],
       "text": {
-        "content": "Finally, a WHITE DWARF, smaller than Earth!",
+        "content": "Enough to strip electrons from atoms at 1,000 km!",
         "position": "top",
         "style": "word_by_word"
       },
-      "screen_effects": [],
+      "screen_effects": [
+        "camera_shake"
+      ],
       "dramatic_moment": false
     }
   ],
-  "formatted_at": "2026-03-20T06:39:39.866980",
+  "formatted_at": "2026-03-20T12:30:34.847331",
   "rendered": true,
-  "rendered_at": "2026-03-20T06:45:00.586687",
-  "video_path": "videos_output/script_20260320_063939.mp4"
+  "rendered_at": "2026-03-20T12:35:49.722478",
+  "video_path": "videos_output/script_20260320_123034.mp4"
 }
