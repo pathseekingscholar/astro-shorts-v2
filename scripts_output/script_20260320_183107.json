@@ -1,17 +1,19 @@
 {
   "idea": {
-    "topic": "Magnetar magnetic field strength",
-    "hook": "What's the STRONGEST magnet you know?",
-    "title": "Magnetar: 100 BILLION Tesla!",
-    "description": "Discover the mind-bending power of Magnetar magnetic fields compared to Earth and the Sun! Prepare to be shocked.",
+    "topic": "Speed of a pulsar rotation",
+    "hook": "How fast can something REALLY spin in space?",
+    "title": "Pulsar Speed: UNBELIEVABLE Spin!",
+    "description": "Ever wonder what the fastest spinning object in the universe is? It's not what you think! Prepare for a mind-blowing reveal about pulsars.",
     "tags": [
       "space",
       "astrophysics",
       "science",
-      "magnetar",
-      "magnetic_field",
+      "pulsar",
       "neutron_star",
-      "extreme_space"
+      "speed",
+      "rotation",
+      "viral",
+      "universe_facts"
     ],
     "topic_family": "stars"
   },
@@ -26,7 +28,7 @@
       "time_end": 4.0,
       "layers": [
         {
-          "type": "earth",
+          "type": "planet",
           "name": "earth",
           "position": "center",
           "size": "large",
@@ -38,7 +40,7 @@
         }
       ],
       "text": {
-        "content": "What's the STRONGEST magnet you know?",
+        "content": "How fast can something REALLY spin... in space?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -50,21 +52,21 @@
       "time_end": 8.0,
       "layers": [
         {
-          "type": "earth",
+          "type": "planet",
           "name": "earth",
           "position": "left",
           "size": "medium",
-          "expression": "looking_right",
+          "expression": "neutral",
           "entry_animation": "slide_from_left",
           "effects": [
             "idle_bounce"
           ]
         },
         {
-          "type": "mars",
-          "name": "mars",
+          "type": "planet",
+          "name": "jupiter",
           "position": "right",
-          "size": "small",
+          "size": "large",
           "expression": "smug",
           "entry_animation": "slide_from_right",
           "effects": [
@@ -73,7 +75,7 @@
         }
       ],
       "text": {
-        "content": "Earth's tiny 0.00005 Tesla!",
+        "content": "Earth spins at 1,000 MPH. Jupiter? 28,000 MPH!",
         "position": "top",
         "style": "word_by_word"
       },
@@ -85,11 +87,11 @@
       "time_end": 12.0,
       "layers": [
         {
-          "type": "sun",
-          "name": "sun",
+          "type": "planet",
+          "name": "neutron_star",
           "position": "center",
           "size": "huge",
-          "expression": "shocked",
+          "expression": "neutral",
           "entry_animation": "zoom_in",
           "effects": [
             "glow",
@@ -97,7 +99,7 @@
           ]
         },
         {
-          "type": "earth",
+          "type": "planet",
           "name": "earth",
           "position": "bottom_left",
           "size": "tiny",
@@ -109,7 +111,7 @@
         }
       ],
       "text": {
-        "content": "The Sun? Up to 0.3 Tesla near sunspots!",
+        "content": "But a pulsar? 700 TIMES A SECOND!",
         "position": "top",
         "style": "slam_in"
       },
@@ -124,92 +126,65 @@
       "time_end": 16.0,
       "layers": [
         {
-          "type": "neutron_star",
-          "name": "magnetar",
-          "position": "center",
-          "size": "huge",
+          "type": "planet",
+          "name": "neutron_star",
+          "position": "left",
+          "size": "large",
           "expression": "neutral",
-          "entry_animation": "spin_in",
-          "effects": [
-            "glow",
-            "pulse"
-          ]
-        },
-        {
-          "type": "sun",
-          "name": "sun",
-          "position": "top_left",
-          "size": "small",
-          "expression": "shocked",
           "entry_animation": "fade_in",
           "effects": [
-            "shake"
+            "vibrate"
           ]
         },
         {
-          "type": "earth",
-          "name": "earth",
-          "position": "bottom_right",
-          "size": "tiny",
-          "expression": "scared",
-          "entry_animation": "pop_in",
+          "type": "planet",
+          "name": "sun",
+          "position": "right",
+          "size": "large",
+          "expression": "shocked",
+          "entry_animation": "slide_from_right",
           "effects": [
-            "shake"
+            "glow"
           ]
         }
       ],
       "text": {
-        "content": "A MAGNETAR'S field? 100 BILLION Tesla!",
+        "content": "Its surface moves at 1/4 the speed of LIGHT!",
         "position": "top",
-        "style": "slam_in"
+        "style": "word_by_word"
       },
       "screen_effects": [
-        "vignette_pulse",
-        "chromatic_aberration"
+        "vignette_pulse"
       ],
-      "dramatic_moment": true
+      "dramatic_moment": false
     },
     {
       "time_start": 16.0,
       "time_end": 20.0,
       "layers": [
         {
-          "type": "neutron_star",
-          "name": "magnetar_zoom",
+          "type": "planet",
+          "name": "earth",
           "position": "center",
-          "size": "large",
-          "expression": "neutral",
-          "entry_animation": "fade_in",
+          "size": "medium",
+          "expression": "excited",
+          "entry_animation": "bounce_in",
           "effects": [
-            "wobble",
-            "pulse"
-          ]
-        },
-        {
-          "type": "earth",
-          "name": "earth_scared",
-          "position": "bottom_right",
-          "size": "tiny",
-          "expression": "scared",
-          "entry_animation": "pop_in",
-          "effects": [
-            "shake"
+            "idle_bounce"
           ]
         }
       ],
       "text": {
-        "content": "Enough to strip electrons from atoms at 1,000 km!",
+        "content": "That's over 150 MILLION MPH! \ud83e\udd2f",
         "position": "top",
-        "style": "word_by_word"
+        "style": "slam_in"
       },
-      "screen_effects": [
-        "camera_shake"
-      ],
+      "screen_effects": [],
       "dramatic_moment": false
     }
   ],
-  "formatted_at": "2026-03-20T12:30:34.847331",
+  "formatted_at": "2026-03-20T18:31:07.199192",
   "rendered": true,
-  "rendered_at": "2026-03-20T12:35:49.722478",
-  "video_path": "videos_output/script_20260320_123034.mp4"
+  "rendered_at": "2026-03-20T18:38:05.931233",
+  "video_path": "videos_output/script_20260320_183107.mp4"
 }
