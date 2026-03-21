@@ -1,21 +1,20 @@
 {
   "idea": {
-    "topic": "Speed of a pulsar rotation",
-    "hook": "How fast can something REALLY spin in space?",
-    "title": "Pulsar Speed: UNBELIEVABLE Spin!",
-    "description": "Ever wonder what the fastest spinning object in the universe is? It's not what you think! Prepare for a mind-blowing reveal about pulsars.",
+    "topic": "Milky Way's Width",
+    "hook": "Ever wonder how WIDE our home galaxy is?",
+    "title": "Milky Way's Mind-Blowing Width!",
+    "description": "How big is our galaxy? Get ready for some mind-blowing numbers and a cosmic journey through the Milky Way's incredible scale!",
     "tags": [
       "space",
       "astrophysics",
       "science",
-      "pulsar",
-      "neutron_star",
-      "speed",
-      "rotation",
-      "viral",
-      "universe_facts"
+      "milkyway",
+      "galaxy",
+      "lightyears",
+      "scale",
+      "universe"
     ],
-    "topic_family": "stars"
+    "topic_family": "scale"
   },
   "metadata": {
     "mood": "mind-blowing",
@@ -40,7 +39,7 @@
         }
       ],
       "text": {
-        "content": "How fast can something REALLY spin... in space?",
+        "content": "Ever wonder how WIDE our home galaxy is?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -53,29 +52,30 @@
       "layers": [
         {
           "type": "planet",
-          "name": "earth",
+          "name": "sun",
           "position": "left",
-          "size": "medium",
-          "expression": "neutral",
+          "size": "huge",
+          "expression": "smug",
           "entry_animation": "slide_from_left",
           "effects": [
-            "idle_bounce"
+            "glow",
+            "pulse"
           ]
         },
         {
           "type": "planet",
-          "name": "jupiter",
-          "position": "right",
-          "size": "large",
-          "expression": "smug",
-          "entry_animation": "slide_from_right",
+          "name": "earth",
+          "position": "bottom_right",
+          "size": "tiny",
+          "expression": "looking_left",
+          "entry_animation": "none",
           "effects": [
-            "pulse"
+            "shake"
           ]
         }
       ],
       "text": {
-        "content": "Earth spins at 1,000 MPH. Jupiter? 28,000 MPH!",
+        "content": "Our solar system is 18 BILLION kilometers across!",
         "position": "top",
         "style": "word_by_word"
       },
@@ -88,20 +88,19 @@
       "layers": [
         {
           "type": "planet",
-          "name": "neutron_star",
+          "name": "black_hole",
           "position": "center",
           "size": "huge",
           "expression": "neutral",
           "entry_animation": "zoom_in",
           "effects": [
-            "glow",
             "pulse"
           ]
         },
         {
           "type": "planet",
           "name": "earth",
-          "position": "bottom_left",
+          "position": "bottom_right",
           "size": "tiny",
           "expression": "scared",
           "entry_animation": "pop_in",
@@ -111,13 +110,14 @@
         }
       ],
       "text": {
-        "content": "But a pulsar? 700 TIMES A SECOND!",
+        "content": "The Milky Way? A WHOPPING 100,000 LIGHT-YEARS wide!",
         "position": "top",
         "style": "slam_in"
       },
       "screen_effects": [
         "camera_shake",
-        "flash"
+        "flash",
+        "vignette_pulse"
       ],
       "dramatic_moment": true
     },
@@ -127,34 +127,34 @@
       "layers": [
         {
           "type": "planet",
-          "name": "neutron_star",
+          "name": "mars",
           "position": "left",
-          "size": "large",
+          "size": "small",
           "expression": "neutral",
-          "entry_animation": "fade_in",
+          "entry_animation": "slide_from_left",
           "effects": [
-            "vibrate"
+            "idle_bounce"
           ]
         },
         {
           "type": "planet",
-          "name": "sun",
+          "name": "jupiter",
           "position": "right",
           "size": "large",
-          "expression": "shocked",
+          "expression": "neutral",
           "entry_animation": "slide_from_right",
           "effects": [
-            "glow"
+            "float"
           ]
         }
       ],
       "text": {
-        "content": "Its surface moves at 1/4 the speed of LIGHT!",
+        "content": "Light, the fastest thing, takes 100,000 YEARS to cross it!",
         "position": "top",
         "style": "word_by_word"
       },
       "screen_effects": [
-        "vignette_pulse"
+        "chromatic_aberration"
       ],
       "dramatic_moment": false
     },
@@ -175,16 +175,16 @@
         }
       ],
       "text": {
-        "content": "That's over 150 MILLION MPH! \ud83e\udd2f",
+        "content": "We're just a tiny speck in this cosmic ocean. Mind blown?",
         "position": "top",
-        "style": "slam_in"
+        "style": "word_by_word"
       },
       "screen_effects": [],
       "dramatic_moment": false
     }
   ],
-  "formatted_at": "2026-03-20T18:31:07.199192",
+  "formatted_at": "2026-03-21T00:57:20.702417",
   "rendered": true,
-  "rendered_at": "2026-03-20T18:38:05.931233",
-  "video_path": "videos_output/script_20260320_183107.mp4"
+  "rendered_at": "2026-03-21T01:04:54.637985",
+  "video_path": "videos_output/script_20260321_005720.mp4"
 }
