@@ -1,20 +1,19 @@
 {
   "idea": {
-    "topic": "How many Earths fit in the Sun?",
-    "hook": "Ever wondered how many Earths our Sun could swallow?",
-    "title": "\ud83e\udd2f Earths in the Sun?! MILLIONS!",
-    "description": "Prepare to have your mind absolutely blown by the sheer scale of our Sun! You won't believe how many Earths fit inside this cosmic giant. #Space #Sun #Earth #Scale",
+    "topic": "Speed of light travel times across the cosmos",
+    "hook": "Think light is FAST? What if you wanted to cross the UNIVERSE?",
+    "title": "Light Speed Travel Times: YEARS!",
+    "description": "Ever wonder how long it would take to travel across space at the speed of light? Prepare to have your mind blown by these incredible cosmic distances!",
     "tags": [
       "space",
       "astrophysics",
       "science",
-      "sun",
-      "earth",
-      "scale",
-      "planets",
-      "mindblown"
+      "speed of light",
+      "universe",
+      "distances",
+      "planets"
     ],
-    "topic_family": "scale"
+    "topic_family": "distances"
   },
   "metadata": {
     "mood": "mind-blowing",
@@ -39,7 +38,7 @@
         }
       ],
       "text": {
-        "content": "Ever wondered how many Earths our Sun could swallow?",
+        "content": "Think light is FAST?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -52,27 +51,29 @@
       "layers": [
         {
           "type": "planet",
-          "name": "jupiter",
+          "name": "earth",
+          "position": "left",
+          "size": "small",
+          "expression": "looking_right",
+          "entry_animation": "slide_from_left",
+          "effects": [
+            "idle_bounce"
+          ]
+        },
+        {
+          "type": "planet",
+          "name": "moon",
           "position": "right",
-          "size": "large",
+          "size": "medium",
           "expression": "smug",
           "entry_animation": "slide_from_right",
           "effects": [
             "pulse"
           ]
-        },
-        {
-          "type": "planet",
-          "name": "earth",
-          "position": "left",
-          "size": "small",
-          "expression": "looking_right",
-          "entry_animation": "none",
-          "effects": []
         }
       ],
       "text": {
-        "content": "Jupiter alone fits 1,300 Earths!",
+        "content": "To the Moon? Just 1.28 seconds!",
         "position": "top",
         "style": "word_by_word"
       },
@@ -97,7 +98,7 @@
         }
       ],
       "text": {
-        "content": "The Sun? It fits ONE MILLION THREE HUNDRED THOUSAND!",
+        "content": "To the Sun? A STAGGERING 8 MINUTES!",
         "position": "top",
         "style": "slam_in"
       },
@@ -113,13 +114,13 @@
       "layers": [
         {
           "type": "planet",
-          "name": "sun",
-          "position": "top_left",
+          "name": "neptune",
+          "position": "center",
           "size": "large",
           "expression": "neutral",
           "entry_animation": "fade_in",
           "effects": [
-            "glow"
+            "float"
           ]
         },
         {
@@ -135,14 +136,14 @@
         }
       ],
       "text": {
-        "content": "That's 1,300,000 Earths! Mind. Blown.",
-        "position": "center",
+        "content": "To Neptune? Over 4 HOURS!",
+        "position": "top",
         "style": "word_by_word"
       },
       "screen_effects": [
         "vignette_pulse"
       ],
-      "dramatic_moment": true
+      "dramatic_moment": false
     },
     {
       "time_start": 16.0,
@@ -150,35 +151,41 @@
       "layers": [
         {
           "type": "planet",
-          "name": "earth",
+          "name": "black_hole",
           "position": "center",
-          "size": "medium",
-          "expression": "excited",
+          "size": "huge",
+          "expression": "neutral",
+          "entry_animation": "zoom_in",
+          "effects": [
+            "pulse",
+            "glow"
+          ]
+        },
+        {
+          "type": "planet",
+          "name": "earth",
+          "position": "bottom_left",
+          "size": "tiny",
+          "expression": "scared",
           "entry_animation": "bounce_in",
           "effects": [
-            "idle_bounce"
+            "vibrate"
           ]
         }
       ],
       "text": {
-        "content": "Our universe is unbelievably HUGE!",
+        "content": "Next Star? 4 YEARS! Milky Way? 100,000 YEARS!",
         "position": "top",
-        "style": "word_by_word"
+        "style": "slam_in"
       },
-      "screen_effects": [],
-      "dramatic_moment": false
+      "screen_effects": [
+        "chromatic_aberration"
+      ],
+      "dramatic_moment": true
     }
   ],
-  "formatted_at": "2026-03-21T12:22:04.961996",
+  "formatted_at": "2026-03-21T18:20:20.596292",
   "rendered": true,
-  "rendered_at": "2026-03-21T12:28:05.307047",
-  "video_path": "videos_output/script_20260321_122204.mp4",
-  "status": "uploaded",
-  "uploaded_at": "2026-03-21T12:28:08.291139",
-  "youtube": {
-    "video_id": "WuXYTpmuLII",
-    "url": "https://youtube.com/shorts/WuXYTpmuLII",
-    "title": "\ud83e\udd2f Earths in the Sun?! MILLIONS!",
-    "uploaded_at": "2026-03-21T12:28:08.291027"
-  }
+  "rendered_at": "2026-03-21T18:26:24.054073",
+  "video_path": "videos_output/script_20260321_182020.mp4"
 }
