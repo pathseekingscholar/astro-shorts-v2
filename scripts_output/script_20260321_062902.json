@@ -1,25 +1,25 @@
 {
   "idea": {
-    "topic": "Milky Way's Width",
-    "hook": "Ever wonder how WIDE our home galaxy is?",
-    "title": "Milky Way's Mind-Blowing Width!",
-    "description": "How big is our galaxy? Get ready for some mind-blowing numbers and a cosmic journey through the Milky Way's incredible scale!",
+    "topic": "Time to Nearest Star",
+    "hook": "How long would it REALLY take to reach the nearest star?",
+    "title": "To Nearest Star: HOW LONG?! (\ud83e\udd2f)",
+    "description": "Ever wondered how long it would take to travel to the closest star? Prepare for a mind-blowing cosmic reality check! #Space #Astrophysics #Stars",
     "tags": [
       "space",
       "astrophysics",
       "science",
-      "milkyway",
-      "galaxy",
-      "lightyears",
-      "scale",
+      "proxima_centauri",
+      "star_travel",
+      "speed_of_light",
+      "distances",
       "universe"
     ],
-    "topic_family": "scale"
+    "topic_family": "distances"
   },
   "metadata": {
     "mood": "mind-blowing",
     "music_style": "epic",
-    "background_search": "deep space galaxy nebula"
+    "background_search": "deep space starfield nebula"
   },
   "timeline": [
     {
@@ -39,7 +39,7 @@
         }
       ],
       "text": {
-        "content": "Ever wonder how WIDE our home galaxy is?",
+        "content": "How long to reach the nearest star?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -52,30 +52,38 @@
       "layers": [
         {
           "type": "planet",
-          "name": "sun",
-          "position": "left",
-          "size": "huge",
-          "expression": "smug",
+          "name": "earth",
+          "position": "bottom_left",
+          "size": "small",
+          "expression": "looking_right",
           "entry_animation": "slide_from_left",
+          "effects": []
+        },
+        {
+          "type": "planet",
+          "name": "mars",
+          "position": "center",
+          "size": "medium",
+          "expression": "smug",
+          "entry_animation": "pop_in",
           "effects": [
-            "glow",
             "pulse"
           ]
         },
         {
           "type": "planet",
-          "name": "earth",
-          "position": "bottom_right",
-          "size": "tiny",
-          "expression": "looking_left",
-          "entry_animation": "none",
+          "name": "jupiter",
+          "position": "top_right",
+          "size": "large",
+          "expression": "neutral",
+          "entry_animation": "slide_from_right",
           "effects": [
-            "shake"
+            "idle_bounce"
           ]
         }
       ],
       "text": {
-        "content": "Our solar system is 18 BILLION kilometers across!",
+        "content": "Moon: 3 days. Mars: 7 months. Jupiter: 1.5 years!",
         "position": "top",
         "style": "word_by_word"
       },
@@ -88,12 +96,13 @@
       "layers": [
         {
           "type": "planet",
-          "name": "black_hole",
+          "name": "sun",
           "position": "center",
           "size": "huge",
-          "expression": "neutral",
+          "expression": "shocked",
           "entry_animation": "zoom_in",
           "effects": [
+            "glow",
             "pulse"
           ]
         },
@@ -110,14 +119,13 @@
         }
       ],
       "text": {
-        "content": "The Milky Way? A WHOPPING 100,000 LIGHT-YEARS wide!",
+        "content": "Nearest star, Proxima Centauri... 4.2 LIGHT-YEARS AWAY!",
         "position": "top",
         "style": "slam_in"
       },
       "screen_effects": [
         "camera_shake",
-        "flash",
-        "vignette_pulse"
+        "flash"
       ],
       "dramatic_moment": true
     },
@@ -127,34 +135,23 @@
       "layers": [
         {
           "type": "planet",
-          "name": "mars",
-          "position": "left",
+          "name": "earth",
+          "position": "center",
           "size": "small",
-          "expression": "neutral",
-          "entry_animation": "slide_from_left",
+          "expression": "scared",
+          "entry_animation": "fade_in",
           "effects": [
             "idle_bounce"
-          ]
-        },
-        {
-          "type": "planet",
-          "name": "jupiter",
-          "position": "right",
-          "size": "large",
-          "expression": "neutral",
-          "entry_animation": "slide_from_right",
-          "effects": [
-            "float"
           ]
         }
       ],
       "text": {
-        "content": "Light, the fastest thing, takes 100,000 YEARS to cross it!",
+        "content": "Our FASTEST probe would take... 50,000 YEARS!",
         "position": "top",
-        "style": "word_by_word"
+        "style": "slam_in"
       },
       "screen_effects": [
-        "chromatic_aberration"
+        "vignette_pulse"
       ],
       "dramatic_moment": false
     },
@@ -172,10 +169,32 @@
           "effects": [
             "idle_bounce"
           ]
+        },
+        {
+          "type": "planet",
+          "name": "moon",
+          "position": "top_right",
+          "size": "tiny",
+          "expression": "neutral",
+          "entry_animation": "pop_in",
+          "effects": [
+            "float"
+          ]
+        },
+        {
+          "type": "planet",
+          "name": "mars",
+          "position": "bottom_left",
+          "size": "tiny",
+          "expression": "neutral",
+          "entry_animation": "pop_in",
+          "effects": [
+            "float"
+          ]
         }
       ],
       "text": {
-        "content": "We're just a tiny speck in this cosmic ocean. Mind blown?",
+        "content": "Space is VAST. Mind. Blown. \ud83e\udd2f",
         "position": "top",
         "style": "word_by_word"
       },
@@ -183,8 +202,8 @@
       "dramatic_moment": false
     }
   ],
-  "formatted_at": "2026-03-21T00:57:20.702417",
+  "formatted_at": "2026-03-21T06:29:02.746764",
   "rendered": true,
-  "rendered_at": "2026-03-21T01:04:54.637985",
-  "video_path": "videos_output/script_20260321_005720.mp4"
+  "rendered_at": "2026-03-21T06:36:10.201194",
+  "video_path": "videos_output/script_20260321_062902.mp4"
 }
