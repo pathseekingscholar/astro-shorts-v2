@@ -1,19 +1,20 @@
 {
   "idea": {
-    "topic": "Gravity on a Neutron Star",
-    "hook": "Ever wonder what EXTREME gravity feels like?",
-    "title": "Neutron Star Gravity: 2 Billion G's!",
-    "description": "Discover the mind-bending gravity of neutron stars, where a teaspoon weighs millions of tons and escape velocity is half the speed of light!",
+    "topic": "Time dilation near black holes",
+    "hook": "Does time pass differently for YOU than for someone in deep space?",
+    "title": "Black Hole Time Travel! (1 hour = 100K years!)",
+    "description": "Ever wonder if time is constant? Near black holes, gravity warps time itself! Discover mind-blowing time dilation facts.",
     "tags": [
       "space",
       "astrophysics",
       "science",
-      "gravity",
-      "neutron_star",
-      "extreme_stars",
-      "universe"
+      "black_holes",
+      "time_dilation",
+      "relativity",
+      "cosmic_facts",
+      "viral_science"
     ],
-    "topic_family": "stars"
+    "topic_family": "black_holes"
   },
   "metadata": {
     "mood": "mind-blowing",
@@ -38,7 +39,7 @@
         }
       ],
       "text": {
-        "content": "Ever wonder what EXTREME gravity feels like?",
+        "content": "Think time flies?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -51,28 +52,30 @@
       "layers": [
         {
           "type": "planet",
-          "name": "sun",
-          "position": "right",
+          "name": "earth",
+          "position": "bottom_left",
+          "size": "medium",
+          "expression": "neutral",
+          "entry_animation": "slide_from_left",
+          "effects": [
+            "idle_bounce"
+          ]
+        },
+        {
+          "type": "planet",
+          "name": "neutron_star",
+          "position": "top_right",
           "size": "large",
-          "expression": "smug",
+          "expression": "neutral",
           "entry_animation": "slide_from_right",
           "effects": [
             "glow",
             "pulse"
           ]
-        },
-        {
-          "type": "planet",
-          "name": "earth",
-          "position": "left",
-          "size": "small",
-          "expression": "looking_right",
-          "entry_animation": "none",
-          "effects": []
         }
       ],
       "text": {
-        "content": "The Sun's surface gravity is 28x Earth's!",
+        "content": "Even on Earth, time runs a TINY bit slower for YOU than for someone in space. But near a Neutron Star?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -85,31 +88,19 @@
       "layers": [
         {
           "type": "planet",
-          "name": "neutron_star",
+          "name": "black_hole",
           "position": "center",
           "size": "huge",
           "expression": "neutral",
           "entry_animation": "zoom_in",
           "effects": [
-            "glow",
             "pulse",
             "vibrate"
-          ]
-        },
-        {
-          "type": "planet",
-          "name": "earth",
-          "position": "bottom_left",
-          "size": "tiny",
-          "expression": "scared",
-          "entry_animation": "pop_in",
-          "effects": [
-            "shake"
           ]
         }
       ],
       "text": {
-        "content": "BUT a Neutron Star has up to 2 BILLION G's!",
+        "content": "Near a BLACK HOLE? Oh, this gets WILD!",
         "position": "top",
         "style": "slam_in"
       },
@@ -126,30 +117,30 @@
       "layers": [
         {
           "type": "planet",
-          "name": "neutron_star",
+          "name": "black_hole",
           "position": "left",
           "size": "large",
           "expression": "neutral",
-          "entry_animation": "fade_in",
+          "entry_animation": "none",
           "effects": [
-            "pulse",
-            "glow"
+            "idle_bounce"
           ]
         },
         {
           "type": "planet",
-          "name": "jupiter",
-          "position": "right",
-          "size": "medium",
-          "expression": "shocked",
-          "entry_animation": "slide_from_right",
+          "name": "earth",
+          "position": "center_right",
+          "size": "tiny",
+          "expression": "scared",
+          "entry_animation": "pop_in",
           "effects": [
-            "shake"
+            "shake",
+            "vibrate"
           ]
         }
       ],
       "text": {
-        "content": "A teaspoon of it weighs 10 MILLION TONS!",
+        "content": "Spend 1 HOUR near its event horizon... For an observer on Earth, 100,000 YEARS could pass!",
         "position": "top",
         "style": "word_by_word"
       },
@@ -164,41 +155,28 @@
       "layers": [
         {
           "type": "planet",
-          "name": "neutron_star",
+          "name": "earth",
           "position": "center",
-          "size": "large",
-          "expression": "neutral",
+          "size": "medium",
+          "expression": "shocked",
           "entry_animation": "bounce_in",
           "effects": [
-            "glow",
-            "float"
-          ]
-        },
-        {
-          "type": "planet",
-          "name": "earth",
-          "position": "bottom_right",
-          "size": "tiny",
-          "expression": "scared",
-          "entry_animation": "fade_in",
-          "effects": [
-            "shake"
+            "idle_bounce",
+            "wobble"
           ]
         }
       ],
       "text": {
-        "content": "Escape velocity is HALF the speed of light!",
+        "content": "Time isn't constant. It's a cosmic river, bent and twisted by gravity itself. Mind. Blown.",
         "position": "top",
-        "style": "slam_in"
+        "style": "word_by_word"
       },
-      "screen_effects": [
-        "camera_shake"
-      ],
-      "dramatic_moment": true
+      "screen_effects": [],
+      "dramatic_moment": false
     }
   ],
-  "formatted_at": "2026-03-22T01:04:37.848479",
+  "formatted_at": "2026-03-22T06:36:47.241427",
   "rendered": true,
-  "rendered_at": "2026-03-22T01:10:38.227315",
-  "video_path": "videos_output/script_20260322_010437.mp4"
+  "rendered_at": "2026-03-22T06:46:24.569969",
+  "video_path": "videos_output/script_20260322_063647.mp4"
 }
