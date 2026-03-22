@@ -3680,5 +3680,209 @@
       }
     ],
     "formatted_at": "2026-03-21T18:20:20.869982"
+  },
+  {
+    "id": "20260322_010437",
+    "status": "formatted",
+    "created_at": "2026-03-22T01:04:37.710280",
+    "idea": {
+      "topic": "Gravity on a Neutron Star",
+      "hook": "Ever wonder what EXTREME gravity feels like?",
+      "title": "Neutron Star Gravity: 2 Billion G's!",
+      "description": "Discover the mind-bending gravity of neutron stars, where a teaspoon weighs millions of tons and escape velocity is half the speed of light!",
+      "tags": [
+        "space",
+        "astrophysics",
+        "science",
+        "gravity",
+        "neutron_star",
+        "extreme_stars",
+        "universe"
+      ],
+      "topic_family": "stars"
+    },
+    "metadata": {
+      "mood": "mind-blowing",
+      "music_style": "epic",
+      "background_search": "deep space galaxy nebula"
+    },
+    "timeline": [
+      {
+        "time_start": 0.0,
+        "time_end": 4.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "center",
+            "size": "large",
+            "expression": "thinking",
+            "entry_animation": "pop_in",
+            "effects": [
+              "idle_bounce"
+            ]
+          }
+        ],
+        "text": {
+          "content": "Ever wonder what EXTREME gravity feels like?",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 4.0,
+        "time_end": 8.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "sun",
+            "position": "right",
+            "size": "large",
+            "expression": "smug",
+            "entry_animation": "slide_from_right",
+            "effects": [
+              "glow",
+              "pulse"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "left",
+            "size": "small",
+            "expression": "looking_right",
+            "entry_animation": "none",
+            "effects": []
+          }
+        ],
+        "text": {
+          "content": "The Sun's surface gravity is 28x Earth's!",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 8.0,
+        "time_end": 12.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "neutron_star",
+            "position": "center",
+            "size": "huge",
+            "expression": "neutral",
+            "entry_animation": "zoom_in",
+            "effects": [
+              "glow",
+              "pulse",
+              "vibrate"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "bottom_left",
+            "size": "tiny",
+            "expression": "scared",
+            "entry_animation": "pop_in",
+            "effects": [
+              "shake"
+            ]
+          }
+        ],
+        "text": {
+          "content": "BUT a Neutron Star has up to 2 BILLION G's!",
+          "position": "top",
+          "style": "slam_in"
+        },
+        "screen_effects": [
+          "camera_shake",
+          "flash",
+          "chromatic_aberration"
+        ],
+        "dramatic_moment": true
+      },
+      {
+        "time_start": 12.0,
+        "time_end": 16.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "neutron_star",
+            "position": "left",
+            "size": "large",
+            "expression": "neutral",
+            "entry_animation": "fade_in",
+            "effects": [
+              "pulse",
+              "glow"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "jupiter",
+            "position": "right",
+            "size": "medium",
+            "expression": "shocked",
+            "entry_animation": "slide_from_right",
+            "effects": [
+              "shake"
+            ]
+          }
+        ],
+        "text": {
+          "content": "A teaspoon of it weighs 10 MILLION TONS!",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [
+          "vignette_pulse"
+        ],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 16.0,
+        "time_end": 20.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "neutron_star",
+            "position": "center",
+            "size": "large",
+            "expression": "neutral",
+            "entry_animation": "bounce_in",
+            "effects": [
+              "glow",
+              "float"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "bottom_right",
+            "size": "tiny",
+            "expression": "scared",
+            "entry_animation": "fade_in",
+            "effects": [
+              "shake"
+            ]
+          }
+        ],
+        "text": {
+          "content": "Escape velocity is HALF the speed of light!",
+          "position": "top",
+          "style": "slam_in"
+        },
+        "screen_effects": [
+          "camera_shake"
+        ],
+        "dramatic_moment": true
+      }
+    ],
+    "formatted_at": "2026-03-22T01:04:38.214741"
   }
 ]

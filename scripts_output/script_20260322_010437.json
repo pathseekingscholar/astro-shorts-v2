@@ -1,19 +1,19 @@
 {
   "idea": {
-    "topic": "Speed of light travel times across the cosmos",
-    "hook": "Think light is FAST? What if you wanted to cross the UNIVERSE?",
-    "title": "Light Speed Travel Times: YEARS!",
-    "description": "Ever wonder how long it would take to travel across space at the speed of light? Prepare to have your mind blown by these incredible cosmic distances!",
+    "topic": "Gravity on a Neutron Star",
+    "hook": "Ever wonder what EXTREME gravity feels like?",
+    "title": "Neutron Star Gravity: 2 Billion G's!",
+    "description": "Discover the mind-bending gravity of neutron stars, where a teaspoon weighs millions of tons and escape velocity is half the speed of light!",
     "tags": [
       "space",
       "astrophysics",
       "science",
-      "speed of light",
-      "universe",
-      "distances",
-      "planets"
+      "gravity",
+      "neutron_star",
+      "extreme_stars",
+      "universe"
     ],
-    "topic_family": "distances"
+    "topic_family": "stars"
   },
   "metadata": {
     "mood": "mind-blowing",
@@ -29,7 +29,7 @@
           "type": "planet",
           "name": "earth",
           "position": "center",
-          "size": "medium",
+          "size": "large",
           "expression": "thinking",
           "entry_animation": "pop_in",
           "effects": [
@@ -38,7 +38,7 @@
         }
       ],
       "text": {
-        "content": "Think light is FAST?",
+        "content": "Ever wonder what EXTREME gravity feels like?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -51,29 +51,28 @@
       "layers": [
         {
           "type": "planet",
-          "name": "earth",
-          "position": "left",
-          "size": "small",
-          "expression": "looking_right",
-          "entry_animation": "slide_from_left",
+          "name": "sun",
+          "position": "right",
+          "size": "large",
+          "expression": "smug",
+          "entry_animation": "slide_from_right",
           "effects": [
-            "idle_bounce"
+            "glow",
+            "pulse"
           ]
         },
         {
           "type": "planet",
-          "name": "moon",
-          "position": "right",
-          "size": "medium",
-          "expression": "smug",
-          "entry_animation": "slide_from_right",
-          "effects": [
-            "pulse"
-          ]
+          "name": "earth",
+          "position": "left",
+          "size": "small",
+          "expression": "looking_right",
+          "entry_animation": "none",
+          "effects": []
         }
       ],
       "text": {
-        "content": "To the Moon? Just 1.28 seconds!",
+        "content": "The Sun's surface gravity is 28x Earth's!",
         "position": "top",
         "style": "word_by_word"
       },
@@ -86,47 +85,21 @@
       "layers": [
         {
           "type": "planet",
-          "name": "sun",
+          "name": "neutron_star",
           "position": "center",
           "size": "huge",
-          "expression": "shocked",
+          "expression": "neutral",
           "entry_animation": "zoom_in",
           "effects": [
             "glow",
-            "pulse"
-          ]
-        }
-      ],
-      "text": {
-        "content": "To the Sun? A STAGGERING 8 MINUTES!",
-        "position": "top",
-        "style": "slam_in"
-      },
-      "screen_effects": [
-        "camera_shake",
-        "flash"
-      ],
-      "dramatic_moment": true
-    },
-    {
-      "time_start": 12.0,
-      "time_end": 16.0,
-      "layers": [
-        {
-          "type": "planet",
-          "name": "neptune",
-          "position": "center",
-          "size": "large",
-          "expression": "neutral",
-          "entry_animation": "fade_in",
-          "effects": [
-            "float"
+            "pulse",
+            "vibrate"
           ]
         },
         {
           "type": "planet",
           "name": "earth",
-          "position": "bottom_right",
+          "position": "bottom_left",
           "size": "tiny",
           "expression": "scared",
           "entry_animation": "pop_in",
@@ -136,7 +109,47 @@
         }
       ],
       "text": {
-        "content": "To Neptune? Over 4 HOURS!",
+        "content": "BUT a Neutron Star has up to 2 BILLION G's!",
+        "position": "top",
+        "style": "slam_in"
+      },
+      "screen_effects": [
+        "camera_shake",
+        "flash",
+        "chromatic_aberration"
+      ],
+      "dramatic_moment": true
+    },
+    {
+      "time_start": 12.0,
+      "time_end": 16.0,
+      "layers": [
+        {
+          "type": "planet",
+          "name": "neutron_star",
+          "position": "left",
+          "size": "large",
+          "expression": "neutral",
+          "entry_animation": "fade_in",
+          "effects": [
+            "pulse",
+            "glow"
+          ]
+        },
+        {
+          "type": "planet",
+          "name": "jupiter",
+          "position": "right",
+          "size": "medium",
+          "expression": "shocked",
+          "entry_animation": "slide_from_right",
+          "effects": [
+            "shake"
+          ]
+        }
+      ],
+      "text": {
+        "content": "A teaspoon of it weighs 10 MILLION TONS!",
         "position": "top",
         "style": "word_by_word"
       },
@@ -151,41 +164,41 @@
       "layers": [
         {
           "type": "planet",
-          "name": "black_hole",
+          "name": "neutron_star",
           "position": "center",
-          "size": "huge",
+          "size": "large",
           "expression": "neutral",
-          "entry_animation": "zoom_in",
+          "entry_animation": "bounce_in",
           "effects": [
-            "pulse",
-            "glow"
+            "glow",
+            "float"
           ]
         },
         {
           "type": "planet",
           "name": "earth",
-          "position": "bottom_left",
+          "position": "bottom_right",
           "size": "tiny",
           "expression": "scared",
-          "entry_animation": "bounce_in",
+          "entry_animation": "fade_in",
           "effects": [
-            "vibrate"
+            "shake"
           ]
         }
       ],
       "text": {
-        "content": "Next Star? 4 YEARS! Milky Way? 100,000 YEARS!",
+        "content": "Escape velocity is HALF the speed of light!",
         "position": "top",
         "style": "slam_in"
       },
       "screen_effects": [
-        "chromatic_aberration"
+        "camera_shake"
       ],
       "dramatic_moment": true
     }
   ],
-  "formatted_at": "2026-03-21T18:20:20.596292",
+  "formatted_at": "2026-03-22T01:04:37.848479",
   "rendered": true,
-  "rendered_at": "2026-03-21T18:26:24.054073",
-  "video_path": "videos_output/script_20260321_182020.mp4"
+  "rendered_at": "2026-03-22T01:10:38.227315",
+  "video_path": "videos_output/script_20260322_010437.mp4"
 }
