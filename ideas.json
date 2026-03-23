@@ -4886,5 +4886,201 @@
       }
     ],
     "formatted_at": "2026-03-23T06:56:29.631029"
+  },
+  {
+    "id": "20260323_123738",
+    "status": "formatted",
+    "created_at": "2026-03-23T12:37:38.587144",
+    "idea": {
+      "topic": "Magnetar magnetic field strength",
+      "hook": "What's the STRONGEST magnet in the UNIVERSE?",
+      "title": "Magnetar: Universe's Strongest Magnet!",
+      "description": "Ever wondered what a magnetar's magnetic field can do? Prepare to have your mind blown by the universe's most extreme magnets!",
+      "tags": [
+        "space",
+        "astrophysics",
+        "science",
+        "magnetar",
+        "neutron_star",
+        "magnets",
+        "extreme",
+        "cosmos"
+      ],
+      "topic_family": "stars"
+    },
+    "metadata": {
+      "mood": "mind-blowing",
+      "music_style": "epic",
+      "background_search": "deep space galaxy nebula"
+    },
+    "timeline": [
+      {
+        "time_start": 0.0,
+        "time_end": 4.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "center",
+            "size": "large",
+            "expression": "thinking",
+            "entry_animation": "pop_in",
+            "effects": [
+              "idle_bounce"
+            ]
+          }
+        ],
+        "text": {
+          "content": "Your phone has a tiny magnet...",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 4.0,
+        "time_end": 8.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "left",
+            "size": "small",
+            "expression": "looking_right",
+            "entry_animation": "none",
+            "effects": [
+              "idle_bounce"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "sun",
+            "position": "right",
+            "size": "medium",
+            "expression": "smug",
+            "entry_animation": "slide_from_right",
+            "effects": [
+              "glow",
+              "pulse"
+            ]
+          }
+        ],
+        "text": {
+          "content": "The Sun's field is THOUSANDS of times stronger!",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 8.0,
+        "time_end": 12.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "neutron_star",
+            "position": "center",
+            "size": "large",
+            "expression": "neutral",
+            "entry_animation": "zoom_in",
+            "effects": [
+              "glow",
+              "pulse"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "bottom_right",
+            "size": "tiny",
+            "expression": "scared",
+            "entry_animation": "pop_in",
+            "effects": [
+              "shake"
+            ]
+          }
+        ],
+        "text": {
+          "content": "But a Neutron Star? Over 100 BILLION Gauss.",
+          "position": "top",
+          "style": "slam_in"
+        },
+        "screen_effects": [
+          "camera_shake",
+          "vignette_pulse"
+        ],
+        "dramatic_moment": true
+      },
+      {
+        "time_start": 12.0,
+        "time_end": 16.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "neutron_star",
+            "position": "center",
+            "size": "huge",
+            "expression": "neutral",
+            "entry_animation": "zoom_in",
+            "effects": [
+              "glow",
+              "vibrate"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "mars",
+            "position": "bottom_left",
+            "size": "tiny",
+            "expression": "scared",
+            "entry_animation": "pop_in",
+            "effects": [
+              "shake"
+            ]
+          }
+        ],
+        "text": {
+          "content": "A Magnetar's field? Up to 1000 TRILLION Gauss!",
+          "position": "top",
+          "style": "slam_in"
+        },
+        "screen_effects": [
+          "camera_shake",
+          "flash",
+          "chromatic_aberration"
+        ],
+        "dramatic_moment": true
+      },
+      {
+        "time_start": 16.0,
+        "time_end": 20.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "center",
+            "size": "medium",
+            "expression": "shocked",
+            "entry_animation": "bounce_in",
+            "effects": [
+              "shake",
+              "idle_bounce"
+            ]
+          }
+        ],
+        "text": {
+          "content": "It could erase your credit card from 100,000 miles!",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [
+          "vignette_pulse"
+        ],
+        "dramatic_moment": false
+      }
+    ],
+    "formatted_at": "2026-03-23T12:37:38.756818"
   }
 ]
