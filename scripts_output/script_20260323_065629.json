@@ -1,21 +1,19 @@
 {
   "idea": {
-    "topic": "How long to reach the nearest star?",
-    "hook": "How long would it REALLY take to reach the nearest star?",
-    "title": "To Nearest Star: 70,000 Years?!",
-    "description": "Ever wondered how long it would take to travel to the closest star? Prepare for a mind-blowing cosmic reality check! Earth to Alpha Centauri \u2013 the numbers will shock you.",
+    "topic": "Magnetar Magnetic Field Strength",
+    "hook": "What's the STRONGEST magnet in the ENTIRE UNIVERSE?",
+    "title": "Magnetars: Universe's ULTIMATE Magnet!",
+    "description": "Discover the mind-blowing magnetic fields of magnetars, millions of times stronger than anything on Earth!",
     "tags": [
       "space",
       "astrophysics",
       "science",
-      "stars",
-      "travel",
-      "light_years",
-      "alpha_centauri",
-      "distances",
-      "scale"
+      "magnetar",
+      "magnetic_field",
+      "neutron_star",
+      "extreme"
     ],
-    "topic_family": "distances"
+    "topic_family": "stars"
   },
   "metadata": {
     "mood": "mind-blowing",
@@ -40,7 +38,7 @@
         }
       ],
       "text": {
-        "content": "How long would it REALLY take to reach the nearest star?",
+        "content": "What's the STRONGEST magnet in the universe?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -53,6 +51,17 @@
       "layers": [
         {
           "type": "planet",
+          "name": "earth",
+          "position": "left",
+          "size": "medium",
+          "expression": "looking_right",
+          "entry_animation": "slide_from_left",
+          "effects": [
+            "idle_bounce"
+          ]
+        },
+        {
+          "type": "planet",
           "name": "mars",
           "position": "right",
           "size": "medium",
@@ -61,19 +70,10 @@
           "effects": [
             "pulse"
           ]
-        },
-        {
-          "type": "planet",
-          "name": "earth",
-          "position": "left",
-          "size": "small",
-          "expression": "looking_right",
-          "entry_animation": "fade_in",
-          "effects": []
         }
       ],
       "text": {
-        "content": "Mars? A quick 7 months with today's tech.",
+        "content": "A fridge magnet is 100x stronger than Earth's field!",
         "position": "top",
         "style": "word_by_word"
       },
@@ -98,7 +98,7 @@
         }
       ],
       "text": {
-        "content": "But the nearest star, Alpha Centauri? It's 4.3 LIGHT-YEARS away!",
+        "content": "The Sun's field is MILLIONS of times stronger!",
         "position": "top",
         "style": "slam_in"
       },
@@ -115,18 +115,19 @@
         {
           "type": "planet",
           "name": "neutron_star",
-          "position": "center",
+          "position": "left",
           "size": "large",
           "expression": "neutral",
-          "entry_animation": "fade_in",
+          "entry_animation": "slide_from_left",
           "effects": [
-            "pulse"
+            "pulse",
+            "vibrate"
           ]
         },
         {
           "type": "planet",
           "name": "earth",
-          "position": "bottom_left",
+          "position": "bottom_right",
           "size": "tiny",
           "expression": "scared",
           "entry_animation": "pop_in",
@@ -136,11 +137,12 @@
         }
       ],
       "text": {
-        "content": "At our FASTEST speed, that's 70,000 YEARS!",
+        "content": "But Magnetars? 100 QUADRILLION times stronger!",
         "position": "top",
         "style": "slam_in"
       },
       "screen_effects": [
+        "camera_shake",
         "vignette_pulse",
         "chromatic_aberration"
       ],
@@ -164,17 +166,17 @@
         {
           "type": "planet",
           "name": "mars",
-          "position": "top_right",
-          "size": "tiny",
-          "expression": "happy",
-          "entry_animation": "slide_from_right",
+          "position": "top_left",
+          "size": "small",
+          "expression": "neutral",
+          "entry_animation": "fade_in",
           "effects": [
-            "float"
+            "idle_bounce"
           ]
         }
       ],
       "text": {
-        "content": "That's why we need new tech! Warp drive, anyone?",
+        "content": "Enough to erase data from 100,000 miles away!",
         "position": "top",
         "style": "word_by_word"
       },
@@ -182,8 +184,8 @@
       "dramatic_moment": false
     }
   ],
-  "formatted_at": "2026-03-23T01:05:35.367259",
+  "formatted_at": "2026-03-23T06:56:29.186863",
   "rendered": true,
-  "rendered_at": "2026-03-23T01:12:19.743194",
-  "video_path": "videos_output/script_20260323_010535.mp4"
+  "rendered_at": "2026-03-23T07:03:55.415917",
+  "video_path": "videos_output/script_20260323_065629.mp4"
 }
