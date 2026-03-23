@@ -1,20 +1,22 @@
 {
   "idea": {
-    "topic": "Magnetar magnetic field strength",
-    "hook": "What's the STRONGEST magnet in the UNIVERSE?",
-    "title": "Magnetar: Universe's Strongest Magnet!",
-    "description": "Ever wondered what a magnetar's magnetic field can do? Prepare to have your mind blown by the universe's most extreme magnets!",
+    "topic": "Solar Scale: Earths in the Sun",
+    "hook": "How many Earths can REALLY fit inside our Sun?",
+    "title": "1.3 Million Earths in the Sun?!\ud83e\udd2f",
+    "description": "Ever wondered just how big our Sun is? Prepare to have your mind blown as we compare Earth to Jupiter, then to the truly gigantic star at the center of our solar system! The numbers are astronomical!",
     "tags": [
       "space",
       "astrophysics",
       "science",
-      "magnetar",
-      "neutron_star",
-      "magnets",
-      "extreme",
-      "cosmos"
+      "sun",
+      "earth",
+      "solar system",
+      "scale",
+      "planets",
+      "viral",
+      "mindblown"
     ],
-    "topic_family": "stars"
+    "topic_family": "scale"
   },
   "metadata": {
     "mood": "mind-blowing",
@@ -30,7 +32,7 @@
           "type": "planet",
           "name": "earth",
           "position": "center",
-          "size": "large",
+          "size": "medium",
           "expression": "thinking",
           "entry_animation": "pop_in",
           "effects": [
@@ -39,7 +41,7 @@
         }
       ],
       "text": {
-        "content": "Your phone has a tiny magnet...",
+        "content": "Think Earth is HUGE?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -52,34 +54,35 @@
       "layers": [
         {
           "type": "planet",
-          "name": "earth",
-          "position": "left",
-          "size": "small",
-          "expression": "looking_right",
-          "entry_animation": "none",
+          "name": "jupiter",
+          "position": "right",
+          "size": "large",
+          "expression": "smug",
+          "entry_animation": "slide_from_right",
           "effects": [
-            "idle_bounce"
+            "pulse"
           ]
         },
         {
           "type": "planet",
-          "name": "sun",
-          "position": "right",
-          "size": "medium",
-          "expression": "smug",
-          "entry_animation": "slide_from_right",
+          "name": "earth",
+          "position": "left",
+          "size": "small",
+          "expression": "looking_right",
+          "entry_animation": "slide_from_left",
           "effects": [
-            "glow",
-            "pulse"
+            "shake"
           ]
         }
       ],
       "text": {
-        "content": "The Sun's field is THOUSANDS of times stronger!",
+        "content": "Jupiter alone fits 1,300 Earths!",
         "position": "top",
         "style": "word_by_word"
       },
-      "screen_effects": [],
+      "screen_effects": [
+        "vignette_pulse"
+      ],
       "dramatic_moment": false
     },
     {
@@ -88,9 +91,9 @@
       "layers": [
         {
           "type": "planet",
-          "name": "neutron_star",
+          "name": "sun",
           "position": "center",
-          "size": "large",
+          "size": "huge",
           "expression": "neutral",
           "entry_animation": "zoom_in",
           "effects": [
@@ -101,9 +104,20 @@
         {
           "type": "planet",
           "name": "earth",
-          "position": "bottom_right",
+          "position": "bottom_left",
           "size": "tiny",
           "expression": "scared",
+          "entry_animation": "pop_in",
+          "effects": [
+            "shake"
+          ]
+        },
+        {
+          "type": "planet",
+          "name": "jupiter",
+          "position": "bottom_right",
+          "size": "small",
+          "expression": "shocked",
           "entry_animation": "pop_in",
           "effects": [
             "shake"
@@ -111,13 +125,13 @@
         }
       ],
       "text": {
-        "content": "But a Neutron Star? Over 100 BILLION Gauss.",
+        "content": "The Sun fits... 1.3 MILLION Earths!",
         "position": "top",
         "style": "slam_in"
       },
       "screen_effects": [
         "camera_shake",
-        "vignette_pulse"
+        "flash"
       ],
       "dramatic_moment": true
     },
@@ -127,39 +141,37 @@
       "layers": [
         {
           "type": "planet",
-          "name": "neutron_star",
+          "name": "sun",
           "position": "center",
           "size": "huge",
           "expression": "neutral",
-          "entry_animation": "zoom_in",
+          "entry_animation": "none",
           "effects": [
             "glow",
-            "vibrate"
+            "float"
           ]
         },
         {
           "type": "planet",
-          "name": "mars",
+          "name": "earth",
           "position": "bottom_left",
           "size": "tiny",
           "expression": "scared",
-          "entry_animation": "pop_in",
+          "entry_animation": "none",
           "effects": [
-            "shake"
+            "idle_bounce"
           ]
         }
       ],
       "text": {
-        "content": "A Magnetar's field? Up to 1000 TRILLION Gauss!",
+        "content": "ONE POINT THREE MILLION of our planet!",
         "position": "top",
-        "style": "slam_in"
+        "style": "word_by_word"
       },
       "screen_effects": [
-        "camera_shake",
-        "flash",
         "chromatic_aberration"
       ],
-      "dramatic_moment": true
+      "dramatic_moment": false
     },
     {
       "time_start": 16.0,
@@ -170,27 +182,35 @@
           "name": "earth",
           "position": "center",
           "size": "medium",
-          "expression": "shocked",
+          "expression": "excited",
           "entry_animation": "bounce_in",
           "effects": [
-            "shake",
             "idle_bounce"
+          ]
+        },
+        {
+          "type": "planet",
+          "name": "sun",
+          "position": "top_right",
+          "size": "tiny",
+          "expression": "neutral",
+          "entry_animation": "fade_in",
+          "effects": [
+            "glow"
           ]
         }
       ],
       "text": {
-        "content": "It could erase your credit card from 100,000 miles!",
+        "content": "Our star is truly VAST! Mind blown yet?",
         "position": "top",
         "style": "word_by_word"
       },
-      "screen_effects": [
-        "vignette_pulse"
-      ],
+      "screen_effects": [],
       "dramatic_moment": false
     }
   ],
-  "formatted_at": "2026-03-23T12:37:38.755981",
+  "formatted_at": "2026-03-23T18:37:27.568977",
   "rendered": true,
-  "rendered_at": "2026-03-23T12:45:07.941816",
-  "video_path": "videos_output/script_20260323_123738.mp4"
+  "rendered_at": "2026-03-23T18:42:52.499185",
+  "video_path": "videos_output/script_20260323_183727.mp4"
 }
