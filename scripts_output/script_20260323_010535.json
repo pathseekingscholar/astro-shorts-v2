@@ -1,21 +1,21 @@
 {
   "idea": {
-    "topic": "Supermassive Black Hole at Galaxy Center: Sagittarius A*",
-    "hook": "Ever wonder what's at the heart of EVERY galaxy?",
-    "title": "Galaxy's Heart: 4.3 Million Suns!",
-    "description": "Discover the unimaginable power of Sagittarius A*, the supermassive black hole at the center of our Milky Way galaxy. It's bigger than you think!",
+    "topic": "How long to reach the nearest star?",
+    "hook": "How long would it REALLY take to reach the nearest star?",
+    "title": "To Nearest Star: 70,000 Years?!",
+    "description": "Ever wondered how long it would take to travel to the closest star? Prepare for a mind-blowing cosmic reality check! Earth to Alpha Centauri \u2013 the numbers will shock you.",
     "tags": [
       "space",
       "astrophysics",
       "science",
-      "black_holes",
-      "galaxy",
-      "milky_way",
-      "sagittarius_a",
-      "scale",
-      "universe"
+      "stars",
+      "travel",
+      "light_years",
+      "alpha_centauri",
+      "distances",
+      "scale"
     ],
-    "topic_family": "black_holes"
+    "topic_family": "distances"
   },
   "metadata": {
     "mood": "mind-blowing",
@@ -40,7 +40,7 @@
         }
       ],
       "text": {
-        "content": "Ever wonder what's at the heart of EVERY galaxy?",
+        "content": "How long would it REALLY take to reach the nearest star?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -53,33 +53,31 @@
       "layers": [
         {
           "type": "planet",
-          "name": "earth",
-          "position": "top_left",
-          "size": "small",
-          "expression": "neutral",
-          "entry_animation": "slide_from_left",
-          "effects": []
+          "name": "mars",
+          "position": "right",
+          "size": "medium",
+          "expression": "smug",
+          "entry_animation": "slide_from_right",
+          "effects": [
+            "pulse"
+          ]
         },
         {
           "type": "planet",
-          "name": "sun",
-          "position": "bottom_right",
-          "size": "medium",
-          "expression": "neutral",
-          "entry_animation": "slide_from_right",
-          "effects": [
-            "glow"
-          ]
+          "name": "earth",
+          "position": "left",
+          "size": "small",
+          "expression": "looking_right",
+          "entry_animation": "fade_in",
+          "effects": []
         }
       ],
       "text": {
-        "content": "Our Milky Way? It's home to 200 BILLION stars!",
+        "content": "Mars? A quick 7 months with today's tech.",
         "position": "top",
-        "style": "slam_in"
+        "style": "word_by_word"
       },
-      "screen_effects": [
-        "vignette_pulse"
-      ],
+      "screen_effects": [],
       "dramatic_moment": false
     },
     {
@@ -89,34 +87,24 @@
         {
           "type": "planet",
           "name": "sun",
-          "position": "top_left",
-          "size": "small",
-          "expression": "scared",
-          "entry_animation": "slide_from_left",
-          "effects": []
-        },
-        {
-          "type": "planet",
-          "name": "black_hole",
           "position": "center",
           "size": "huge",
-          "expression": "neutral",
+          "expression": "shocked",
           "entry_animation": "zoom_in",
           "effects": [
-            "pulse",
-            "wobble"
+            "glow",
+            "pulse"
           ]
         }
       ],
       "text": {
-        "content": "At its center: Sagittarius A*! 4.3 MILLION times the Sun's mass!",
+        "content": "But the nearest star, Alpha Centauri? It's 4.3 LIGHT-YEARS away!",
         "position": "top",
         "style": "slam_in"
       },
       "screen_effects": [
         "camera_shake",
-        "flash",
-        "chromatic_aberration"
+        "flash"
       ],
       "dramatic_moment": true
     },
@@ -126,48 +114,37 @@
       "layers": [
         {
           "type": "planet",
-          "name": "black_hole",
+          "name": "neutron_star",
           "position": "center",
-          "size": "huge",
+          "size": "large",
           "expression": "neutral",
-          "entry_animation": "none",
-          "effects": [
-            "pulse",
-            "float"
-          ]
-        },
-        {
-          "type": "planet",
-          "name": "sun",
-          "position": "top_right",
-          "size": "tiny",
-          "expression": "dead",
           "entry_animation": "fade_in",
           "effects": [
-            "shake"
+            "pulse"
           ]
         },
         {
           "type": "planet",
-          "name": "jupiter",
+          "name": "earth",
           "position": "bottom_left",
           "size": "tiny",
           "expression": "scared",
-          "entry_animation": "fade_in",
+          "entry_animation": "pop_in",
           "effects": [
-            "vibrate"
+            "shake"
           ]
         }
       ],
       "text": {
-        "content": "Its event horizon is 17 times bigger than our Sun!",
+        "content": "At our FASTEST speed, that's 70,000 YEARS!",
         "position": "top",
-        "style": "word_by_word"
+        "style": "slam_in"
       },
       "screen_effects": [
-        "vignette_pulse"
+        "vignette_pulse",
+        "chromatic_aberration"
       ],
-      "dramatic_moment": false
+      "dramatic_moment": true
     },
     {
       "time_start": 16.0,
@@ -188,16 +165,16 @@
           "type": "planet",
           "name": "mars",
           "position": "top_right",
-          "size": "small",
-          "expression": "looking_left",
-          "entry_animation": "bounce_in",
+          "size": "tiny",
+          "expression": "happy",
+          "entry_animation": "slide_from_right",
           "effects": [
-            "idle_bounce"
+            "float"
           ]
         }
       ],
       "text": {
-        "content": "A cosmic anchor, shaping galaxies for BILLIONS of years!",
+        "content": "That's why we need new tech! Warp drive, anyone?",
         "position": "top",
         "style": "word_by_word"
       },
@@ -205,8 +182,8 @@
       "dramatic_moment": false
     }
   ],
-  "formatted_at": "2026-03-22T18:20:22.715554",
+  "formatted_at": "2026-03-23T01:05:35.367259",
   "rendered": true,
-  "rendered_at": "2026-03-22T18:29:33.163601",
-  "video_path": "videos_output/script_20260322_182022.mp4"
+  "rendered_at": "2026-03-23T01:12:19.743194",
+  "video_path": "videos_output/script_20260323_010535.mp4"
 }

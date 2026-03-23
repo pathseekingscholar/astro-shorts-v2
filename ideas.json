@@ -4506,5 +4506,194 @@
       }
     ],
     "formatted_at": "2026-03-22T18:20:22.716111"
+  },
+  {
+    "id": "20260323_010535",
+    "status": "formatted",
+    "created_at": "2026-03-23T01:05:35.231246",
+    "idea": {
+      "topic": "How long to reach the nearest star?",
+      "hook": "How long would it REALLY take to reach the nearest star?",
+      "title": "To Nearest Star: 70,000 Years?!",
+      "description": "Ever wondered how long it would take to travel to the closest star? Prepare for a mind-blowing cosmic reality check! Earth to Alpha Centauri \u2013 the numbers will shock you.",
+      "tags": [
+        "space",
+        "astrophysics",
+        "science",
+        "stars",
+        "travel",
+        "light_years",
+        "alpha_centauri",
+        "distances",
+        "scale"
+      ],
+      "topic_family": "distances"
+    },
+    "metadata": {
+      "mood": "mind-blowing",
+      "music_style": "epic",
+      "background_search": "deep space galaxy nebula"
+    },
+    "timeline": [
+      {
+        "time_start": 0.0,
+        "time_end": 4.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "center",
+            "size": "large",
+            "expression": "thinking",
+            "entry_animation": "pop_in",
+            "effects": [
+              "idle_bounce"
+            ]
+          }
+        ],
+        "text": {
+          "content": "How long would it REALLY take to reach the nearest star?",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 4.0,
+        "time_end": 8.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "mars",
+            "position": "right",
+            "size": "medium",
+            "expression": "smug",
+            "entry_animation": "slide_from_right",
+            "effects": [
+              "pulse"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "left",
+            "size": "small",
+            "expression": "looking_right",
+            "entry_animation": "fade_in",
+            "effects": []
+          }
+        ],
+        "text": {
+          "content": "Mars? A quick 7 months with today's tech.",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      },
+      {
+        "time_start": 8.0,
+        "time_end": 12.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "sun",
+            "position": "center",
+            "size": "huge",
+            "expression": "shocked",
+            "entry_animation": "zoom_in",
+            "effects": [
+              "glow",
+              "pulse"
+            ]
+          }
+        ],
+        "text": {
+          "content": "But the nearest star, Alpha Centauri? It's 4.3 LIGHT-YEARS away!",
+          "position": "top",
+          "style": "slam_in"
+        },
+        "screen_effects": [
+          "camera_shake",
+          "flash"
+        ],
+        "dramatic_moment": true
+      },
+      {
+        "time_start": 12.0,
+        "time_end": 16.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "neutron_star",
+            "position": "center",
+            "size": "large",
+            "expression": "neutral",
+            "entry_animation": "fade_in",
+            "effects": [
+              "pulse"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "bottom_left",
+            "size": "tiny",
+            "expression": "scared",
+            "entry_animation": "pop_in",
+            "effects": [
+              "shake"
+            ]
+          }
+        ],
+        "text": {
+          "content": "At our FASTEST speed, that's 70,000 YEARS!",
+          "position": "top",
+          "style": "slam_in"
+        },
+        "screen_effects": [
+          "vignette_pulse",
+          "chromatic_aberration"
+        ],
+        "dramatic_moment": true
+      },
+      {
+        "time_start": 16.0,
+        "time_end": 20.0,
+        "layers": [
+          {
+            "type": "planet",
+            "name": "earth",
+            "position": "center",
+            "size": "medium",
+            "expression": "excited",
+            "entry_animation": "bounce_in",
+            "effects": [
+              "idle_bounce"
+            ]
+          },
+          {
+            "type": "planet",
+            "name": "mars",
+            "position": "top_right",
+            "size": "tiny",
+            "expression": "happy",
+            "entry_animation": "slide_from_right",
+            "effects": [
+              "float"
+            ]
+          }
+        ],
+        "text": {
+          "content": "That's why we need new tech! Warp drive, anyone?",
+          "position": "top",
+          "style": "word_by_word"
+        },
+        "screen_effects": [],
+        "dramatic_moment": false
+      }
+    ],
+    "formatted_at": "2026-03-23T01:05:35.792718"
   }
 ]
