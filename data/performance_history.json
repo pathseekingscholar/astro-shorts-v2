@@ -402,14 +402,14 @@
     "published_at": "2026-03-19T06:48:11Z",
     "topic_family": "planetary_facts",
     "metrics": {
-      "views": 77,
-      "likes": 0,
+      "views": 125,
+      "likes": 1,
       "comments": 0,
-      "watch_time_minutes": 1,
-      "avg_view_duration_seconds": 14
+      "watch_time_minutes": 3,
+      "avg_view_duration_seconds": 11
     },
-    "performance_score": 0.497,
-    "analyzed_at": "2026-03-21T06:39:03.202792"
+    "performance_score": 0.627,
+    "analyzed_at": "2026-03-23T07:06:15.752730"
   },
   {
     "video_id": "qLc6RPrukhs",
@@ -417,14 +417,14 @@
     "published_at": "2026-03-19T01:11:01Z",
     "topic_family": "planetary_facts",
     "metrics": {
-      "views": 153,
-      "likes": 2,
+      "views": 272,
+      "likes": 1,
       "comments": 0,
-      "watch_time_minutes": 10,
-      "avg_view_duration_seconds": 14
+      "watch_time_minutes": 16,
+      "avg_view_duration_seconds": 13
     },
-    "performance_score": 0.953,
-    "analyzed_at": "2026-03-21T06:39:03.362704"
+    "performance_score": 1.36,
+    "analyzed_at": "2026-03-23T07:06:15.865375"
   },
   {
     "video_id": "1oB5rG4X-68",
@@ -434,10 +434,12 @@
     "metrics": {
       "views": 5,
       "likes": 0,
-      "comments": 0
+      "comments": 0,
+      "watch_time_minutes": 0,
+      "avg_view_duration_seconds": 11
     },
-    "performance_score": 0.013,
-    "analyzed_at": "2026-03-21T06:39:03.483740"
+    "performance_score": 0.232,
+    "analyzed_at": "2026-03-23T07:06:15.992037"
   },
   {
     "video_id": "DESzDN8YREI",
@@ -445,14 +447,14 @@
     "published_at": "2026-03-18T12:46:18Z",
     "topic_family": "scale_comparison",
     "metrics": {
-      "views": 82,
-      "likes": 2,
+      "views": 1621,
+      "likes": 40,
       "comments": 0,
-      "watch_time_minutes": 9,
-      "avg_view_duration_seconds": 18
+      "watch_time_minutes": 158,
+      "avg_view_duration_seconds": 15
     },
-    "performance_score": 0.83,
-    "analyzed_at": "2026-03-21T06:39:03.631625"
+    "performance_score": 2.1,
+    "analyzed_at": "2026-03-23T07:06:16.117526"
   },
   {
     "video_id": "hmr5_hmbYcA",
@@ -475,12 +477,14 @@
     "published_at": "2026-03-20T06:45:22Z",
     "topic_family": "planetary_facts",
     "metrics": {
-      "views": 165,
+      "views": 163,
       "likes": 5,
-      "comments": 0
+      "comments": 0,
+      "watch_time_minutes": 12,
+      "avg_view_duration_seconds": 15
     },
-    "performance_score": 0.512,
-    "analyzed_at": "2026-03-21T06:39:02.616459"
+    "performance_score": 1.108,
+    "analyzed_at": "2026-03-23T07:06:15.264552"
   },
   {
     "video_id": "7_G7Xq7gzm4",
@@ -488,12 +492,14 @@
     "published_at": "2026-03-20T01:08:36Z",
     "topic_family": "planetary_facts",
     "metrics": {
-      "views": 256,
+      "views": 259,
       "likes": 5,
-      "comments": 0
+      "comments": 0,
+      "watch_time_minutes": 17,
+      "avg_view_duration_seconds": 13
     },
-    "performance_score": 0.74,
-    "analyzed_at": "2026-03-21T06:39:02.757322"
+    "performance_score": 1.433,
+    "analyzed_at": "2026-03-23T07:06:15.390060"
   },
   {
     "video_id": "TSbF-YjcyrM",
@@ -503,10 +509,12 @@
     "metrics": {
       "views": 74,
       "likes": 0,
-      "comments": 0
+      "comments": 0,
+      "watch_time_minutes": 2,
+      "avg_view_duration_seconds": 14
     },
-    "performance_score": 0.185,
-    "analyzed_at": "2026-03-21T06:39:02.901359"
+    "performance_score": 0.515,
+    "analyzed_at": "2026-03-23T07:06:15.514018"
   },
   {
     "video_id": "6SWYy536DnY",
@@ -516,10 +524,12 @@
     "metrics": {
       "views": 244,
       "likes": 0,
-      "comments": 0
+      "comments": 0,
+      "watch_time_minutes": 24,
+      "avg_view_duration_seconds": 29
     },
-    "performance_score": 0.61,
-    "analyzed_at": "2026-03-21T06:39:03.045404"
+    "performance_score": 1.79,
+    "analyzed_at": "2026-03-23T07:06:15.630596"
   },
   {
     "video_id": "Onsxdzku6QQ",
@@ -532,7 +542,7 @@
       "comments": 0
     },
     "performance_score": 0.0,
-    "analyzed_at": "2026-03-21T06:39:01.981061"
+    "analyzed_at": "2026-03-23T07:06:14.771678"
   },
   {
     "video_id": "ejKQQNHpu14",
@@ -542,10 +552,12 @@
     "metrics": {
       "views": 77,
       "likes": 0,
-      "comments": 0
+      "comments": 0,
+      "watch_time_minutes": 2,
+      "avg_view_duration_seconds": 11
     },
-    "performance_score": 0.193,
-    "analyzed_at": "2026-03-21T06:39:02.133960"
+    "performance_score": 0.462,
+    "analyzed_at": "2026-03-23T07:06:14.887797"
   },
   {
     "video_id": "N_Dy3hbVtTw",
@@ -555,10 +567,12 @@
     "metrics": {
       "views": 69,
       "likes": 0,
-      "comments": 0
+      "comments": 0,
+      "watch_time_minutes": 3,
+      "avg_view_duration_seconds": 12
     },
-    "performance_score": 0.172,
-    "analyzed_at": "2026-03-21T06:39:02.267587"
+    "performance_score": 0.487,
+    "analyzed_at": "2026-03-23T07:06:15.013527"
   },
   {
     "video_id": "u1GRo5IqnDI",
@@ -566,11 +580,117 @@
     "published_at": "2026-03-20T12:36:12Z",
     "topic_family": "planetary_facts",
     "metrics": {
-      "views": 89,
+      "views": 83,
       "likes": 2,
+      "comments": 0,
+      "watch_time_minutes": 6,
+      "avg_view_duration_seconds": 13
+    },
+    "performance_score": 0.657,
+    "analyzed_at": "2026-03-23T07:06:15.140459"
+  },
+  {
+    "video_id": "H0z65kTfkjA",
+    "title": "Astrophysics Facts #Shorts",
+    "published_at": "2026-03-23T07:04:12Z",
+    "topic_family": "planetary_facts",
+    "metrics": {
+      "views": 0,
+      "likes": 0,
       "comments": 0
     },
-    "performance_score": 0.263,
-    "analyzed_at": "2026-03-21T06:39:02.403419"
+    "performance_score": 0.0,
+    "analyzed_at": "2026-03-23T07:06:13.802615"
+  },
+  {
+    "video_id": "nnetoVqohZ8",
+    "title": "Astrophysics Facts #Shorts",
+    "published_at": "2026-03-23T01:12:42Z",
+    "topic_family": "planetary_facts",
+    "metrics": {
+      "views": 0,
+      "likes": 0,
+      "comments": 0
+    },
+    "performance_score": 0.0,
+    "analyzed_at": "2026-03-23T07:06:13.913100"
+  },
+  {
+    "video_id": "8fIhrHUJNDI",
+    "title": "Astrophysics Facts #Shorts",
+    "published_at": "2026-03-22T18:29:54Z",
+    "topic_family": "planetary_facts",
+    "metrics": {
+      "views": 0,
+      "likes": 0,
+      "comments": 0
+    },
+    "performance_score": 0.0,
+    "analyzed_at": "2026-03-23T07:06:14.039074"
+  },
+  {
+    "video_id": "6gIgxBwq4D0",
+    "title": "Astrophysics Facts #Shorts",
+    "published_at": "2026-03-22T12:28:59Z",
+    "topic_family": "planetary_facts",
+    "metrics": {
+      "views": 0,
+      "likes": 0,
+      "comments": 0
+    },
+    "performance_score": 0.0,
+    "analyzed_at": "2026-03-23T07:06:14.159966"
+  },
+  {
+    "video_id": "LZOMCkNvKY4",
+    "title": "Astrophysics Facts #Shorts",
+    "published_at": "2026-03-22T06:46:50Z",
+    "topic_family": "planetary_facts",
+    "metrics": {
+      "views": 0,
+      "likes": 0,
+      "comments": 0
+    },
+    "performance_score": 0.0,
+    "analyzed_at": "2026-03-23T07:06:14.264132"
+  },
+  {
+    "video_id": "oalhyYJn2tY",
+    "title": "Astrophysics Facts #Shorts",
+    "published_at": "2026-03-22T01:10:59Z",
+    "topic_family": "planetary_facts",
+    "metrics": {
+      "views": 0,
+      "likes": 0,
+      "comments": 0
+    },
+    "performance_score": 0.0,
+    "analyzed_at": "2026-03-23T07:06:14.416261"
+  },
+  {
+    "video_id": "SOeXDy8ctZ0",
+    "title": "Astrophysics Facts #Shorts",
+    "published_at": "2026-03-21T18:26:44Z",
+    "topic_family": "planetary_facts",
+    "metrics": {
+      "views": 0,
+      "likes": 0,
+      "comments": 0
+    },
+    "performance_score": 0.0,
+    "analyzed_at": "2026-03-23T07:06:14.526448"
+  },
+  {
+    "video_id": "WuXYTpmuLII",
+    "title": "\ud83e\udd2f Earths in the Sun?! MILLIONS!",
+    "published_at": "2026-03-21T12:28:59Z",
+    "topic_family": "scale_comparison",
+    "metrics": {
+      "views": 1,
+      "likes": 1,
+      "comments": 0
+    },
+    "performance_score": 0.023,
+    "analyzed_at": "2026-03-23T07:06:14.649556"
   }
 ]
