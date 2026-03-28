@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: '0 */6 * * *'
   workflow_dispatch:
+    inputs:
+      preview:
+        description: 'Run fast preview render instead of full production render'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   generate:
@@ -21,7 +27,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg imagemagick
+          sudo apt-get install -y ffmpeg imagemagick wget fonts-dejavu
           sudo sed -i 's/rights="none" pattern="@\*"/rights="read|write" pattern="@*"/' /etc/ImageMagick-6/policy.xml || true
           sudo sed -i '/<policy domain="path" rights="none" pattern="@\*"/d' /etc/ImageMagick-6/policy.xml || true
       
@@ -31,6 +37,14 @@ jobs:
           pip install requests Pillow numpy
           pip install moviepy==1.0.3
           pip install google-auth google-auth-oauthlib google-api-python-client
+
+      - name: Download Montserrat ExtraBold
+        run: |
+          mkdir -p assets/fonts
+          wget -q "https://github.com/JulietaUla/Montserrat/raw/master/fonts/ttf/Montserrat-ExtraBold.ttf" \
+            -O assets/fonts/Montserrat-ExtraBold.ttf || true
+          wget -q "https://github.com/JulietaUla/Montserrat/raw/master/fonts/ttf/Montserrat-Regular.ttf" \
+            -O assets/fonts/Montserrat-Regular.ttf || true
       
       - name: Generate idea
         env:
@@ -45,7 +59,16 @@ jobs:
       - name: Render video
         env:
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
-        run: python scripts/video_renderer.py
+          NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
+          MUBERT_API_KEY: ${{ secrets.MUBERT_API_KEY }}
+          SUNO_API_URL: ${{ secrets.SUNO_API_URL }}
+          SUNO_COOKIE: ${{ secrets.SUNO_COOKIE }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.preview }}" = "true" ]; then
+            python scripts/video_renderer.py --preview
+          else
+            python scripts/video_renderer.py
+          fi
       
       - name: Upload to YouTube
         env:

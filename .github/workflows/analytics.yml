@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: '0 */6 * * *'
   workflow_dispatch:
+    inputs:
+      preview:
+        description: 'Run fast preview renders instead of full production renders'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   generate:
@@ -21,7 +27,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg imagemagick fonts-dejavu wget unzip
+          sudo apt-get install -y ffmpeg imagemagick fonts-dejavu wget
           sudo sed -i 's/rights="none" pattern="@\*"/rights="read|write" pattern="@*"/' \
             /etc/ImageMagick-6/policy.xml 2>/dev/null || true
 
@@ -81,9 +87,18 @@ jobs:
           YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          MUBERT_API_KEY: ${{ secrets.MUBERT_API_KEY }}
+          SUNO_API_URL: ${{ secrets.SUNO_API_URL }}
+          SUNO_COOKIE: ${{ secrets.SUNO_COOKIE }}
           VIDEO_COUNT: ${{ steps.strategy.outputs.count }}
         run: |
           COUNT=${VIDEO_COUNT:-2}
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.preview }}" = "true" ]; then
+            RENDER_CMD="python scripts/video_renderer.py --preview"
+          else
+            RENDER_CMD="python scripts/video_renderer.py"
+          fi
           echo "🎬 Generating $COUNT video(s)..."
           for i in $(seq 1 $COUNT); do
             echo ""
@@ -92,7 +107,7 @@ jobs:
             echo "=========================================="
             python scripts/idea_generator.py
             python scripts/script_formatter.py
-            python scripts/video_renderer.py
+            eval "$RENDER_CMD"
             python scripts/youtube_uploader.py
             sleep 8
           done

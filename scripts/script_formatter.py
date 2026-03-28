@@ -10,15 +10,16 @@ In V5, ideas already contain the full timeline, so this mainly:
 
 import os
 import json
-import shutil
 from datetime import datetime
 
-# Import asset fetcher
+# Import music fetcher
 try:
-    from asset_fetcher import fetch_assets_for_script, download_music
+    from music_generator import get_music_for_mood
 except ImportError:
-    fetch_assets_for_script = None
-    download_music = None
+    try:
+        from scripts.music_generator import get_music_for_mood
+    except ImportError:
+        get_music_for_mood = None
 
 # =============================================================================
 # CONFIG
@@ -132,15 +133,19 @@ def save_script(formatted_data, idea_id):
 def fetch_music_for_script(formatted_data):
     """Pre-fetch music for the script."""
     
-    if not download_music:
+    if not get_music_for_mood:
         return
     
-    mood = formatted_data.get('metadata', {}).get('music_style', '')
-    if not mood:
-        mood = formatted_data.get('metadata', {}).get('mood', 'cinematic')
+    metadata = formatted_data.get('metadata', {})
+    mood = metadata.get('music_style') or metadata.get('mood') or 'cinematic'
+    timeline = formatted_data.get('timeline', [])
+    duration = sum(
+        max(0.0, scene.get('time_end', 0) - scene.get('time_start', 0))
+        for scene in timeline
+    ) + 2.5
     
     print(f"🎵 Fetching music for mood: {mood}")
-    download_music(mood)
+    get_music_for_mood(mood, max(duration, 10.0))
 
 
 # =============================================================================

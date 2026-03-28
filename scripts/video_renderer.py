@@ -1,1098 +1,1238 @@
 """
-Video Renderer - CINEMA EDITION
-================================
-Upgrades over V5:
-- Parallax 3-layer starfield (depth)
-- NASA APOD background image integration  
-- Montserrat font with fallbacks
-- Hook screen (first 2.5s, zoom-in punch)
-- Progress bar at bottom
-- Highlighted number text (yellow, larger, glow)
-- Glow rings on all planets
-- Shooting star effect
-- Topic-based color themes
-- All existing V5 features preserved
+Dark Cosmos renderer for Astro Shorts.
 """
 
-import os
+from __future__ import annotations
+
+import argparse
+import hashlib
+import io
 import json
-import random
 import math
+import os
+import random
+import re
 import textwrap
-import requests
 from datetime import datetime
-from moviepy.editor import VideoClip, AudioFileClip, concatenate_videoclips
-from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageEnhance
+from pathlib import Path
+
+import moviepy.audio.fx.all as afx
 import numpy as np
+import requests
+from moviepy.editor import AudioFileClip, VideoClip
+from PIL import Image, ImageChops, ImageColor, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
-# =============================================================================
-# CONFIG
-# =============================================================================
-WIDTH = 1080
-HEIGHT = 1920
-FPS = 30
-SCRIPTS_DIR = "scripts_output"
-OUTPUT_DIR = "videos_output"
-AUDIO_DIR = "assets/audio"
-FONTS_DIR = "assets/fonts"
+try:
+    from music_generator import get_music_for_mood
+except ImportError:
+    from scripts.music_generator import get_music_for_mood
 
-COLORS = {
-    'background':  (8,   8,  24),
-    'text_white':  (255, 255, 255),
-    'text_yellow': (255, 220,   0),
-    'text_cyan':   (0,   255, 255),
-    'text_red':    (255,  80,  80),
-    'text_pink':   (255, 100, 200),
-    'text_orange': (255, 160,  40),
-    'glow_blue':   (0,   180, 255),
-    'glow_pink':   (255, 100, 200),
-    'glow_yellow': (255, 200,   0),
-    'accent':      (255, 220,   0),
-    'progress':    (255, 200,   0),
-}
+
+BASE_WIDTH = 1080
+BASE_HEIGHT = 1920
+BASE_FPS = 24
+WIDTH = BASE_WIDTH
+HEIGHT = BASE_HEIGHT
+FPS = BASE_FPS
+HOOK_DURATION = 2.5
+TRANSITION_DURATION = 0.45
+PREVIEW_MODE = False
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+SCRIPTS_DIR = ROOT_DIR / "scripts_output"
+OUTPUT_DIR = ROOT_DIR / "videos_output"
+BACKGROUNDS_DIR = ROOT_DIR / "assets" / "backgrounds"
+FONTS_DIR = ROOT_DIR / "assets" / "fonts"
+
+WHITE = (255, 255, 255)
+NUMBER_YELLOW = ImageColor.getrgb("#FFD700")
+PLANET_CYAN = ImageColor.getrgb("#00FFFF")
+PILL_DARK = (5, 8, 16, 160)
 
 POSITIONS = {
-    'center':       (0.5,  0.5),
-    'left':         (0.28, 0.5),
-    'right':        (0.72, 0.5),
-    'top':          (0.5,  0.3),
-    'bottom':       (0.5,  0.7),
-    'top_left':     (0.28, 0.3),
-    'top_right':    (0.72, 0.3),
-    'bottom_left':  (0.28, 0.7),
-    'bottom_right': (0.72, 0.7),
+    "center": (0.50, 0.52),
+    "left": (0.25, 0.54),
+    "right": (0.75, 0.54),
+    "top": (0.50, 0.30),
+    "bottom": (0.50, 0.72),
+    "top_left": (0.25, 0.30),
+    "top_right": (0.75, 0.30),
+    "bottom_left": (0.25, 0.74),
+    "bottom_right": (0.75, 0.74),
 }
 
 SIZES = {
-    'tiny':   50,
-    'small':  90,
-    'medium': 150,
-    'large':  210,
-    'huge':   280,
+    "tiny": 55,
+    "small": 92,
+    "medium": 150,
+    "large": 220,
+    "huge": 300,
 }
 
-# Topic → visual theme mapping
-THEMES = {
-    'scale':          {'nebula': (10, 20, 60), 'accent': (60, 140, 255),  'star_tint': (100, 160, 255)},
-    'travel_time':    {'nebula': (5,  15, 50), 'accent': (80, 160, 255),  'star_tint': (120, 170, 255)},
-    'planetary_facts':{'nebula': (30, 15, 5),  'accent': (255, 160, 40),  'star_tint': (255, 200, 100)},
-    'hypothetical':   {'nebula': (20, 5,  40), 'accent': (200, 80, 255),  'star_tint': (180, 100, 255)},
-    'myth_busting':   {'nebula': (5,  25, 15), 'accent': (0,   255, 160), 'star_tint': (80,  255, 160)},
-    'cosmic_mystery': {'nebula': (30, 5,  30), 'accent': (255, 60,  180), 'star_tint': (255, 100, 200)},
-    'extreme':        {'nebula': (40, 5,  5),  'accent': (255, 80,  40),  'star_tint': (255, 120,  80)},
-    'default':        {'nebula': (15, 10, 35), 'accent': (255, 220,   0), 'star_tint': (180, 180, 255)},
+PLANET_NAMES = {
+    "earth",
+    "mars",
+    "jupiter",
+    "saturn",
+    "sun",
+    "moon",
+    "neptune",
+    "venus",
+    "mercury",
+    "uranus",
+    "black_hole",
+    "neutron_star",
 }
 
-# =============================================================================
-# FONT LOADING
-# =============================================================================
-def get_font(size, bold=True):
-    """Load Montserrat if available, else fallback chain."""
-    font_candidates = []
-    if bold:
-        font_candidates = [
-            os.path.join(FONTS_DIR, "Montserrat-ExtraBold.ttf"),
-            os.path.join(FONTS_DIR, "Montserrat-Bold.ttf"),
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-            "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
-            "C:/Windows/Fonts/arialbd.ttf",
-        ]
+TOPIC_THEMES = {
+    "black_hole": {
+        "accent": ImageColor.getrgb("#B03060"),
+        "accent_secondary": ImageColor.getrgb("#7A1FA2"),
+        "nebula": ImageColor.getrgb("#240914"),
+        "nebula_secondary": ImageColor.getrgb("#32124B"),
+        "star_tint": ImageColor.getrgb("#FF9AAE"),
+        "planet_glow": ImageColor.getrgb("#FF7A45"),
+    },
+    "galaxy": {
+        "accent": ImageColor.getrgb("#7A6BFF"),
+        "accent_secondary": ImageColor.getrgb("#284C9B"),
+        "nebula": ImageColor.getrgb("#071731"),
+        "nebula_secondary": ImageColor.getrgb("#221251"),
+        "star_tint": ImageColor.getrgb("#A9B6FF"),
+        "planet_glow": ImageColor.getrgb("#8290FF"),
+    },
+    "quantum": {
+        "accent": ImageColor.getrgb("#39FF9C"),
+        "accent_secondary": ImageColor.getrgb("#0F5F58"),
+        "nebula": ImageColor.getrgb("#021A1C"),
+        "nebula_secondary": ImageColor.getrgb("#0B3A34"),
+        "star_tint": ImageColor.getrgb("#7BFFD6"),
+        "planet_glow": ImageColor.getrgb("#36E3AE"),
+    },
+    "solar": {
+        "accent": ImageColor.getrgb("#FFB347"),
+        "accent_secondary": ImageColor.getrgb("#A55311"),
+        "nebula": ImageColor.getrgb("#241204"),
+        "nebula_secondary": ImageColor.getrgb("#4A2107"),
+        "star_tint": ImageColor.getrgb("#FFD09A"),
+        "planet_glow": ImageColor.getrgb("#FFB55A"),
+    },
+    "mystery": {
+        "accent": ImageColor.getrgb("#D633FF"),
+        "accent_secondary": ImageColor.getrgb("#68004F"),
+        "nebula": ImageColor.getrgb("#18000F"),
+        "nebula_secondary": ImageColor.getrgb("#4A033A"),
+        "star_tint": ImageColor.getrgb("#FFA6F9"),
+        "planet_glow": ImageColor.getrgb("#F758D4"),
+    },
+    "travel": {
+        "accent": ImageColor.getrgb("#8FB8FF"),
+        "accent_secondary": ImageColor.getrgb("#34567A"),
+        "nebula": ImageColor.getrgb("#08121E"),
+        "nebula_secondary": ImageColor.getrgb("#20364F"),
+        "star_tint": ImageColor.getrgb("#C8E1FF"),
+        "planet_glow": ImageColor.getrgb("#9AC5FF"),
+    },
+}
+
+TRANSITIONS = ("crossfade", "horizontal_wipe", "zoom_through")
+
+
+def configure_render_mode(preview: bool = False) -> None:
+    global PREVIEW_MODE, WIDTH, HEIGHT, FPS
+    PREVIEW_MODE = preview
+    if preview:
+        WIDTH = 540
+        HEIGHT = 960
+        FPS = 12
     else:
-        font_candidates = [
-            os.path.join(FONTS_DIR, "Montserrat-Regular.ttf"),
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+        WIDTH = BASE_WIDTH
+        HEIGHT = BASE_HEIGHT
+        FPS = BASE_FPS
+
+
+def clamp(value: float, low: float, high: float) -> float:
+    return max(low, min(high, value))
+
+
+def ease_out_back(value: float) -> float:
+    c1 = 1.70158
+    c3 = c1 + 1
+    t = clamp(value, 0.0, 1.0)
+    return 1 + c3 * (t - 1) ** 3 + c1 * (t - 1) ** 2
+
+
+def ease_out_cubic(value: float) -> float:
+    t = clamp(value, 0.0, 1.0)
+    return 1 - (1 - t) ** 3
+
+
+def ease_in_out_cubic(value: float) -> float:
+    t = clamp(value, 0.0, 1.0)
+    if t < 0.5:
+        return 4 * t * t * t
+    return 1 - ((-2 * t + 2) ** 3) / 2
+
+
+def slugify(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", value.lower()).strip("_") or "space"
+
+
+def get_font(size: int, *, bold: bool = True) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    candidates = [
+        FONTS_DIR / "Montserrat-ExtraBold.ttf",
+        FONTS_DIR / "Montserrat-Bold.ttf",
+        Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"),
+        Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
+        Path("C:/Windows/Fonts/arialbd.ttf"),
+    ]
+    if not bold:
+        candidates = [
+            FONTS_DIR / "Montserrat-Regular.ttf",
+            Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
+            Path("C:/Windows/Fonts/arial.ttf"),
         ]
-    for p in font_candidates:
-        if os.path.exists(p):
+
+    for path in candidates:
+        if path.exists():
             try:
-                return ImageFont.truetype(p, size)
+                return ImageFont.truetype(str(path), size)
             except Exception:
                 continue
     return ImageFont.load_default()
 
-# =============================================================================
-# EASING
-# =============================================================================
-def ease_out_back(t):
-    c1, c3 = 1.70158, 2.70158
-    return 1 + c3 * pow(t - 1, 3) + c1 * pow(t - 1, 2)
 
-def ease_out_elastic(t):
-    if t == 0 or t == 1: return t
-    return pow(2, -10 * t) * math.sin((t * 10 - 0.75) * (2 * math.pi) / 3) + 1
+def infer_theme(script_data: dict) -> str:
+    idea = script_data.get("idea", {})
+    text = " ".join(
+        str(value)
+        for value in (
+            idea.get("topic", ""),
+            idea.get("title", ""),
+            idea.get("hook", ""),
+            idea.get("topic_family", ""),
+        )
+    ).lower()
 
-def ease_out_cubic(t):
-    return 1 - pow(1 - t, 3)
+    if any(term in text for term in ("black hole", "singularity", "event horizon")):
+        return "black_hole"
+    if any(term in text for term in ("quantum", "particle", "atom", "boson")):
+        return "quantum"
+    if any(term in text for term in ("dark matter", "dark energy", "mystery", "unknown")):
+        return "mystery"
+    if any(term in text for term in ("travel", "light speed", "voyager", "distance", "reach")):
+        return "travel"
+    if any(term in text for term in ("planet", "solar", "mars", "jupiter", "saturn", "venus", "sun", "earth")):
+        return "solar"
+    return "galaxy"
 
-def ease_in_out_cubic(t):
-    return 4 * t * t * t if t < 0.5 else 1 - pow(-2 * t + 2, 3) / 2
 
-# =============================================================================
-# NASA APOD BACKGROUND
-# =============================================================================
-def fetch_nasa_background(topic_keywords=""):
-    """Try to fetch a NASA APOD image as background."""
+def infer_topic_keyword(script_data: dict) -> str:
+    idea = script_data.get("idea", {})
+    topic = str(idea.get("topic", "")).lower()
+    timeline = script_data.get("timeline", [])
+    planet_names = [
+        layer.get("name", "")
+        for scene in timeline
+        for layer in scene.get("layers", [])
+        if layer.get("type") == "planet"
+    ]
+    if "black hole" in topic or "black_hole" in topic:
+        return "black hole"
+    if any(word in topic for word in ("galaxy", "milky way", "universe")):
+        return "galaxy nebula"
+    if any(word in topic for word in ("dark matter", "dark energy")):
+        return "deep space nebula"
+    if any(word in topic for word in ("travel", "distance", "light-year", "voyager")):
+        return "galaxy stars"
+    for name in planet_names:
+        if name in PLANET_NAMES and name not in {"black_hole", "neutron_star"}:
+            return f"planet {name.replace('_', ' ')}"
+    return "space nebula"
+
+
+def background_cache_path(keyword: str) -> Path:
+    normalized = slugify(keyword)
+    digest = hashlib.md5(keyword.encode("utf-8")).hexdigest()[:10]
+    return BACKGROUNDS_DIR / f"{normalized}_{digest}.jpg"
+
+
+def fetch_image_bytes(url: str, session: requests.Session, timeout: int = 90) -> bytes | None:
+    try:
+        response = session.get(url, timeout=timeout)
+        response.raise_for_status()
+        return response.content
+    except Exception:
+        return None
+
+
+def select_best_apod(items: list[dict], keyword: str) -> dict | None:
+    query_terms = [term for term in re.split(r"\W+", keyword.lower()) if term]
+    best_item = None
+    best_score = -1
+    for item in items:
+        if item.get("media_type") != "image":
+            continue
+        haystack = " ".join(str(item.get(field, "")).lower() for field in ("title", "explanation", "copyright"))
+        score = sum(term in haystack for term in query_terms)
+        if score > best_score:
+            best_item = item
+            best_score = score
+    return best_item
+
+
+def try_nasa_apod(keyword: str, session: requests.Session) -> bytes | None:
     api_key = os.environ.get("NASA_API_KEY", "")
     if not api_key:
         return None
     try:
-        resp = requests.get(
-            f"https://api.nasa.gov/planetary/apod?api_key={api_key}&count=5",
-            timeout=10
+        response = session.get(
+            "https://api.nasa.gov/planetary/apod",
+            params={"api_key": api_key, "count": 5},
+            timeout=45,
         )
-        if resp.status_code != 200:
+        response.raise_for_status()
+        data = response.json()
+        if not isinstance(data, list):
             return None
-        items = resp.json()
-        # Prefer images (not video)
-        images = [i for i in items if i.get("media_type") == "image"]
-        if not images:
+        picked = select_best_apod(data, keyword)
+        if not picked:
             return None
-        pick = random.choice(images)
-        img_url = pick.get("url", "")
-        if not img_url:
+        image_url = picked.get("hdurl") or picked.get("url")
+        if not image_url:
             return None
-        img_resp = requests.get(img_url, timeout=15)
-        if img_resp.status_code != 200:
-            return None
-        from io import BytesIO
-        img = Image.open(BytesIO(img_resp.content)).convert("RGB")
-        img = img.resize((WIDTH, HEIGHT), Image.Resampling.LANCZOS)
-        # Darken significantly so text stays readable
-        img = ImageEnhance.Brightness(img).enhance(0.3)
-        img = ImageEnhance.Contrast(img).enhance(0.7)
-        print(f"🌌 NASA background: {pick.get('title','')[:40]}")
-        return img
-    except Exception as e:
-        print(f"⚠️ NASA fetch failed: {e}")
+        return fetch_image_bytes(image_url, session)
+    except Exception:
         return None
 
-# =============================================================================
-# PARALLAX STARFIELD (3 depth layers)
-# =============================================================================
-def create_parallax_starfield(theme_key="default", seed=42, nasa_bg=None):
-    """
-    Returns a list of 3 starfield layers (far, mid, near) as numpy arrays.
-    If nasa_bg provided, layer 0 is the NASA image.
-    """
-    theme = THEMES.get(theme_key, THEMES["default"])
-    nebula_color = theme["nebula"]
-    star_tint = theme["star_tint"]
 
-    layers = []
+def extract_nasa_library_url(item: dict, session: requests.Session) -> str | None:
+    for link in item.get("links") or []:
+        href = link.get("href")
+        if isinstance(href, str) and href.startswith("http"):
+            return href
 
-    # --- Layer 0: deep background (or NASA image) ---
-    if nasa_bg is not None:
-        layers.append(np.array(nasa_bg, dtype=np.uint8))
-    else:
-        random.seed(seed)
-        bg = Image.new("RGB", (WIDTH, HEIGHT), (5, 5, 18))
-        draw = ImageDraw.Draw(bg)
-        # Gradient
-        for y in range(HEIGHT):
-            t = y / HEIGHT
-            r = int(5 + nebula_color[0] * 0.15 * (1 - t))
-            g = int(5 + nebula_color[1] * 0.15 * (1 - t))
-            b = int(18 + nebula_color[2] * 0.3 * (1 - t))
-            draw.line([(0, y), (WIDTH, y)], fill=(min(255,r), min(255,g), min(255,b)))
-        # Nebula blobs
-        for _ in range(3):
-            cx = random.randint(0, WIDTH)
-            cy = random.randint(0, HEIGHT)
-            rad = random.randint(250, 550)
-            for r in range(rad, 0, -25):
-                af = 1.0 - (r / rad)
-                c = tuple(int(nc * 0.18 * af) for nc in nebula_color)
-                draw.ellipse([cx-r, cy-r, cx+r, cy+r], fill=c)
-        # Distant stars (tiny, dim)
-        for _ in range(400):
-            x, y = random.randint(0, WIDTH-1), random.randint(0, HEIGHT-1)
-            b = random.randint(40, 100)
-            draw.point((x, y), fill=(b, b, min(255, b + 30)))
-        layers.append(np.array(bg, dtype=np.uint8))
+    data = item.get("data") or []
+    if not data:
+        return None
+    nasa_id = data[0].get("nasa_id")
+    if not nasa_id:
+        return None
+    try:
+        response = session.get(f"https://images-api.nasa.gov/asset/{nasa_id}", timeout=45)
+        response.raise_for_status()
+        items = response.json().get("collection", {}).get("items", [])
+        for asset in items:
+            href = asset.get("href")
+            if isinstance(href, str) and href.lower().endswith((".jpg", ".jpeg", ".png")):
+                return href
+    except Exception:
+        return None
+    return None
 
-    # --- Layer 1: mid stars ---
-    random.seed(seed + 1)
-    mid = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(mid)
-    for _ in range(150):
-        x, y = random.randint(0, WIDTH-1), random.randint(0, HEIGHT-1)
-        b = random.randint(100, 200)
-        tc = star_tint
-        color = (
-            min(255, int(b * 0.5 + tc[0] * 0.5)),
-            min(255, int(b * 0.5 + tc[1] * 0.5)),
-            min(255, int(b * 0.5 + tc[2] * 0.5)),
-            220,
+
+def try_nasa_library(keyword: str, session: requests.Session) -> bytes | None:
+    try:
+        response = session.get(
+            "https://images-api.nasa.gov/search",
+            params={"q": keyword, "media_type": "image", "page": 1},
+            timeout=45,
         )
-        sz = random.choice([1, 1, 2])
-        draw.ellipse([x-sz, y-sz, x+sz, y+sz], fill=color)
-    layers.append(np.array(mid, dtype=np.uint8))
+        response.raise_for_status()
+        items = response.json().get("collection", {}).get("items", [])
+        for item in items[:8]:
+            image_url = extract_nasa_library_url(item, session)
+            if image_url:
+                image_bytes = fetch_image_bytes(image_url, session)
+                if image_bytes:
+                    return image_bytes
+    except Exception:
+        return None
+    return None
 
-    # --- Layer 2: foreground bright stars + glow ---
-    random.seed(seed + 2)
-    fg = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(fg)
-    for _ in range(35):
-        x, y = random.randint(20, WIDTH-20), random.randint(20, HEIGHT-20)
-        for r in range(7, 0, -1):
-            intensity = int(60 + 195 * (1 - r / 7))
-            draw.ellipse([x-r, y-r, x+r, y+r],
-                         fill=(intensity, intensity, min(255, intensity+30), int(180 * (1 - r/7))))
-        draw.ellipse([x-1, y-1, x+1, y+1], fill=(255, 255, 255, 255))
-    # Lens flares
-    for _ in range(5):
-        x, y = random.randint(60, WIDTH-60), random.randint(60, HEIGHT-60)
-        for d in range(-15, 16):
-            i = int(160 * (1 - abs(d)/15))
-            if i > 0:
-                draw.point((x+d, y), fill=(i, i, i, i+80))
-                draw.point((x, y+d), fill=(i, i, i, i+80))
-        draw.ellipse([x-2, y-2, x+2, y+2], fill=(255, 255, 255, 255))
-    layers.append(np.array(fg, dtype=np.uint8))
 
-    return layers
+def hubble_category_for_keyword(keyword: str) -> str:
+    text = keyword.lower()
+    if "black hole" in text:
+        return "black-holes"
+    if "planet" in text or "solar" in text:
+        return "solar-system"
+    if "nebula" in text:
+        return "nebulae"
+    return "galaxies"
 
-def composite_parallax(layers, t, total_duration, shooting_star_t=None):
-    """
-    Composite the 3 parallax layers with drift.
-    Layer 0 (bg): slowest drift
-    Layer 1 (mid): medium drift  
-    Layer 2 (fg): fastest drift
-    Also renders shooting star if timing matches.
-    """
-    progress = t / max(total_duration, 0.001)
 
-    # Start from layer 0 (RGB)
-    base = Image.fromarray(layers[0], "RGB")
+def try_esa_hubble(keyword: str, session: requests.Session) -> bytes | None:
+    category = hubble_category_for_keyword(keyword)
+    urls = [
+        f"https://esahubble.org/images/archive/category/{category}/?format=json",
+        f"https://esahubble.org/images/archive/category/{category}/",
+    ]
+    for url in urls:
+        try:
+            response = session.get(url, timeout=45)
+            response.raise_for_status()
+            if "json" in response.headers.get("content-type", ""):
+                data = response.json()
+                items = data if isinstance(data, list) else data.get("results", [])
+                for item in items[:8]:
+                    image_url = item.get("fullsize_url") or item.get("url")
+                    if image_url:
+                        image_bytes = fetch_image_bytes(image_url, session)
+                        if image_bytes:
+                            return image_bytes
+            else:
+                match = re.search(r'https://cdn\.spacetelescope\.org/archives/images/[^"\']+\.(jpg|jpeg|png)', response.text)
+                if match:
+                    image_bytes = fetch_image_bytes(match.group(0), session)
+                    if image_bytes:
+                        return image_bytes
+        except Exception:
+            continue
+    return None
 
-    # Mid layer drift (subtle horizontal + vertical)
-    if layers[1].shape[2] == 4:
-        mid = Image.fromarray(layers[1], "RGBA")
-        dx_mid = int(math.sin(progress * math.pi * 2) * 8)
-        dy_mid = int(-progress * 15)
-        mid_shifted = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
-        mid_shifted.paste(mid, (dx_mid, dy_mid))
-        base = base.convert("RGBA")
-        base = Image.alpha_composite(base, mid_shifted)
-        base = base.convert("RGB")
 
-    # Foreground drift (faster)
-    if layers[2].shape[2] == 4:
-        fg = Image.fromarray(layers[2], "RGBA")
-        dx_fg = int(math.sin(progress * math.pi * 2) * 18)
-        dy_fg = int(-progress * 35)
-        fg_shifted = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
-        fg_shifted.paste(fg, (dx_fg, dy_fg))
-        base = base.convert("RGBA")
-        base = Image.alpha_composite(base, fg_shifted)
-        base = base.convert("RGB")
+def try_hubble_legacy(keyword: str, session: requests.Session) -> bytes | None:
+    del keyword
+    try:
+        response = session.get(
+            "https://hla.stsci.edu/cgi-bin/fitscut.cgi",
+            params={
+                "ra": "10.684",
+                "dec": "41.269",
+                "size": "700",
+                "format": "jpeg",
+                "red": "DSS2 Red",
+                "green": "DSS2 Blue",
+                "blue": "DSS2 IR",
+            },
+            timeout=45,
+        )
+        if response.ok and response.content:
+            return response.content
+    except Exception:
+        return None
+    return None
 
-    # Shooting star
-    if shooting_star_t is not None:
-        elapsed = t - shooting_star_t
-        if 0 <= elapsed < 0.6:
-            frac = elapsed / 0.6
-            draw = ImageDraw.Draw(base)
-            sx = int(WIDTH * 0.1 + frac * WIDTH * 0.8)
-            sy = int(HEIGHT * 0.15 + frac * HEIGHT * 0.25)
-            tail_len = int(120 * (1 - frac))
-            alpha_v = int(255 * (1 - frac))
-            for i in range(tail_len):
-                px = sx - i
-                py = sy - int(i * 0.35)
-                if 0 <= px < WIDTH and 0 <= py < HEIGHT:
-                    a = int(alpha_v * (1 - i / tail_len))
-                    brightness = max(0, a)
-                    draw.point((px, py), fill=(brightness, brightness, min(255, brightness + 40)))
 
-    return base
+def get_space_background(keyword: str) -> tuple[Image.Image | None, Path | None]:
+    cache_path = background_cache_path(keyword)
+    if cache_path.exists():
+        try:
+            return Image.open(cache_path).convert("RGB"), cache_path
+        except Exception:
+            cache_path.unlink(missing_ok=True)
 
-# =============================================================================
-# HOOK SCREEN
-# =============================================================================
-def render_hook_screen(hook_text, theme_key, layers, t, total_dur):
-    """First 2.5s: big bold hook text, zoom-in entrance."""
-    frame = composite_parallax(layers, t, total_dur)
-    draw = ImageDraw.Draw(frame)
-    theme = THEMES.get(theme_key, THEMES["default"])
-    accent = theme["accent"]
+    BACKGROUNDS_DIR.mkdir(parents=True, exist_ok=True)
+    session = requests.Session()
+    session.headers.update({"User-Agent": "astro-shorts-v2/1.0"})
 
-    # Dark bar behind text
-    bar_h = 400
-    bar_y = HEIGHT // 2 - bar_h // 2
+    image_bytes = None
+    for provider in (try_nasa_apod, try_nasa_library, try_esa_hubble, try_hubble_legacy):
+        image_bytes = provider(keyword, session)
+        if image_bytes:
+            break
+
+    if not image_bytes:
+        return None, None
+
+    try:
+        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        image.save(cache_path, quality=92)
+        return image, cache_path
+    except Exception:
+        return None, None
+
+
+def cover_resize(image: Image.Image, size: tuple[int, int]) -> Image.Image:
+    target_w, target_h = size
+    scale = max(target_w / image.width, target_h / image.height)
+    resized = image.resize((int(image.width * scale), int(image.height * scale)), Image.Resampling.LANCZOS)
+    left = (resized.width - target_w) // 2
+    top = (resized.height - target_h) // 2
+    return resized.crop((left, top, left + target_w, top + target_h))
+
+
+def build_base_background(topic_image: Image.Image | None, theme_key: str) -> Image.Image:
+    theme = TOPIC_THEMES[theme_key]
+    if topic_image is None:
+        base = Image.new("RGB", (WIDTH, HEIGHT), theme["nebula"])
+    else:
+        base = cover_resize(topic_image, (WIDTH, HEIGHT))
+        base = ImageEnhance.Brightness(base).enhance(0.30)
+        base = ImageEnhance.Contrast(base).enhance(0.85)
+
     overlay = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
-    od = ImageDraw.Draw(overlay)
-    od.rectangle([0, bar_y, WIDTH, bar_y + bar_h], fill=(0, 0, 0, 180))
-    frame = Image.alpha_composite(frame.convert("RGBA"), overlay).convert("RGB")
+    draw = ImageDraw.Draw(overlay)
+    for y in range(HEIGHT):
+        blend = y / max(HEIGHT - 1, 1)
+        color = tuple(
+            int(theme["nebula"][idx] * (1 - blend) + theme["nebula_secondary"][idx] * blend)
+            for idx in range(3)
+        )
+        draw.line((0, y, WIDTH, y), fill=(*color, 86))
 
-    # Zoom-in scale: 0 → 1.0 over 0.4s
-    scale = min(ease_out_back(min(t / 0.4, 1.0)), 1.05)
-    font_size = int(82 * scale)
-    font_size = max(20, font_size)
-    font = get_font(font_size)
+    vignette = Image.new("L", (WIDTH, HEIGHT), 0)
+    vignette_draw = ImageDraw.Draw(vignette)
+    cx = WIDTH // 2
+    cy = HEIGHT // 2
+    max_radius = int(max(WIDTH, HEIGHT) * 0.78)
+    for radius in range(max_radius, 0, -30):
+        alpha = int(150 * (1 - radius / max_radius))
+        vignette_draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=alpha)
 
-    # Accent underline color for hook
-    draw = ImageDraw.Draw(frame)
+    background = Image.alpha_composite(base.convert("RGBA"), overlay)
+    dark_mask = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    dark_mask.putalpha(vignette)
+    background = Image.alpha_composite(background, dark_mask)
+    return background
 
-    # Word wrap
-    lines = textwrap.wrap(hook_text, width=18)
-    line_h = int(font_size * 1.25)
-    total_h = len(lines) * line_h
-    start_y = HEIGHT // 2 - total_h // 2
 
-    for li, line in enumerate(lines):
-        ly = start_y + li * line_h
-        # Measure
-        bbox = draw.textbbox((0, 0), line, font=font)
-        lw = bbox[2] - bbox[0]
-        lx = (WIDTH - lw) // 2
+def build_particle_system(theme_key: str, keyword: str, total_duration: float) -> dict:
+    rng = random.Random(hashlib.md5(f"{theme_key}:{keyword}".encode("utf-8")).hexdigest())
+    theme = TOPIC_THEMES[theme_key]
+    stars = []
+    layer_counts = (80, 50, 28) if PREVIEW_MODE else (150, 95, 55)
+    for depth, count in enumerate(layer_counts, start=1):
+        layer = []
+        for _ in range(count):
+            layer.append(
+                {
+                    "x": rng.uniform(0, WIDTH),
+                    "y": rng.uniform(0, HEIGHT),
+                    "size": rng.uniform(0.8, 1.8 + depth * 0.5),
+                    "speed_x": rng.uniform(-5, 5) * depth,
+                    "speed_y": rng.uniform(-8, -2) * depth,
+                    "alpha": rng.randint(80, 225),
+                }
+            )
+        stars.append(layer)
 
-        # Glow pass
-        glow_layer = Image.new("RGBA", frame.size, (0, 0, 0, 0))
-        gd = ImageDraw.Draw(glow_layer)
-        for off in [8, 5, 3]:
-            a = int(30 * (1 - off / 10))
-            for dx in range(-off, off+1, 3):
-                for dy in range(-off, off+1, 3):
-                    gd.text((lx+dx, ly+dy), line, font=font,
-                             fill=(*accent, a))
-        glow_layer = glow_layer.filter(ImageFilter.GaussianBlur(3))
-        frame = Image.alpha_composite(frame.convert("RGBA"), glow_layer).convert("RGB")
-        draw = ImageDraw.Draw(frame)
+    blobs = []
+    blob_count = 2 if PREVIEW_MODE else 3
+    for _ in range(blob_count):
+        blobs.append(
+            {
+                "x": rng.uniform(WIDTH * 0.15, WIDTH * 0.85),
+                "y": rng.uniform(HEIGHT * 0.08, HEIGHT * 0.78),
+                "radius": rng.randint(140, 260) if PREVIEW_MODE else rng.randint(220, 420),
+                "phase": rng.uniform(0, math.pi * 2),
+                "color": rng.choice((theme["accent"], theme["accent_secondary"])),
+            }
+        )
 
-        # Outline
-        for dx in range(-3, 4):
-            for dy in range(-3, 4):
-                draw.text((lx+dx, ly+dy), line, font=font, fill=(0, 0, 0))
-        # Text
-        draw.text((lx, ly), line, font=font, fill=(255, 255, 255))
+    shooting_star_time = rng.uniform(total_duration * 0.30, total_duration * 0.70) if total_duration > 2 else None
+    return {"stars": stars, "blobs": blobs, "shooting_star_time": shooting_star_time}
 
-    # Accent bar at bottom of text block
-    bar_bottom = start_y + total_h + 20
-    acc_w = int(WIDTH * 0.5 * min(t / 0.8, 1.0))
-    acc_x = (WIDTH - acc_w) // 2
-    draw.rectangle([acc_x, bar_bottom, acc_x + acc_w, bar_bottom + 5],
-                   fill=accent)
 
-    return np.array(frame)
+def draw_nebula_blobs(frame: Image.Image, particles: dict, t: float) -> Image.Image:
+    overlay = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    for blob in particles["blobs"]:
+        alpha = int(30 + 24 * (0.5 + 0.5 * math.sin(t * 0.55 + blob["phase"])))
+        blob_img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(blob_img)
+        radius = blob["radius"]
+        draw.ellipse(
+            (blob["x"] - radius, blob["y"] - radius, blob["x"] + radius, blob["y"] + radius),
+            fill=(*blob["color"], alpha),
+        )
+        blob_img = blob_img.filter(ImageFilter.GaussianBlur(radius // 5))
+        overlay = Image.alpha_composite(overlay, blob_img)
+    return Image.alpha_composite(frame.convert("RGBA"), overlay)
 
-# =============================================================================
-# PROGRESS BAR
-# =============================================================================
-def draw_progress_bar(frame_img, progress, theme_key="default"):
-    """Draw a thin progress bar at the very bottom."""
-    draw = ImageDraw.Draw(frame_img)
-    theme = THEMES.get(theme_key, THEMES["default"])
-    accent = theme["accent"]
-    bar_y = HEIGHT - 12
-    # Background track
-    draw.rectangle([0, bar_y, WIDTH, HEIGHT], fill=(20, 20, 20))
-    # Fill
-    fill_w = int(WIDTH * min(progress, 1.0))
-    if fill_w > 0:
-        draw.rectangle([0, bar_y, fill_w, HEIGHT], fill=accent)
-    # Glowing tip
-    if fill_w > 4:
-        tip_x = fill_w
-        for i in range(8, 0, -1):
-            a = int(180 * (1 - i / 8))
-            draw.rectangle([tip_x - i, bar_y - i//2, tip_x + 2,
-                            HEIGHT + i//2], fill=(*accent, a))
 
-# =============================================================================
-# PLANET DRAWING (with glow rings)
-# =============================================================================
-def draw_planet_with_glow(draw, cx, cy, radius, planet_type='earth',
-                           expression='neutral', frame_num=0):
-    """Draw planet with outer glow ring, then planet, then eyes."""
+def draw_star_layers(frame: Image.Image, particles: dict, theme_key: str, t: float, total_duration: float) -> Image.Image:
+    theme = TOPIC_THEMES[theme_key]
+    overlay = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    duration = max(total_duration, 0.01)
 
-    # Glow rings
-    glow_colors = {
-        'earth':       (60, 140, 255),
-        'mars':        (255, 100, 60),
-        'jupiter':     (255, 180, 120),
-        'saturn':      (220, 200, 150),
-        'sun':         (255, 200, 50),
-        'moon':        (200, 200, 220),
-        'neptune':     (80, 140, 255),
-        'venus':       (255, 200, 120),
-        'black_hole':  (180, 60, 255),
-        'neutron_star':(180, 180, 255),
+    for depth, layer in enumerate(particles["stars"], start=1):
+        for star in layer:
+            x = (star["x"] + star["speed_x"] * (t / duration) * duration) % WIDTH
+            y = (star["y"] + star["speed_y"] * (t / duration) * duration) % HEIGHT
+            twinkle = 0.6 + 0.4 * math.sin(t * (depth + 1.5) + star["x"] * 0.01)
+            alpha = int(star["alpha"] * twinkle)
+            base_color = tuple(min(255, int(theme["star_tint"][idx] * 0.55 + 255 * 0.45)) for idx in range(3))
+            radius = star["size"] + depth * 0.1
+            draw.ellipse((x - radius, y - radius, x + radius, y + radius), fill=(*base_color, alpha))
+
+    result = Image.alpha_composite(frame.convert("RGBA"), overlay)
+    shooting_star_time = particles.get("shooting_star_time")
+    if shooting_star_time is not None:
+        elapsed = t - shooting_star_time
+        if 0 <= elapsed <= 0.65:
+            streak = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+            streak_draw = ImageDraw.Draw(streak)
+            progress = elapsed / 0.65
+            x = WIDTH * (0.18 + 0.60 * progress)
+            y = HEIGHT * (0.18 + 0.22 * progress)
+            for idx in range(16):
+                length = 16 - idx
+                alpha = int(220 * (1 - idx / 16) * (1 - progress * 0.45))
+                streak_draw.line(
+                    (x - idx * 14, y - idx * 5, x - idx * 14 + length * 2, y - idx * 5 + length * 0.5),
+                    fill=(255, 255, 255, alpha),
+                    width=max(1, 4 - idx // 5),
+                )
+            result = Image.alpha_composite(result, streak)
+    return result.convert("RGBA")
+
+
+def compose_background(base_background: Image.Image, particles: dict, theme_key: str, t: float, total_duration: float) -> Image.Image:
+    frame = base_background.copy()
+    frame = draw_nebula_blobs(frame, particles, t)
+    frame = draw_star_layers(frame.convert("RGB"), particles, theme_key, t, total_duration)
+    return frame.convert("RGBA")
+
+
+def apply_screen_effects(frame: Image.Image, effects: list[str], frame_index: int) -> Image.Image:
+    result = frame.convert("RGBA")
+    if "camera_shake" in effects:
+        rng = random.Random(frame_index)
+        shifted = Image.new("RGBA", result.size, (0, 0, 0, 255))
+        shifted.paste(result, (rng.randint(-10, 10), rng.randint(-8, 8)))
+        result = shifted
+    if "chromatic_aberration" in effects:
+        r, g, b, a = result.split()
+        r = r.transform(result.size, Image.AFFINE, (1, 0, -3, 0, 1, 0))
+        b = b.transform(result.size, Image.AFFINE, (1, 0, 3, 0, 1, 0))
+        result = Image.merge("RGBA", (r, g, b, a))
+    if "flash" in effects:
+        white = Image.new("RGBA", result.size, (255, 255, 255, 90))
+        result = Image.alpha_composite(result, white)
+    if "vignette_pulse" in effects:
+        pulse = 70 + int(26 * math.sin(frame_index / FPS * 4))
+        edge = Image.new("RGBA", result.size, (0, 0, 0, 0))
+        edge_draw = ImageDraw.Draw(edge)
+        edge_draw.rectangle((0, 0, WIDTH, HEIGHT), fill=(0, 0, 0, pulse))
+        cutout = Image.new("L", result.size, 255)
+        cutout_draw = ImageDraw.Draw(cutout)
+        cutout_draw.ellipse((120, 200, WIDTH - 120, HEIGHT - 260), fill=0)
+        edge.putalpha(cutout.filter(ImageFilter.GaussianBlur(80)))
+        result = Image.alpha_composite(result, edge)
+    if "glitch" in effects:
+        rng = random.Random(frame_index * 17)
+        band_y = rng.randint(120, HEIGHT - 180)
+        band_height = rng.randint(18, 48)
+        strip = result.crop((0, band_y, WIDTH, band_y + band_height))
+        result.paste(strip, (rng.randint(-22, 22), band_y))
+    return result
+
+
+def glow_color_for_planet(name: str, theme_key: str) -> tuple[int, int, int]:
+    theme = TOPIC_THEMES[theme_key]
+    defaults = {
+        "earth": (72, 150, 255),
+        "mars": (255, 123, 89),
+        "jupiter": (255, 185, 126),
+        "saturn": (245, 216, 162),
+        "sun": (255, 198, 56),
+        "moon": (215, 219, 235),
+        "neptune": (98, 153, 255),
+        "venus": (255, 198, 120),
+        "mercury": (190, 170, 150),
+        "black_hole": theme["accent"],
+        "neutron_star": (213, 225, 255),
     }
-    glow_col = glow_colors.get(planet_type, (150, 150, 255))
+    return defaults.get(name, theme["planet_glow"])
 
-    # Pulsing glow radius
-    pulse = 1.0 + 0.04 * math.sin(frame_num / FPS * 2 * math.pi * 0.8)
-    for i in range(6, 0, -1):
-        r = int(radius * (1.15 + i * 0.06) * pulse)
-        alpha = int(35 * (1 - i / 7))
-        glow_img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
-        gd = ImageDraw.Draw(glow_img)
-        gd.ellipse([cx-r, cy-r, cx+r, cy+r],
-                   fill=(*glow_col, alpha))
-        # We'll composite this in render_frame
 
-    # Draw the planet body
-    planets = {
-        'earth':        {'ocean': (40, 100, 180), 'land': (60, 140, 80)},
-        'mars':         {'base': (180, 80, 60)},
-        'jupiter':      {'base': (200, 160, 120), 'bands': [(180, 140, 100), (220, 180, 140)]},
-        'saturn':       {'base': (210, 190, 150), 'ring': (180, 160, 130)},
-        'sun':          {'base': (255, 200, 50)},
-        'moon':         {'base': (180, 180, 180), 'crater': (140, 140, 140)},
-        'neptune':      {'base': (60, 100, 200)},
-        'venus':        {'base': (230, 180, 100)},
-        'mercury':      {'base': (160, 150, 140)},
-        'black_hole':   {'base': (10, 10, 10)},
-        'neutron_star': {'base': (200, 200, 255)},
-    }
-    config = planets.get(planet_type, planets['earth'])
-
-    if planet_type == 'sun':
-        for i in range(8, 0, -1):
-            r = radius + i * int(radius * 0.1)
-            intensity = 255 - i * 22
-            draw.ellipse([cx-r, cy-r, cx+r, cy+r],
-                         fill=(intensity, int(intensity * 0.6), 0))
-        draw.ellipse([cx-radius, cy-radius, cx+radius, cy+radius],
-                     fill=config['base'])
-
-    elif planet_type == 'earth':
-        draw.ellipse([cx-radius, cy-radius, cx+radius, cy+radius],
-                     fill=config['ocean'])
-        land = config['land']
-        draw.ellipse([cx-int(radius*0.7), cy-int(radius*0.5),
-                      cx-int(radius*0.2), cy+int(radius*0.1)], fill=land)
-        draw.ellipse([cx-int(radius*0.6), cy+int(radius*0.1),
-                      cx-int(radius*0.3), cy+int(radius*0.5)], fill=land)
-        draw.ellipse([cx+int(radius*0.1), cy-int(radius*0.4),
-                      cx+int(radius*0.5), cy+int(radius*0.1)], fill=land)
-        draw.ellipse([cx+int(radius*0.15), cy,
-                      cx+int(radius*0.45), cy+int(radius*0.5)], fill=land)
-        draw.ellipse([cx+int(radius*0.3), cy-int(radius*0.6),
-                      cx+int(radius*0.7), cy-int(radius*0.1)], fill=land)
-
-    elif planet_type == 'jupiter':
-        draw.ellipse([cx-radius, cy-radius, cx+radius, cy+radius],
-                     fill=config['base'])
-        bands = config['bands']
-        for i in range(7):
-            band_y = cy - radius + (i * 2 * radius // 7)
-            for dy in range(radius // 5):
-                y = band_y + dy
+def draw_planet_body(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int, name: str) -> None:
+    if name == "earth":
+        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(46, 104, 194))
+        land = (79, 167, 114)
+        draw.ellipse((cx - radius * 0.68, cy - radius * 0.52, cx - radius * 0.08, cy + radius * 0.14), fill=land)
+        draw.ellipse((cx + radius * 0.14, cy - radius * 0.40, cx + radius * 0.58, cy + radius * 0.15), fill=land)
+        draw.ellipse((cx + radius * 0.10, cy + radius * 0.06, cx + radius * 0.48, cy + radius * 0.52), fill=land)
+        return
+    if name == "mars":
+        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(194, 91, 58))
+        return
+    if name == "jupiter":
+        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(214, 176, 134))
+        band_colors = ((184, 142, 103), (229, 194, 150))
+        for band in range(7):
+            band_y = cy - radius + band * (2 * radius / 7)
+            color = band_colors[band % 2]
+            for line_idx in range(int(radius / 5)):
+                y = band_y + line_idx
                 dist = abs(y - cy)
                 if dist < radius:
-                    x_ext = int(math.sqrt(radius**2 - dist**2))
-                    draw.line([(cx - x_ext, y), (cx + x_ext, y)],
-                               fill=bands[i % 2], width=1)
-        # Great Red Spot
-        draw.ellipse([cx+int(radius*0.15), cy+int(radius*0.1),
-                      cx+int(radius*0.45), cy+int(radius*0.26)],
-                     fill=(180, 100, 80))
-
-    elif planet_type == 'saturn':
-        ring = config['ring']
-        for i in range(3):
-            rr = int(radius * (1.3 + i * 0.15))
-            draw.arc([cx-rr, cy-int(radius*0.2), cx+rr, cy+int(radius*0.2)],
-                     0, 180, fill=ring, width=max(1, 8-i*2))
-        draw.ellipse([cx-radius, cy-radius, cx+radius, cy+radius],
-                     fill=config['base'])
-        for i in range(3):
-            rr = int(radius * (1.3 + i * 0.15))
-            draw.arc([cx-rr, cy-int(radius*0.2), cx+rr, cy+int(radius*0.2)],
-                     180, 360, fill=ring, width=max(1, 8-i*2))
-
-    elif planet_type == 'black_hole':
-        for i in range(5, 0, -1):
-            r = int(radius * (1.2 + i * 0.1))
-            draw.ellipse([cx-r, cy-int(r*0.3), cx+r, cy+int(r*0.3)],
-                         fill=(80+i*15, 30+i*10, 120+i*10))
-        draw.ellipse([cx-radius, cy-radius, cx+radius, cy+radius],
-                     fill=(5, 5, 5))
-
-    elif planet_type == 'neutron_star':
-        for i in range(6, 0, -1):
-            r = radius + i * int(radius * 0.1)
-            draw.ellipse([cx-r, cy-r, cx+r, cy+r],
-                         fill=(150+i*15, 150+i*15, 255))
-        draw.ellipse([cx-radius, cy-radius, cx+radius, cy+radius],
-                     fill=config['base'])
-
-    elif planet_type == 'moon':
-        draw.ellipse([cx-radius, cy-radius, cx+radius, cy+radius],
-                     fill=config['base'])
-        craters = [(0.3, -0.2, 0.15), (-0.2, 0.3, 0.12),
-                   (0.4, 0.2, 0.1), (-0.3, -0.3, 0.08)]
-        for dx, dy, size in craters:
-            cr = int(size * radius)
-            draw.ellipse([cx+int(dx*radius)-cr, cy+int(dy*radius)-cr,
-                          cx+int(dx*radius)+cr, cy+int(dy*radius)+cr],
-                         fill=config.get('crater', (140, 140, 140)))
-    else:
-        draw.ellipse([cx-radius, cy-radius, cx+radius, cy+radius],
-                     fill=config.get('base', (150, 150, 150)))
-
-    # Highlight
-    hx, hy = cx - radius//3, cy - radius//3
-    for r in range(radius//4, 0, -2):
-        draw.ellipse([hx-r, hy-r, hx+r, hy+r],
-                     fill=(255, 255, 255) if r > radius//8 else (220, 220, 255))
-
-    _draw_eyes(draw, cx, cy, radius, expression, planet_type)
+                    half = int(math.sqrt(radius * radius - dist * dist))
+                    draw.line((cx - half, y, cx + half, y), fill=color)
+        draw.ellipse((cx + radius * 0.16, cy + radius * 0.08, cx + radius * 0.45, cy + radius * 0.25), fill=(189, 111, 89))
+        return
+    if name == "saturn":
+        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(222, 196, 145))
+        return
+    if name == "sun":
+        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(255, 189, 42))
+        return
+    if name == "moon":
+        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(188, 188, 194))
+        for crater_x, crater_y, scale in ((-0.24, -0.10, 0.14), (0.18, 0.12, 0.12), (-0.05, 0.30, 0.10)):
+            cr = radius * scale
+            draw.ellipse(
+                (cx + crater_x * radius - cr, cy + crater_y * radius - cr, cx + crater_x * radius + cr, cy + crater_y * radius + cr),
+                fill=(148, 148, 154),
+            )
+        return
+    if name == "black_hole":
+        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(6, 6, 8))
+        return
+    if name == "neutron_star":
+        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(216, 225, 255))
+        return
+    colors = {"neptune": (67, 116, 214), "venus": (222, 180, 109), "mercury": (165, 152, 138)}
+    draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=colors.get(name, (150, 150, 150)))
 
 
-def _draw_eyes(draw, cx, cy, radius, expression='neutral', planet_type='earth'):
-    expressions = {
-        'neutral':      {'scale': 1.0, 'pupil_offset': (0, 0)},
-        'happy':        {'scale': 1.0, 'happy': True},
-        'scared':       {'scale': 1.5, 'small_pupil': True},
-        'shocked':      {'scale': 1.7, 'small_pupil': True},
-        'excited':      {'scale': 1.3},
-        'thinking':     {'scale': 1.0, 'pupil_offset': (0.2, -0.2)},
-        'angry':        {'scale': 0.9, 'angry': True},
-        'smug':         {'scale': 0.85, 'pupil_offset': (0.15, 0.1)},
-        'looking_left': {'scale': 1.0, 'pupil_offset': (-0.35, 0)},
-        'looking_right':{'scale': 1.0, 'pupil_offset': (0.35, 0)},
-        'sleeping':     {'scale': 1.0, 'closed': True},
-        'dead':         {'scale': 1.2, 'x_eyes': True},
-    }
-    expr = expressions.get(expression, expressions['neutral'])
-    eye_scale = expr.get('scale', 1.0)
+def draw_saturn_rings(planet_layer: Image.Image, cx: int, cy: int, radius: int) -> None:
+    rings = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(rings)
+    ring_color = (229, 208, 167, 170)
+    inner_box = (cx - radius * 1.55, cy - radius * 0.42, cx + radius * 1.55, cy + radius * 0.42)
+    outer_box = (cx - radius * 1.75, cy - radius * 0.48, cx + radius * 1.75, cy + radius * 0.48)
+    draw.ellipse(outer_box, outline=ring_color, width=max(5, radius // 10))
+    draw.ellipse(inner_box, outline=(196, 171, 130, 185), width=max(3, radius // 14))
+    rotated = rings.rotate(-17, resample=Image.Resampling.BICUBIC, center=(cx, cy))
+    planet_layer.alpha_composite(rotated)
+
+
+def draw_black_hole_accretion_disk(planet_layer: Image.Image, cx: int, cy: int, radius: int) -> None:
+    disk = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(disk)
+    colors = ((255, 73, 55, 120), (255, 136, 40, 160), (255, 209, 92, 200))
+    for idx, color in enumerate(colors, start=1):
+        pad_x = radius * (1.20 + idx * 0.12)
+        pad_y = radius * (0.38 + idx * 0.06)
+        draw.ellipse((cx - pad_x, cy - pad_y, cx + pad_x, cy + pad_y), outline=color, width=max(4, radius // 18))
+    rotated = disk.rotate(-10, resample=Image.Resampling.BICUBIC, center=(cx, cy))
+    planet_layer.alpha_composite(rotated)
+
+
+def draw_sun_corona(planet_layer: Image.Image, cx: int, cy: int, radius: int, t: float) -> None:
+    rays = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(rays)
+    rotation = t * 14
+    for idx in range(8):
+        angle = math.radians(rotation + idx * 45)
+        start_x = cx + math.cos(angle) * radius * 1.08
+        start_y = cy + math.sin(angle) * radius * 1.08
+        end_x = cx + math.cos(angle) * radius * 1.45
+        end_y = cy + math.sin(angle) * radius * 1.45
+        alpha = int(90 + 60 * math.sin(t * 1.5 + idx))
+        draw.line((start_x, start_y, end_x, end_y), fill=(255, 194, 92, alpha), width=max(4, radius // 18))
+    rays = rays.filter(ImageFilter.GaussianBlur(4))
+    planet_layer.alpha_composite(rays)
+
+
+def draw_planet_glow(planet_layer: Image.Image, cx: int, cy: int, radius: int, glow_color: tuple[int, int, int], t: float) -> None:
+    pulse = 1.0 + 0.05 * math.sin(t * 3.0)
+    for step in range(6, 0, -1):
+        glow = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(glow)
+        expand = radius * (1.08 + step * 0.08) * pulse
+        alpha = int(34 * (1 - step / 7))
+        draw.ellipse((cx - expand, cy - expand, cx + expand, cy + expand), fill=(*glow_color, alpha))
+        glow = glow.filter(ImageFilter.GaussianBlur(10 + step * 3))
+        planet_layer.alpha_composite(glow)
+
+
+def draw_highlight(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int) -> None:
+    hx = cx - radius * 0.36
+    hy = cy - radius * 0.34
+    for idx in range(max(4, radius // 10), 0, -2):
+        alpha = int(140 * (1 - idx / max(4, radius // 10)))
+        draw.ellipse((hx - idx * 2, hy - idx * 2, hx + idx * 2, hy + idx * 2), fill=(255, 255, 255, alpha))
+
+
+def draw_eyes(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int, expression: str, name: str) -> None:
+    eye_y = cy - radius * 0.08
     spacing = radius * 0.32
-    eye_y = int(cy - radius * 0.08)
-    eye_r = int(radius * 0.18 * eye_scale)
-    pupil_r = int(eye_r * (0.35 if expr.get('small_pupil') else 0.5))
-    eye_white = (255, 255, 220) if planet_type == 'sun' else (255, 255, 255)
+    eye_radius = max(10, int(radius * 0.18))
+    pupil_radius = max(4, int(eye_radius * 0.46))
+    white_color = (255, 255, 230) if name == "sun" else (255, 255, 255)
+    offsets = {"looking_left": (-0.30, 0), "looking_right": (0.30, 0), "thinking": (0.18, -0.20), "smug": (0.18, 0.10)}
+    pupil_offset = offsets.get(expression, (0, 0))
 
-    for i, ex in enumerate([int(cx - spacing), int(cx + spacing)]):
-        if expr.get('happy'):
-            draw.arc([ex-eye_r, eye_y-eye_r, ex+eye_r, eye_y+eye_r],
-                     200, 340, fill=(0, 0, 0), width=max(4, eye_r//3))
-        elif expr.get('closed'):
-            draw.line([(ex-eye_r, eye_y), (ex+eye_r, eye_y)],
-                      fill=(0, 0, 0), width=4)
-        elif expr.get('x_eyes'):
-            draw.line([(ex-eye_r, eye_y-eye_r), (ex+eye_r, eye_y+eye_r)],
-                      fill=(0, 0, 0), width=4)
-            draw.line([(ex-eye_r, eye_y+eye_r), (ex+eye_r, eye_y-eye_r)],
-                      fill=(0, 0, 0), width=4)
-        elif expr.get('angry'):
-            draw.ellipse([ex-eye_r, eye_y-eye_r, ex+eye_r, eye_y+eye_r],
-                         fill=eye_white, outline=(0, 0, 0), width=2)
-            if i == 0:
-                draw.line([(ex-eye_r-5, eye_y-eye_r+5),
-                            (ex+eye_r+5, eye_y-eye_r-8)],
-                           fill=(0, 0, 0), width=5)
+    for idx, ex in enumerate((cx - spacing, cx + spacing)):
+        if expression == "happy":
+            draw.arc((ex - eye_radius, eye_y - eye_radius, ex + eye_radius, eye_y + eye_radius), 200, 340, fill=(0, 0, 0, 255), width=max(3, eye_radius // 3))
+            continue
+        if expression == "dead":
+            draw.line((ex - eye_radius, eye_y - eye_radius, ex + eye_radius, eye_y + eye_radius), fill=(0, 0, 0, 255), width=4)
+            draw.line((ex - eye_radius, eye_y + eye_radius, ex + eye_radius, eye_y - eye_radius), fill=(0, 0, 0, 255), width=4)
+            continue
+        scale = 1.5 if expression in {"scared", "shocked"} else 1.0
+        scaled_eye = eye_radius * scale
+        draw.ellipse((ex - scaled_eye, eye_y - scaled_eye, ex + scaled_eye, eye_y + scaled_eye), fill=white_color, outline=(0, 0, 0, 255), width=2)
+        if expression == "angry":
+            if idx == 0:
+                draw.line((ex - scaled_eye - 4, eye_y - scaled_eye + 4, ex + scaled_eye + 4, eye_y - scaled_eye - 8), fill=(0, 0, 0, 255), width=4)
             else:
-                draw.line([(ex-eye_r-5, eye_y-eye_r-8),
-                            (ex+eye_r+5, eye_y-eye_r+5)],
-                           fill=(0, 0, 0), width=5)
-            offset = expr.get('pupil_offset', (0, 0.1))
-            px = ex + int(offset[0] * eye_r)
-            py = eye_y + int(offset[1] * eye_r)
-            draw.ellipse([px-pupil_r, py-pupil_r, px+pupil_r, py+pupil_r],
-                         fill=(0, 0, 0))
+                draw.line((ex - scaled_eye - 4, eye_y - scaled_eye - 8, ex + scaled_eye + 4, eye_y - scaled_eye + 4), fill=(0, 0, 0, 255), width=4)
+        pupil_size = pupil_radius * (0.45 if expression in {"scared", "shocked"} else 1.0)
+        px = ex + pupil_offset[0] * scaled_eye
+        py = eye_y + pupil_offset[1] * scaled_eye
+        draw.ellipse((px - pupil_size, py - pupil_size, px + pupil_size, py + pupil_size), fill=(0, 0, 0, 255))
+        shine = max(2, int(pupil_size // 2))
+        draw.ellipse((px - pupil_size * 0.55 - shine, py - pupil_size * 0.55 - shine, px - pupil_size * 0.55 + shine, py - pupil_size * 0.55 + shine), fill=(255, 255, 255, 255))
+
+
+def render_planet(layer: dict, theme_key: str, scene_progress: float, global_t: float) -> Image.Image:
+    base_radius = SIZES.get(layer.get("size", "medium"), 150)
+    x_norm, y_norm = POSITIONS.get(layer.get("position", "center"), POSITIONS["center"])
+    cx = int(WIDTH * x_norm)
+    cy = int(HEIGHT * y_norm)
+    entry_animation = layer.get("entry_animation", "none")
+    scale = 1.0
+    offset_x = 0
+    offset_y = 0
+    if entry_animation != "none":
+        p = clamp(scene_progress / 0.32, 0.0, 1.0)
+        if entry_animation == "pop_in":
+            scale *= ease_out_back(p)
+        elif entry_animation == "slide_from_left":
+            offset_x -= int((1 - ease_out_cubic(p)) * WIDTH * 0.5)
+        elif entry_animation == "slide_from_right":
+            offset_x += int((1 - ease_out_cubic(p)) * WIDTH * 0.5)
+        elif entry_animation == "zoom_in":
+            scale *= 0.60 + 0.40 * ease_out_cubic(p)
+        elif entry_animation == "bounce_in":
+            scale *= 0.70 + 0.30 * ease_out_back(p)
+    effects = layer.get("effects", [])
+    if "pulse" in effects:
+        scale *= 1.0 + 0.05 * math.sin(global_t * 4.0)
+    if "shake" in effects:
+        rng = random.Random(int(global_t * FPS * 9))
+        offset_x += rng.randint(-8, 8)
+        offset_y += rng.randint(-8, 8)
+    offset_y += int(math.sin(global_t * 1.6 + cx * 0.01) * (16 if ("idle_bounce" in effects or "float" in effects) else 10))
+    cx += offset_x
+    cy += offset_y
+    radius = max(14, int(base_radius * scale))
+    name = layer.get("name", "earth")
+    expression = layer.get("expression", "neutral")
+    glow_color = glow_color_for_planet(name, theme_key)
+    planet_layer = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw_planet_glow(planet_layer, cx, cy, radius, glow_color, global_t)
+    if name == "saturn":
+        draw_saturn_rings(planet_layer, cx, cy, radius)
+    if name == "black_hole":
+        draw_black_hole_accretion_disk(planet_layer, cx, cy, radius)
+    if name == "sun":
+        draw_sun_corona(planet_layer, cx, cy, radius, global_t)
+    body = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    body_draw = ImageDraw.Draw(body)
+    draw_planet_body(body_draw, cx, cy, radius, name)
+    draw_highlight(body_draw, cx, cy, radius)
+    draw_eyes(body_draw, cx, cy, radius, expression, name)
+    body = body.filter(ImageFilter.GaussianBlur(0.15))
+    planet_layer.alpha_composite(body)
+    return planet_layer
+
+
+def classify_word(word: str) -> str:
+    clean = word.lower().strip(".,!?;:()[]{}")
+    if any(ch.isdigit() for ch in word):
+        return "number"
+    if clean in PLANET_NAMES or clean.replace(" ", "_") in PLANET_NAMES:
+        return "planet"
+    if word.isupper() and len(word) > 2:
+        return "accent"
+    return "base"
+
+
+def segment_style(word: str, base_size: int, theme_key: str) -> tuple[ImageFont.ImageFont, tuple[int, int, int], tuple[int, int, int]]:
+    theme = TOPIC_THEMES[theme_key]
+    kind = classify_word(word)
+    if kind == "number":
+        return get_font(int(base_size * 1.20)), NUMBER_YELLOW, NUMBER_YELLOW
+    if kind == "planet":
+        return get_font(base_size), PLANET_CYAN, PLANET_CYAN
+    if kind == "accent":
+        return get_font(base_size), theme["accent"], theme["accent"]
+    return get_font(base_size), WHITE, theme["accent_secondary"]
+
+
+def wrap_segments(content: str, base_size: int, max_width: int, theme_key: str) -> list[list[dict]]:
+    measure = ImageDraw.Draw(Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0)))
+    words = content.split()
+    lines: list[list[dict]] = []
+    current: list[dict] = []
+    current_width = 0
+    for word in words:
+        font, color, glow = segment_style(word, base_size, theme_key)
+        token = f"{word} "
+        bbox = measure.textbbox((0, 0), token, font=font)
+        width = bbox[2] - bbox[0]
+        segment = {"text": word, "token_width": width, "font": font, "color": color, "glow": glow}
+        if current and current_width + width > max_width:
+            lines.append(current)
+            current = [segment]
+            current_width = width
         else:
-            draw.ellipse([ex-eye_r, eye_y-eye_r, ex+eye_r, eye_y+eye_r],
-                         fill=eye_white, outline=(0, 0, 0), width=2)
-            offset = expr.get('pupil_offset', (0, 0))
-            px = ex + int(offset[0] * eye_r)
-            py = eye_y + int(offset[1] * eye_r)
-            draw.ellipse([px-pupil_r, py-pupil_r, px+pupil_r, py+pupil_r],
-                         fill=(0, 0, 0))
-            hl_r = max(3, pupil_r // 2)
-            draw.ellipse([px-int(pupil_r*0.4)-hl_r, py-int(pupil_r*0.4)-hl_r,
-                           px-int(pupil_r*0.4)+hl_r, py-int(pupil_r*0.4)+hl_r],
-                         fill=(255, 255, 255))
+            current.append(segment)
+            current_width += width
+    if current:
+        lines.append(current)
+    return lines
 
-# =============================================================================
-# ENTRY ANIMATIONS
-# =============================================================================
-def apply_entry_animation(progress, anim_type, duration=0.3):
-    if anim_type == 'none' or progress > duration:
-        return {'scale': 1.0, 'offset': (0, 0), 'alpha': 1.0}
-    t = min(progress / duration, 1.0)
-    if anim_type == 'pop_in':
-        return {'scale': ease_out_back(t), 'offset': (0, 0), 'alpha': 1.0}
-    elif anim_type == 'slide_from_left':
-        return {'scale': 1.0, 'offset': (-WIDTH * (1 - ease_out_cubic(t)), 0), 'alpha': 1.0}
-    elif anim_type == 'slide_from_right':
-        return {'scale': 1.0, 'offset': (WIDTH * (1 - ease_out_cubic(t)), 0), 'alpha': 1.0}
-    elif anim_type == 'slide_from_top':
-        return {'scale': 1.0, 'offset': (0, -HEIGHT * (1 - ease_out_cubic(t))), 'alpha': 1.0}
-    elif anim_type == 'slide_from_bottom':
-        return {'scale': 1.0, 'offset': (0, HEIGHT * (1 - ease_out_cubic(t))), 'alpha': 1.0}
-    elif anim_type == 'fade_in':
-        return {'scale': 1.0, 'offset': (0, 0), 'alpha': t}
-    elif anim_type == 'zoom_in':
-        return {'scale': 0.3 + 0.7 * ease_out_cubic(t), 'offset': (0, 0), 'alpha': t}
-    elif anim_type == 'bounce_in':
-        return {'scale': ease_out_elastic(t), 'offset': (0, 0), 'alpha': 1.0}
-    return {'scale': 1.0, 'offset': (0, 0), 'alpha': 1.0}
 
-def apply_object_effect(frame_num, effect_type):
-    t = frame_num / FPS
-    if effect_type == 'idle_bounce':
-        return {'offset': (0, math.sin(t * 2) * 8)}
-    elif effect_type == 'shake':
-        random.seed(frame_num)
-        return {'offset': (random.randint(-10, 10), random.randint(-10, 10))}
-    elif effect_type == 'pulse':
-        return {'scale_mod': 1.0 + math.sin(t * 4) * 0.05}
-    elif effect_type == 'glow':
-        return {'glow': 0.5 + math.sin(t * 3) * 0.3}
-    elif effect_type == 'wobble':
-        return {'rotation': math.sin(t * 3) * 10}
-    elif effect_type == 'vibrate':
-        random.seed(frame_num)
-        return {'offset': (random.randint(-4, 4), random.randint(-4, 4))}
-    elif effect_type == 'float':
-        return {'offset': (0, math.sin(t * 1.5) * 15)}
-    elif effect_type == 'spin':
-        return {'rotation': (t * 90) % 360}
-    return {}
-
-# =============================================================================
-# SCREEN EFFECTS
-# =============================================================================
-def apply_screen_effect(img, effect_type, frame_num=0):
-    if effect_type == 'camera_shake':
-        random.seed(frame_num)
-        dx, dy = random.randint(-12, 12), random.randint(-12, 12)
-        result = Image.new('RGB', img.size, COLORS['background'])
-        result.paste(img, (dx, dy))
-        return result
-    elif effect_type == 'flash':
-        flash = Image.new('RGB', img.size, (255, 255, 255))
-        return Image.blend(img, flash, 0.35)
-    elif effect_type == 'chromatic_aberration':
-        r, g, b = img.split()
-        r = r.transform(img.size, Image.AFFINE, (1, 0, -4, 0, 1, 0))
-        b = b.transform(img.size, Image.AFFINE, (1, 0, 4, 0, 1, 0))
-        return Image.merge('RGB', (r, g, b))
-    elif effect_type == 'vignette_pulse':
-        vignette = Image.new('L', img.size, 255)
-        draw = ImageDraw.Draw(vignette)
-        cx, cy = img.width // 2, img.height // 2
-        max_r = max(cx, cy) * 1.5
-        for r in range(int(max_r), 0, -10):
-            draw.ellipse([cx-r, cy-r, cx+r, cy+r],
-                         fill=int(255 * (r / max_r)))
-        pulse = 0.25 + math.sin(frame_num / FPS * 4) * 0.1
-        vignette = ImageEnhance.Brightness(vignette).enhance(1 - pulse)
-        result = img.copy().convert('RGBA')
-        result.putalpha(vignette)
-        bg = Image.new('RGBA', img.size, (*COLORS['background'], 255))
-        return Image.alpha_composite(bg, result).convert('RGB')
-    elif effect_type == 'glitch':
-        result = img.copy()
-        if random.random() < 0.4:
-            y = random.randint(0, img.height - 40)
-            h = random.randint(15, 40)
-            sl = img.crop((0, y, img.width, y + h))
-            result.paste(sl, (random.randint(-25, 25), y))
-        return result
-    return img
-
-# =============================================================================
-# TEXT RENDERING  (enhanced: number highlighting, glow, word-by-word)
-# =============================================================================
-def render_text_enhanced(img, text_config, progress, frame_num, theme_key="default"):
-    """
-    Full-featured text renderer:
-    - word_by_word: reveals words progressively
-    - slam_in: big then normal
-    - typewriter: char by char
-    - Numbers auto-highlighted yellow + slightly larger
-    - Planet names auto-highlighted cyan
-    - Glow behind all text
-    """
-    content = text_config.get('content', '')
+def rendered_content_for_style(content: str, style: str, progress: float) -> str:
     if not content:
-        return img
-
-    position = text_config.get('position', 'top')
-    style = text_config.get('style', 'word_by_word')
-    highlight = text_config.get('highlight', [])  # optional extra highlight words
-
-    base_font_size = 52
-    theme = THEMES.get(theme_key, THEMES["default"])
-    accent = theme["accent"]
-
-    # Apply style
-    if style == 'word_by_word':
+        return ""
+    if style == "typewriter":
+        chars = max(1, int(len(content) * clamp(progress * 1.25, 0.0, 1.0)))
+        return content[:chars]
+    if style == "word_by_word":
         words = content.split()
-        num_show = max(1, int(len(words) * min(progress * 1.4, 1.0)))
-        content = ' '.join(words[:num_show])
-    elif style == 'slam_in':
-        if progress < 0.15:
-            base_font_size = int(52 * (3.0 - 2.0 * (progress / 0.15)))
-            base_font_size = max(52, min(base_font_size, 130))
-    elif style == 'typewriter':
-        num_chars = int(len(content) * min(progress * 1.2, 1.0))
-        content = content[:num_chars]
+        count = max(1, int(len(words) * clamp(progress * 1.35, 0.0, 1.0)))
+        return " ".join(words[:count])
+    return content
 
-    result = img.convert('RGBA')
-    font = get_font(base_font_size)
 
-    y_base = 170 if position == 'top' else HEIGHT - 320
+def draw_text_block(frame: Image.Image, text_config: dict, scene_progress: float, theme_key: str) -> Image.Image:
+    content = text_config.get("content", "").strip()
+    if not content:
+        return frame
+    style = text_config.get("style", "word_by_word")
+    position = text_config.get("position", "top")
+    visible_text = rendered_content_for_style(content, style, scene_progress)
+    if not visible_text:
+        return frame
+    base_size = 68
+    if style == "slam_in":
+        zoom_progress = clamp(scene_progress / 0.18, 0.0, 1.0)
+        base_size = int(68 * (1.55 - 0.55 * ease_out_back(zoom_progress)))
+    lines = wrap_segments(visible_text, base_size, WIDTH - 180, theme_key)
+    if not lines:
+        return frame
 
-    # Word-level rendering with color coding
-    lines = textwrap.wrap(content, width=22)
-    line_height = int(base_font_size * 1.35)
+    overlay = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    y_start = 180 if position == "top" else HEIGHT - 430
+    line_spacing = int(base_size * 1.15)
+    for line_index, line in enumerate(lines):
+        line_width = sum(segment["token_width"] for segment in line)
+        x = (WIDTH - line_width) // 2
+        line_y = y_start + line_index * line_spacing
+        font_heights = [segment["font"].size if hasattr(segment["font"], "size") else base_size for segment in line]
+        pill_height = int(max(font_heights) + 16)
+        draw.rounded_rectangle((x - 8, line_y - 8, x + line_width + 8, line_y + pill_height), radius=18, fill=PILL_DARK)
+        cursor_x = x
+        for segment in line:
+            font = segment["font"]
+            text = segment["text"]
+            color = segment["color"]
+            glow = segment["glow"]
+            glow_layer = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+            glow_draw = ImageDraw.Draw(glow_layer)
+            for offset in (5, 3):
+                alpha = 28 if offset == 5 else 52
+                for dx in (-offset, 0, offset):
+                    for dy in (-offset, 0, offset):
+                        glow_draw.text((cursor_x + dx, line_y + dy), text, font=font, fill=(*glow, alpha))
+            glow_layer = glow_layer.filter(ImageFilter.GaussianBlur(4))
+            overlay.alpha_composite(glow_layer)
+            shadow_draw = ImageDraw.Draw(overlay)
+            for dx in (-2, -1, 0, 1, 2):
+                for dy in (-2, -1, 0, 1, 2):
+                    shadow_draw.text((cursor_x + dx, line_y + dy), text, font=font, fill=(0, 0, 0, 255))
+            shadow_draw.text((cursor_x, line_y), text, font=font, fill=(*color, 255))
+            cursor_x += segment["token_width"]
+    return Image.alpha_composite(frame.convert("RGBA"), overlay)
 
-    for li, line in enumerate(lines):
-        ly = y_base + li * line_height
-        words_in_line = line.split()
 
-        # Measure total line width for centering
-        total_w = 0
-        temp_draw = ImageDraw.Draw(result)
-        for w in words_in_line:
-            bb = temp_draw.textbbox((0, 0), w + ' ', font=font)
-            total_w += bb[2] - bb[0]
-        lx = max(40, (WIDTH - total_w) // 2)
-
-        for word in words_in_line:
-            word_clean = word.lower().strip('.,!?:')
-
-            # Determine color and size
-            is_number = any(c.isdigit() for c in word)
-            is_planet = word_clean in ['earth', 'mars', 'jupiter', 'saturn',
-                                        'sun', 'moon', 'neptune', 'venus',
-                                        'mercury', 'uranus']
-            is_highlight = word_clean in [h.lower() for h in highlight]
-            is_caps = word.isupper() and len(word) > 2
-
-            if is_number:
-                color = COLORS['text_yellow']
-                glow_col = COLORS['glow_yellow']
-                word_font = get_font(int(base_font_size * 1.18))
-            elif is_planet:
-                color = COLORS['text_cyan']
-                glow_col = COLORS['glow_blue']
-                word_font = font
-            elif is_highlight or is_caps:
-                color = tuple(accent)
-                glow_col = tuple(accent)
-                word_font = get_font(int(base_font_size * 1.1))
-            else:
-                color = COLORS['text_white']
-                glow_col = COLORS['glow_blue']
-                word_font = font
-
-            # Glow
-            glow_layer = Image.new('RGBA', img.size, (0, 0, 0, 0))
-            gd = ImageDraw.Draw(glow_layer)
-            for off in [6, 4, 2]:
-                a = int(45 * (1 - off / 7))
-                for dx in range(-off, off+1, 2):
-                    for dy in range(-off, off+1, 2):
-                        gd.text((lx+dx, ly+dy), word, font=word_font,
-                                 fill=(*glow_col, a))
-            glow_layer = glow_layer.filter(ImageFilter.GaussianBlur(2))
-            result = Image.alpha_composite(result, glow_layer)
-
-            # Outline
-            ol = Image.new('RGBA', img.size, (0, 0, 0, 0))
-            od = ImageDraw.Draw(ol)
-            for dx in range(-3, 4):
-                for dy in range(-3, 4):
-                    od.text((lx+dx, ly+dy), word, font=word_font,
-                             fill=(0, 0, 0, 255))
-            result = Image.alpha_composite(result, ol)
-
-            # Text
-            tl = Image.new('RGBA', img.size, (0, 0, 0, 0))
-            td = ImageDraw.Draw(tl)
-            td.text((lx, ly), word, font=word_font, fill=(*color, 255))
-            result = Image.alpha_composite(result, tl)
-
-            bb = ImageDraw.Draw(result).textbbox((0, 0), word + ' ', font=word_font)
-            lx += bb[2] - bb[0]
-
-    return result.convert('RGB')
-
-# =============================================================================
-# MAIN FRAME RENDERER
-# =============================================================================
-def render_frame(scene, frame_num, total_frames, parallax_layers,
-                  shooting_star_t, theme_key, video_start_frame, total_video_frames):
-    progress = frame_num / max(total_frames - 1, 1)
-    t = frame_num / FPS
-    total_dur = total_frames / FPS
-
-    # Composite parallax background
-    frame = composite_parallax(parallax_layers, t, total_dur, shooting_star_t)
-
+def draw_progress_bar(frame: Image.Image, progress: float, theme_key: str) -> None:
+    theme = TOPIC_THEMES[theme_key]
     draw = ImageDraw.Draw(frame)
-    layers = scene.get('layers', [])
-    text_config = scene.get('text', {})
-    screen_effects = scene.get('screen_effects', [])
+    bar_height = 8
+    y = HEIGHT - bar_height
+    draw.rectangle((0, y, WIDTH, HEIGHT), fill=(30, 32, 40, 220))
+    fill_width = int(WIDTH * clamp(progress, 0.0, 1.0))
+    if fill_width <= 0:
+        return
+    draw.rectangle((0, y, fill_width, HEIGHT), fill=(*theme["accent"], 255))
+    glow = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    glow_draw = ImageDraw.Draw(glow)
+    glow_draw.ellipse((fill_width - 16, y - 10, fill_width + 16, HEIGHT + 10), fill=(*theme["accent"], 150))
+    glow = glow.filter(ImageFilter.GaussianBlur(6))
+    frame.alpha_composite(glow)
 
-    # Draw glow rings under planets (separate RGBA layer)
-    theme = THEMES.get(theme_key, THEMES["default"])
-    glow_colors = {
-        'earth': (60, 140, 255), 'mars': (255, 100, 60),
-        'jupiter': (255, 180, 120), 'saturn': (220, 200, 150),
-        'sun': (255, 200, 50), 'moon': (200, 200, 220),
-        'neptune': (80, 140, 255), 'venus': (255, 200, 120),
-        'black_hole': (180, 60, 255), 'neutron_star': (180, 180, 255),
-    }
 
-    for layer in layers:
-        if layer.get('type') != 'planet':
-            continue
-        name = layer.get('name', 'earth')
-        position = layer.get('position', 'center')
-        size_key = layer.get('size', 'medium')
-        expression = layer.get('expression', 'neutral')
-        entry_anim = layer.get('entry_animation', 'pop_in')
-        effects = layer.get('effects', [])
-
-        pos_norm = POSITIONS.get(position, (0.5, 0.5))
-        cx = int(pos_norm[0] * WIDTH)
-        cy = int(pos_norm[1] * HEIGHT)
-        radius = SIZES.get(size_key, 150)
-
-        entry = apply_entry_animation(progress, entry_anim)
-        radius = int(radius * entry.get('scale', 1.0))
-        cx += int(entry.get('offset', (0, 0))[0])
-        cy += int(entry.get('offset', (0, 0))[1])
-
-        for effect in effects:
-            eff = apply_object_effect(frame_num, effect)
-            if 'offset' in eff:
-                cx += int(eff['offset'][0])
-                cy += int(eff['offset'][1])
-            if 'scale_mod' in eff:
-                radius = int(radius * eff['scale_mod'])
-
-        if radius < 10:
-            continue
-
-        # Glow ring layer
-        glow_col = glow_colors.get(name, (150, 150, 255))
-        pulse = 1.0 + 0.04 * math.sin(frame_num / FPS * 2 * math.pi * 0.8)
+def draw_hook_screen(base_background: Image.Image, particles: dict, hook_text: str, theme_key: str, t: float) -> Image.Image:
+    frame = compose_background(base_background, particles, theme_key, t, HOOK_DURATION)
+    theme = TOPIC_THEMES[theme_key]
+    overlay = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    scale = 0.60 + 0.40 * ease_out_back(clamp(t / 0.4, 0.0, 1.0))
+    font_size = int(92 * scale)
+    font = get_font(font_size)
+    lines = textwrap.wrap(hook_text, width=16)
+    line_height = int(font_size * 1.12)
+    block_height = len(lines) * line_height
+    start_y = HEIGHT // 2 - block_height // 2 - 70
+    for idx, line in enumerate(lines):
+        bbox = draw.textbbox((0, 0), line, font=font)
+        width = bbox[2] - bbox[0]
+        x = (WIDTH - width) // 2
+        y = start_y + idx * line_height
+        draw.rounded_rectangle((x - 16, y - 12, x + width + 16, y + font_size + 8), radius=22, fill=(8, 10, 18, 165))
         glow_layer = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
-        gd = ImageDraw.Draw(glow_layer)
-        for i in range(7, 0, -1):
-            r = int(radius * (1.12 + i * 0.07) * pulse)
-            a = int(28 * (1 - i / 8))
-            gd.ellipse([cx-r, cy-r, cx+r, cy+r], fill=(*glow_col, a))
-        frame = Image.alpha_composite(frame.convert("RGBA"),
-                                       glow_layer).convert("RGB")
-        draw = ImageDraw.Draw(frame)
+        glow_draw = ImageDraw.Draw(glow_layer)
+        for spread in (10, 6):
+            alpha = 24 if spread == 10 else 48
+            for dx in (-spread, 0, spread):
+                for dy in (-spread, 0, spread):
+                    glow_draw.text((x + dx, y + dy), line, font=font, fill=(*theme["accent"], alpha))
+        glow_layer = glow_layer.filter(ImageFilter.GaussianBlur(6))
+        overlay.alpha_composite(glow_layer)
+        shadow_draw = ImageDraw.Draw(overlay)
+        for dx in (-3, -2, -1, 0, 1, 2, 3):
+            for dy in (-3, -2, -1, 0, 1, 2, 3):
+                shadow_draw.text((x + dx, y + dy), line, font=font, fill=(0, 0, 0, 255))
+        shadow_draw.text((x, y), line, font=font, fill=(255, 255, 255, 255))
+    underline_progress = ease_out_cubic(clamp(t / 0.6, 0.0, 1.0))
+    underline_width = int((WIDTH * 0.52) * underline_progress)
+    underline_x = (WIDTH - int(WIDTH * 0.52)) // 2
+    underline_y = start_y + block_height + 36
+    if underline_width > 0:
+        draw.rounded_rectangle((underline_x, underline_y, underline_x + underline_width, underline_y + 6), radius=4, fill=theme["accent"])
+    frame = Image.alpha_composite(frame.convert("RGBA"), overlay)
+    draw_progress_bar(frame, t / max(HOOK_DURATION, 0.01), theme_key)
+    return frame
 
-        # Planet body + eyes
-        draw_planet_with_glow(draw, cx, cy, radius, name, expression, frame_num)
 
-    # Text
-    if text_config:
-        frame = render_text_enhanced(frame, text_config, progress,
-                                      frame_num, theme_key)
-
-    # Screen effects
-    for effect in screen_effects:
-        frame = apply_screen_effect(frame, effect, frame_num)
-
-    # Progress bar (global video progress)
-    global_progress = (video_start_frame + frame_num) / max(total_video_frames, 1)
+def render_scene_frame(
+    scene: dict,
+    base_background: Image.Image,
+    particles: dict,
+    theme_key: str,
+    local_t: float,
+    scene_duration_value: float,
+    *,
+    global_progress: float,
+) -> Image.Image:
+    frame = compose_background(base_background, particles, theme_key, local_t, scene_duration_value)
+    progress = clamp(local_t / max(scene_duration_value, 0.01), 0.0, 1.0)
+    for layer in scene.get("layers", []):
+        if layer.get("type") == "planet":
+            frame.alpha_composite(render_planet(layer, theme_key, progress, local_t))
+    frame = draw_text_block(frame, scene.get("text", {}), progress, theme_key)
+    frame = apply_screen_effects(frame, scene.get("screen_effects", []), int(local_t * FPS))
     draw_progress_bar(frame, global_progress, theme_key)
+    return frame
 
-    return np.array(frame)
 
-# =============================================================================
-# VIDEO CREATION
-# =============================================================================
-def create_video(script_data, output_path):
-    print(f"🎬 Cinema renderer starting: {output_path}")
+def scene_duration(scene: dict) -> float:
+    start = float(scene.get("time_start", 0.0))
+    end = float(scene.get("time_end", start + 4.0))
+    return max(0.5, end - start)
 
-    timeline = script_data.get('timeline', [])
+
+def transition_frame(current: Image.Image, next_frame: Image.Image, transition_type: str, progress: float) -> Image.Image:
+    p = clamp(progress, 0.0, 1.0)
+    if transition_type == "crossfade":
+        return Image.blend(current.convert("RGBA"), next_frame.convert("RGBA"), p)
+    if transition_type == "horizontal_wipe":
+        wipe = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 255))
+        current_shift = int(-WIDTH * ease_in_out_cubic(p))
+        next_shift = int(WIDTH * (1 - ease_in_out_cubic(p)))
+        wipe.alpha_composite(current, (current_shift, 0))
+        wipe.alpha_composite(next_frame, (next_shift, 0))
+        return wipe
+    if transition_type == "zoom_through":
+        scale = 1.0 + 0.38 * ease_out_cubic(p)
+        zoomed = current.resize((int(WIDTH * scale), int(HEIGHT * scale)), Image.Resampling.LANCZOS)
+        left = (zoomed.width - WIDTH) // 2
+        top = (zoomed.height - HEIGHT) // 2
+        zoomed = zoomed.crop((left, top, left + WIDTH, top + HEIGHT)).convert("RGBA")
+        if p > 0.55:
+            zoomed = Image.blend(zoomed, next_frame.convert("RGBA"), clamp((p - 0.55) / 0.45, 0.0, 1.0))
+        flash = Image.new("RGBA", (WIDTH, HEIGHT), (255, 255, 255, int(120 * math.sin(math.pi * p))))
+        return Image.alpha_composite(zoomed, flash)
+    return next_frame
+
+
+def build_segment_plan(script_data: dict) -> tuple[list[dict], float]:
+    timeline = script_data.get("timeline", [])
+    has_hook = bool(script_data.get("idea", {}).get("hook"))
+    segments = []
+    elapsed = 0.0
+    if has_hook:
+        segments.append({"type": "hook", "start": 0.0, "end": HOOK_DURATION})
+        elapsed += HOOK_DURATION
+    for index, scene in enumerate(timeline):
+        duration = scene_duration(scene)
+        segments.append({"type": "scene", "scene_index": index, "start": elapsed, "end": elapsed + duration})
+        elapsed += duration
+        if index < len(timeline) - 1:
+            segments.append(
+                {
+                    "type": "transition",
+                    "scene_index": index,
+                    "next_scene_index": index + 1,
+                    "transition_type": TRANSITIONS[index % len(TRANSITIONS)],
+                    "start": elapsed,
+                    "end": elapsed + TRANSITION_DURATION,
+                }
+            )
+            elapsed += TRANSITION_DURATION
+    return segments, elapsed
+
+
+def create_video(script_data: dict, output_path: Path) -> bool:
+    timeline = script_data.get("timeline", [])
     if not timeline:
-        print("❌ No timeline in script")
+        print("No timeline found.")
         return False
 
-    idea = script_data.get('idea', {})
-    topic_family = idea.get('topic_family', 'default')
-    theme_key = topic_family if topic_family in THEMES else 'default'
-    hook_text = idea.get('hook', '')
+    theme_key = infer_theme(script_data)
+    topic_keyword = infer_topic_keyword(script_data)
+    base_image, background_path = get_space_background(topic_keyword)
+    base_background = build_base_background(base_image, theme_key)
+    segments, total_duration = build_segment_plan(script_data)
+    particles = build_particle_system(theme_key, topic_keyword, total_duration)
+    mood = script_data.get("metadata", {}).get("music_style") or script_data.get("metadata", {}).get("mood") or "cinematic"
+    music_path = get_music_for_mood(mood, total_duration)
 
-    print(f"🎨 Theme: {theme_key}")
-    print(f"🎣 Hook: {hook_text[:60]}")
+    print(f"Renderer theme: {theme_key}")
+    print(f"Topic keyword: {topic_keyword}")
+    if background_path:
+        print(f"Background source cache: {background_path}")
+    if music_path:
+        print(f"Music track: {music_path}")
 
-    # Fetch NASA background (optional)
-    nasa_bg = fetch_nasa_background(idea.get('topic', ''))
+    scene_cache: dict[tuple[int, int], np.ndarray] = {}
 
-    # Build parallax layers
-    parallax_layers = create_parallax_starfield(theme_key, seed=42, nasa_bg=nasa_bg)
+    def frame_for_scene(scene_index: int, local_t: float, global_progress: float) -> Image.Image:
+        scene = timeline[scene_index]
+        scene_len = scene_duration(scene)
+        frame_key = (scene_index, int(clamp(local_t, 0.0, scene_len) * FPS))
+        cached = scene_cache.get(frame_key)
+        if cached is not None:
+            return Image.fromarray(cached).convert("RGBA")
+        rendered = render_scene_frame(scene, base_background, particles, theme_key, local_t, scene_len, global_progress=global_progress)
+        scene_cache[frame_key] = np.array(rendered.convert("RGB"), dtype=np.uint8)
+        return rendered
 
-    # Pick shooting star timing (random within video)
-    total_script_duration = sum(
-        s.get('time_end', 4) - s.get('time_start', 0) for s in timeline
-    )
-    hook_dur = 2.5 if hook_text else 0
-    total_duration = hook_dur + total_script_duration
-    shooting_star_t = random.uniform(total_duration * 0.3, total_duration * 0.75)
+    def make_frame(t: float) -> np.ndarray:
+        clamped_t = clamp(t, 0.0, max(total_duration - 1 / FPS, 0.0))
+        for segment in segments:
+            if segment["start"] <= clamped_t < segment["end"] or math.isclose(clamped_t, segment["end"]):
+                global_progress = clamped_t / max(total_duration, 0.01)
+                local_t = clamped_t - segment["start"]
+                if segment["type"] == "hook":
+                    frame = draw_hook_screen(base_background, particles, script_data.get("idea", {}).get("hook", ""), theme_key, local_t)
+                elif segment["type"] == "scene":
+                    frame = frame_for_scene(segment["scene_index"], local_t, global_progress)
+                else:
+                    current_index = segment["scene_index"]
+                    next_index = segment["next_scene_index"]
+                    progress = local_t / TRANSITION_DURATION
+                    current_duration = scene_duration(timeline[current_index])
+                    current_frame = frame_for_scene(current_index, max(current_duration - 1 / FPS, 0.0), global_progress)
+                    next_frame = frame_for_scene(next_index, min(progress * 0.35, scene_duration(timeline[next_index])), global_progress)
+                    frame = transition_frame(current_frame, next_frame, segment["transition_type"], progress)
+                    draw_progress_bar(frame, global_progress, theme_key)
+                return np.array(frame.convert("RGB"), dtype=np.uint8)
+        fallback = draw_hook_screen(base_background, particles, script_data.get("idea", {}).get("hook", ""), theme_key, 0.0)
+        return np.array(fallback.convert("RGB"), dtype=np.uint8)
 
-    total_video_frames = int(total_duration * FPS)
-    clips = []
-    current_frame_offset = 0
+    video = VideoClip(make_frame, duration=total_duration)
+    audio_clip = None
+    if music_path and Path(music_path).exists():
+        try:
+            audio_clip = AudioFileClip(music_path).fx(afx.audio_loop, duration=total_duration)
+            audio_clip = audio_clip.subclip(0, total_duration).volumex(0.34)
+            audio_clip = audio_clip.fx(afx.audio_fadein, 0.7).fx(afx.audio_fadeout, 1.2)
+            video = video.set_audio(audio_clip)
+        except Exception as exc:
+            print(f"Audio attachment failed: {exc}")
 
-    # 1. Hook screen clip
-    if hook_text:
-        hook_duration = 2.5
-        hook_total_frames = int(hook_duration * FPS)
-        print("⚡ Rendering hook screen...")
-
-        def make_hook_frame(t,
-                             _layers=parallax_layers,
-                             _hook=hook_text,
-                             _theme=theme_key,
-                             _dur=hook_duration,
-                             _ss_t=shooting_star_t):
-            return render_hook_screen(_hook, _theme, _layers, t, _dur)
-
-        clips.append(VideoClip(make_hook_frame, duration=hook_duration))
-        current_frame_offset += hook_total_frames
-
-    # 2. Main scene clips
-    for i, scene in enumerate(timeline):
-        start = scene.get('time_start', 0)
-        end = scene.get('time_end', 4)
-        duration = max(0.5, end - start)
-        total_frames = int(duration * FPS)
-        text_preview = scene.get('text', {}).get('content', '')[:40]
-        print(f"  🎬 Scene {i+1}/{len(timeline)} ({duration:.1f}s): {text_preview}...")
-
-        frame_offset = current_frame_offset
-
-        def make_frame(t,
-                        _scene=scene,
-                        _total=total_frames,
-                        _layers=parallax_layers,
-                        _ss=shooting_star_t,
-                        _theme=theme_key,
-                        _offset=frame_offset,
-                        _total_v=total_video_frames):
-            fn = min(int(t * FPS), _total - 1)
-            return render_frame(_scene, fn, _total, _layers,
-                                  _ss, _theme, _offset, _total_v)
-
-        clips.append(VideoClip(make_frame, duration=duration))
-        current_frame_offset += total_frames
-
-    # Join
-    print("🔗 Joining clips...")
-    video = concatenate_videoclips(clips, method="compose")
-
-    # Audio
-    audio_added = False
-    if os.path.exists(AUDIO_DIR):
-        audio_files = [f for f in os.listdir(AUDIO_DIR)
-                       if f.lower().endswith(('.mp3', '.wav', '.ogg', '.m4a'))]
-        # Try theme-matched music first
-        matched = [f for f in audio_files if theme_key in f.lower()]
-        if not matched:
-            matched = audio_files
-        if matched:
-            try:
-                music_path = os.path.join(AUDIO_DIR, random.choice(matched))
-                audio = AudioFileClip(music_path)
-                if audio.duration < video.duration:
-                    loops = int(video.duration / audio.duration) + 1
-                    audio = concatenate_videoclips  # won't hit, just safety
-                    from moviepy.editor import concatenate_audioclips
-                    audio = concatenate_audioclips(
-                        [AudioFileClip(music_path)] * (int(video.duration / AudioFileClip(music_path).duration) + 1)
-                    )
-                audio = audio.subclip(0, video.duration).volumex(0.28)
-                audio = audio.audio_fadein(0.8).audio_fadeout(1.5)
-                video = video.set_audio(audio)
-                print(f"🎵 Music: {os.path.basename(music_path)}")
-                audio_added = True
-            except Exception as e:
-                print(f"⚠️ Music error: {e}")
-
-    if not audio_added:
-        print("⚠️ No audio added")
-
-    # Export
-    print(f"💾 Encoding → {output_path}")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     video.write_videofile(
-        output_path,
+        str(output_path),
         fps=FPS,
-        codec='libx264',
-        preset='medium',
+        codec="libx264",
+        audio_codec="aac",
+        preset="ultrafast" if PREVIEW_MODE else "veryfast",
         threads=4,
         logger=None,
-        bitrate='6000k',
+        bitrate="1800k" if PREVIEW_MODE else "5000k",
     )
 
-    # Cleanup
     try:
-        if video.audio:
-            video.audio.close()
         video.close()
-        for c in clips:
-            c.close()
+        if audio_clip:
+            audio_clip.close()
     except Exception:
         pass
 
-    if os.path.exists(output_path):
-        size_mb = os.path.getsize(output_path) / (1024 * 1024)
-        print(f"✅ Done! {size_mb:.1f} MB → {output_path}")
-        return True
+    script_data["background_path"] = str(background_path) if background_path else None
+    script_data["music_path"] = music_path
+    return output_path.exists()
 
-    print("❌ Output file not created")
-    return False
 
-# =============================================================================
-# ENTRY POINT
-# =============================================================================
-def process_scripts():
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    if not os.path.exists(SCRIPTS_DIR):
-        print(f"📁 No scripts directory: {SCRIPTS_DIR}")
+def process_scripts(*, preview: bool = False) -> None:
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    if not SCRIPTS_DIR.exists():
+        print(f"No scripts directory: {SCRIPTS_DIR}")
         return
-    scripts = [f for f in os.listdir(SCRIPTS_DIR) if f.endswith('.json')]
+    scripts = sorted(path for path in SCRIPTS_DIR.glob("*.json"))
     if not scripts:
-        print("📭 No scripts to process")
+        print("No scripts to process.")
         return
-    print(f"📁 {len(scripts)} script(s) found")
 
-    for script_file in scripts:
-        script_path = os.path.join(SCRIPTS_DIR, script_file)
+    for script_path in scripts:
         try:
-            with open(script_path, 'r') as f:
-                script_data = json.load(f)
-            if script_data.get('rendered'):
-                print(f"⏭️  Already rendered: {script_file}")
+            script_data = json.loads(script_path.read_text(encoding="utf-8"))
+            if script_data.get("rendered") and not preview:
+                print(f"Skipping already rendered script: {script_path.name}")
                 continue
-            output_path = os.path.join(
-                OUTPUT_DIR, script_file.replace('.json', '.mp4')
-            )
-            if create_video(script_data, output_path):
-                script_data['rendered'] = True
-                script_data['rendered_at'] = datetime.now().isoformat()
-                script_data['video_path'] = output_path
-                with open(script_path, 'w') as f:
-                    json.dump(script_data, f, indent=2)
-        except Exception as e:
-            print(f"❌ Error: {e}")
+            if preview:
+                output_path = OUTPUT_DIR / f"{script_path.stem}_preview.mp4"
+            else:
+                output_path = OUTPUT_DIR / script_path.with_suffix(".mp4").name
+            ok = create_video(script_data, output_path)
+            if ok:
+                if preview:
+                    script_data["preview_rendered_at"] = datetime.now().isoformat()
+                    script_data["preview_video_path"] = str(output_path)
+                else:
+                    script_data["rendered"] = True
+                    script_data["rendered_at"] = datetime.now().isoformat()
+                    script_data["video_path"] = str(output_path)
+                script_path.write_text(json.dumps(script_data, indent=2), encoding="utf-8")
+                print(f"Rendered: {output_path}")
+        except Exception as exc:
+            print(f"Renderer failed for {script_path.name}: {exc}")
             import traceback
             traceback.print_exc()
 
-def main():
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Render Astro Shorts videos.")
+    parser.add_argument("--preview", action="store_true", help="Render a faster low-resolution preview without marking the script as final.")
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    configure_render_mode(preview=args.preview)
     print("=" * 60)
-    print("🎬 ASTRO SHORTS V2 — Cinema Renderer")
+    print("ASTRO SHORTS V2 - Dark Cosmos Renderer")
+    if PREVIEW_MODE:
+        print("Preview mode enabled: 540x960 @ 12fps")
     print("=" * 60)
-    process_scripts()
+    process_scripts(preview=PREVIEW_MODE)
     print("=" * 60)
-    print("✅ Complete!")
+    print("Render pass complete")
     print("=" * 60)
+
 
 if __name__ == "__main__":
     main()
