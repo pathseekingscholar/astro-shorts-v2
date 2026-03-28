@@ -61,11 +61,30 @@ jobs:
           SUNO_COOKIE: ${{ secrets.SUNO_COOKIE }}
         run: python scripts/video_renderer.py --preview
 
+      - name: Inspect generated files
+        run: |
+          echo "Scripts output:"
+          ls -la scripts_output || true
+          echo ""
+          echo "Videos output:"
+          ls -la videos_output || true
+
+      - name: Ensure preview exists
+        run: |
+          if ls videos_output/*_preview.mp4 1>/dev/null 2>&1; then
+            echo "Preview render found."
+          else
+            echo "No preview MP4 was created in videos_output/."
+            exit 1
+          fi
+
       - name: Upload preview artifact
         uses: actions/upload-artifact@v4
         with:
           name: preview-render-${{ github.run_number }}
-          path: videos_output/*_preview.mp4
+          path: |
+            videos_output/*_preview.mp4
+            videos_output/*.mp4
           retention-days: 7
 
       - name: Optional YouTube upload
