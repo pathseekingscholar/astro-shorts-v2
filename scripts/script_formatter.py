@@ -72,7 +72,12 @@ def validate_script(script_data):
 
 def get_pending_ideas(ideas):
     """Get ideas with status 'pending'."""
-    return [i for i in ideas if i.get('status') == 'pending']
+    pending = [i for i in ideas if i.get('status') == 'pending']
+    return sorted(
+        pending,
+        key=lambda item: item.get('created_at', ''),
+        reverse=True,
+    )
 
 
 def format_script(idea_data):

@@ -136,6 +136,14 @@ TOPIC_THEMES = {
 }
 
 TRANSITIONS = ("crossfade", "horizontal_wipe", "zoom_through")
+THEME_SCENE_EFFECTS = {
+    "black_hole": ["lens_pulse", "star_swirl"],
+    "galaxy": ["star_swirl"],
+    "quantum": ["glitch", "speed_lines"],
+    "solar": ["lens_pulse"],
+    "mystery": ["vignette_pulse", "chromatic_aberration"],
+    "travel": ["speed_lines", "lens_pulse"],
+}
 
 
 def configure_render_mode(preview: bool = False) -> None:
@@ -488,6 +496,19 @@ def build_base_background(topic_image: Image.Image | None, theme_key: str) -> Im
     return background
 
 
+def add_color_wash(frame: Image.Image, theme_key: str, t: float) -> Image.Image:
+    theme = TOPIC_THEMES[theme_key]
+    overlay = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    sweep = 0.5 + 0.5 * math.sin(t * 0.45)
+    top_alpha = int(28 + 22 * sweep)
+    bottom_alpha = int(36 + 18 * (1 - sweep))
+    draw.ellipse((-WIDTH * 0.18, -HEIGHT * 0.12, WIDTH * 0.65, HEIGHT * 0.42), fill=(*theme["accent"], top_alpha))
+    draw.ellipse((WIDTH * 0.35, HEIGHT * 0.45, WIDTH * 1.1, HEIGHT * 1.05), fill=(*theme["accent_secondary"], bottom_alpha))
+    overlay = overlay.filter(ImageFilter.GaussianBlur(90 if PREVIEW_MODE else 130))
+    return Image.alpha_composite(frame.convert("RGBA"), overlay)
+
+
 def build_particle_system(theme_key: str, keyword: str, total_duration: float) -> dict:
     rng = random.Random(hashlib.md5(f"{theme_key}:{keyword}".encode("utf-8")).hexdigest())
     theme = TOPIC_THEMES[theme_key]
@@ -583,6 +604,7 @@ def compose_background(base_background: Image.Image, particles: dict, theme_key:
     frame = base_background.copy()
     frame = draw_nebula_blobs(frame, particles, t)
     frame = draw_star_layers(frame.convert("RGB"), particles, theme_key, t, total_duration)
+    frame = add_color_wash(frame, theme_key, t)
     return frame.convert("RGBA")
 
 
@@ -617,6 +639,49 @@ def apply_screen_effects(frame: Image.Image, effects: list[str], frame_index: in
         band_height = rng.randint(18, 48)
         strip = result.crop((0, band_y, WIDTH, band_y + band_height))
         result.paste(strip, (rng.randint(-22, 22), band_y))
+    if "speed_lines" in effects:
+        lines = Image.new("RGBA", result.size, (0, 0, 0, 0))
+        ld = ImageDraw.Draw(lines)
+        for idx in range(14 if PREVIEW_MODE else 24):
+            y = int((idx + 1) * HEIGHT / (16 if PREVIEW_MODE else 28))
+            alpha = 28 + (idx % 5) * 10
+            ld.line((WIDTH * 0.08, y, WIDTH * 0.92, y - 40), fill=(255, 255, 255, alpha), width=2)
+        lines = lines.filter(ImageFilter.GaussianBlur(2))
+        result = Image.alpha_composite(result, lines)
+    if "energy_burst" in effects:
+        burst = Image.new("RGBA", result.size, (0, 0, 0, 0))
+        bd = ImageDraw.Draw(burst)
+        cx = WIDTH // 2
+        cy = HEIGHT // 2
+        for idx in range(12):
+            angle = math.radians((frame_index * 3 + idx * 30) % 360)
+            inner = 80
+            outer = 420 if not PREVIEW_MODE else 260
+            x1 = cx + math.cos(angle) * inner
+            y1 = cy + math.sin(angle) * inner
+            x2 = cx + math.cos(angle) * outer
+            y2 = cy + math.sin(angle) * outer
+            bd.line((x1, y1, x2, y2), fill=(255, 220, 120, 72), width=5)
+        burst = burst.filter(ImageFilter.GaussianBlur(4))
+        result = Image.alpha_composite(result, burst)
+    if "lens_pulse" in effects:
+        pulse = Image.new("RGBA", result.size, (0, 0, 0, 0))
+        pd = ImageDraw.Draw(pulse)
+        alpha = int(40 + 30 * math.sin(frame_index / max(FPS, 1) * 3.5))
+        pd.ellipse((WIDTH * 0.18, HEIGHT * 0.12, WIDTH * 0.82, HEIGHT * 0.76), outline=(255, 255, 255, alpha), width=6)
+        pulse = pulse.filter(ImageFilter.GaussianBlur(5))
+        result = Image.alpha_composite(result, pulse)
+    if "star_swirl" in effects:
+        swirl = Image.new("RGBA", result.size, (0, 0, 0, 0))
+        sd = ImageDraw.Draw(swirl)
+        for idx in range(32 if PREVIEW_MODE else 56):
+            angle = frame_index * 0.05 + idx * 0.24
+            radius = 60 + idx * (8 if PREVIEW_MODE else 10)
+            x = WIDTH / 2 + math.cos(angle) * radius
+            y = HEIGHT / 2 + math.sin(angle) * radius * 0.52
+            sd.ellipse((x - 3, y - 3, x + 3, y + 3), fill=(255, 255, 255, 95))
+        swirl = swirl.filter(ImageFilter.GaussianBlur(1))
+        result = Image.alpha_composite(result, swirl)
     return result
 
 
@@ -638,19 +703,42 @@ def glow_color_for_planet(name: str, theme_key: str) -> tuple[int, int, int]:
     return defaults.get(name, theme["planet_glow"])
 
 
+def base_color_for_planet(name: str) -> tuple[int, int, int]:
+    colors = {
+        "earth": (52, 118, 214),
+        "mars": (211, 96, 67),
+        "jupiter": (219, 177, 135),
+        "saturn": (228, 200, 148),
+        "sun": (255, 192, 58),
+        "moon": (192, 192, 198),
+        "black_hole": (8, 8, 10),
+        "neutron_star": (218, 226, 255),
+        "neptune": (82, 129, 230),
+        "venus": (232, 188, 114),
+        "mercury": (171, 156, 142),
+    }
+    return colors.get(name, (150, 150, 150))
+
+
+def soften_color(color: tuple[int, int, int], lift: int) -> tuple[int, int, int]:
+    return tuple(min(255, component + lift) for component in color)
+
+
 def draw_planet_body(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int, name: str) -> None:
+    base_fill = base_color_for_planet(name)
     if name == "earth":
-        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(46, 104, 194))
+        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=base_fill)
         land = (79, 167, 114)
         draw.ellipse((cx - radius * 0.68, cy - radius * 0.52, cx - radius * 0.08, cy + radius * 0.14), fill=land)
         draw.ellipse((cx + radius * 0.14, cy - radius * 0.40, cx + radius * 0.58, cy + radius * 0.15), fill=land)
         draw.ellipse((cx + radius * 0.10, cy + radius * 0.06, cx + radius * 0.48, cy + radius * 0.52), fill=land)
         return
     if name == "mars":
-        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(194, 91, 58))
+        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=base_fill)
+        draw.arc((cx - radius * 0.65, cy - radius * 0.12, cx + radius * 0.55, cy + radius * 0.52), 210, 340, fill=(235, 154, 120), width=max(3, radius // 16))
         return
     if name == "jupiter":
-        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(214, 176, 134))
+        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=base_fill)
         band_colors = ((184, 142, 103), (229, 194, 150))
         for band in range(7):
             band_y = cy - radius + band * (2 * radius / 7)
@@ -664,13 +752,19 @@ def draw_planet_body(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int, n
         draw.ellipse((cx + radius * 0.16, cy + radius * 0.08, cx + radius * 0.45, cy + radius * 0.25), fill=(189, 111, 89))
         return
     if name == "saturn":
-        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(222, 196, 145))
+        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=base_fill)
+        for stripe in range(4):
+            y = cy - radius * 0.42 + stripe * radius * 0.28
+            draw.arc((cx - radius * 0.88, y - radius * 0.12, cx + radius * 0.88, y + radius * 0.12), 180, 360, fill=soften_color(base_fill, 18), width=max(2, radius // 24))
         return
     if name == "sun":
-        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(255, 189, 42))
+        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=base_fill)
+        for flare in range(4):
+            flare_r = radius * (0.72 - flare * 0.12)
+            draw.ellipse((cx - flare_r, cy - flare_r, cx + flare_r, cy + flare_r), outline=(255, 227, 120, 140), width=max(2, radius // 20))
         return
     if name == "moon":
-        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(188, 188, 194))
+        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=base_fill)
         for crater_x, crater_y, scale in ((-0.24, -0.10, 0.14), (0.18, 0.12, 0.12), (-0.05, 0.30, 0.10)):
             cr = radius * scale
             draw.ellipse(
@@ -679,13 +773,13 @@ def draw_planet_body(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int, n
             )
         return
     if name == "black_hole":
-        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(6, 6, 8))
+        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=base_fill)
         return
     if name == "neutron_star":
-        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(216, 225, 255))
+        draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=base_fill)
+        draw.ellipse((cx - radius * 0.55, cy - radius * 0.55, cx + radius * 0.55, cy + radius * 0.55), fill=soften_color(base_fill, 20))
         return
-    colors = {"neptune": (67, 116, 214), "venus": (222, 180, 109), "mercury": (165, 152, 138)}
-    draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=colors.get(name, (150, 150, 150)))
+    draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=base_fill)
 
 
 def draw_saturn_rings(planet_layer: Image.Image, cx: int, cy: int, radius: int) -> None:
@@ -781,6 +875,72 @@ def draw_eyes(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int, expressi
         draw.ellipse((px - pupil_size * 0.55 - shine, py - pupil_size * 0.55 - shine, px - pupil_size * 0.55 + shine, py - pupil_size * 0.55 + shine), fill=(255, 255, 255, 255))
 
 
+def draw_face_features(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int, expression: str, name: str) -> None:
+    mouth_y = cy + radius * 0.28
+    mouth_w = radius * 0.52
+    if expression in {"happy", "excited", "smug"}:
+        draw.arc((cx - mouth_w * 0.5, mouth_y - radius * 0.12, cx + mouth_w * 0.5, mouth_y + radius * 0.18), 10, 170, fill=(30, 20, 20, 255), width=max(3, radius // 18))
+    elif expression in {"scared", "shocked"}:
+        draw.ellipse((cx - radius * 0.12, mouth_y - radius * 0.10, cx + radius * 0.12, mouth_y + radius * 0.14), outline=(20, 15, 18, 255), width=max(3, radius // 18))
+    elif expression == "angry":
+        draw.arc((cx - mouth_w * 0.45, mouth_y - radius * 0.02, cx + mouth_w * 0.45, mouth_y + radius * 0.12), 190, 350, fill=(30, 20, 20, 255), width=max(3, radius // 18))
+    else:
+        draw.arc((cx - mouth_w * 0.40, mouth_y, cx + mouth_w * 0.40, mouth_y + radius * 0.10), 205, 335, fill=(30, 20, 20, 220), width=max(2, radius // 22))
+
+    if expression in {"happy", "excited", "scared"} and name != "black_hole":
+        blush = max(8, int(radius * 0.10))
+        for bx in (cx - radius * 0.45, cx + radius * 0.45):
+            draw.ellipse((bx - blush, cy + radius * 0.08 - blush, bx + blush, cy + radius * 0.08 + blush), fill=(255, 120, 150, 64))
+
+    if expression in {"angry", "thinking", "smug"}:
+        brow_y = cy - radius * 0.34
+        tilt = -radius * 0.08 if expression == "angry" else radius * 0.03
+        draw.line((cx - radius * 0.52, brow_y + tilt, cx - radius * 0.14, brow_y - tilt), fill=(15, 15, 18, 255), width=max(3, radius // 20))
+        draw.line((cx + radius * 0.14, brow_y - tilt, cx + radius * 0.52, brow_y + tilt), fill=(15, 15, 18, 255), width=max(3, radius // 20))
+
+
+def draw_planet_outline(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int) -> None:
+    draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), outline=(255, 255, 255, 110), width=max(2, radius // 20))
+
+
+def draw_planet_stickers(planet_layer: Image.Image, cx: int, cy: int, radius: int, name: str, theme_key: str, t: float) -> None:
+    overlay = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    accent = TOPIC_THEMES[theme_key]["accent"]
+    if name in {"earth", "mars", "venus", "neptune"}:
+        for idx in range(3):
+            angle = t * 0.9 + idx * 2.0
+            x = cx + math.cos(angle) * radius * 0.95
+            y = cy + math.sin(angle) * radius * 0.75
+            r = max(3, radius // 18)
+            draw.ellipse((x - r, y - r, x + r, y + r), fill=(*accent, 90))
+    if name == "sun":
+        for idx in range(6):
+            angle = t * 1.1 + idx * (math.pi / 3)
+            x = cx + math.cos(angle) * radius * 1.18
+            y = cy + math.sin(angle) * radius * 1.18
+            draw.ellipse((x - 5, y - 5, x + 5, y + 5), fill=(255, 240, 150, 115))
+    if name == "black_hole":
+        draw.arc((cx - radius * 1.55, cy - radius * 0.72, cx + radius * 1.55, cy + radius * 0.72), 15, 195, fill=(*accent, 120), width=max(3, radius // 16))
+    overlay = overlay.filter(ImageFilter.GaussianBlur(2))
+    planet_layer.alpha_composite(overlay)
+
+
+def draw_orbit_sparkles(planet_layer: Image.Image, cx: int, cy: int, radius: int, t: float, glow_color: tuple[int, int, int]) -> None:
+    sparkles = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    sd = ImageDraw.Draw(sparkles)
+    for idx in range(6):
+        angle = t * 1.8 + idx * (math.pi / 3)
+        orbit_x = cx + math.cos(angle) * radius * 1.45
+        orbit_y = cy + math.sin(angle) * radius * 0.95
+        sparkle_r = max(2, radius // 24)
+        sd.ellipse((orbit_x - sparkle_r, orbit_y - sparkle_r, orbit_x + sparkle_r, orbit_y + sparkle_r), fill=(*glow_color, 150))
+        sd.line((orbit_x - sparkle_r * 2, orbit_y, orbit_x + sparkle_r * 2, orbit_y), fill=(255, 255, 255, 120), width=1)
+        sd.line((orbit_x, orbit_y - sparkle_r * 2, orbit_x, orbit_y + sparkle_r * 2), fill=(255, 255, 255, 120), width=1)
+    sparkles = sparkles.filter(ImageFilter.GaussianBlur(1))
+    planet_layer.alpha_composite(sparkles)
+
+
 def render_planet(layer: dict, theme_key: str, scene_progress: float, global_t: float) -> Image.Image:
     base_radius = SIZES.get(layer.get("size", "medium"), 150)
     x_norm, y_norm = POSITIONS.get(layer.get("position", "center"), POSITIONS["center"])
@@ -824,13 +984,18 @@ def render_planet(layer: dict, theme_key: str, scene_progress: float, global_t: 
         draw_black_hole_accretion_disk(planet_layer, cx, cy, radius)
     if name == "sun":
         draw_sun_corona(planet_layer, cx, cy, radius, global_t)
+    if "orbit_sparkles" in effects:
+        draw_orbit_sparkles(planet_layer, cx, cy, radius, global_t, glow_color)
     body = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
     body_draw = ImageDraw.Draw(body)
     draw_planet_body(body_draw, cx, cy, radius, name)
+    draw_planet_outline(body_draw, cx, cy, radius)
     draw_highlight(body_draw, cx, cy, radius)
     draw_eyes(body_draw, cx, cy, radius, expression, name)
+    draw_face_features(body_draw, cx, cy, radius, expression, name)
     body = body.filter(ImageFilter.GaussianBlur(0.15))
     planet_layer.alpha_composite(body)
+    draw_planet_stickers(planet_layer, cx, cy, radius, name, theme_key, global_t)
     return planet_layer
 
 
@@ -881,6 +1046,18 @@ def wrap_segments(content: str, base_size: int, max_width: int, theme_key: str) 
     return lines
 
 
+def fit_text_layout(content: str, initial_size: int, theme_key: str, *, max_lines: int = 4) -> tuple[int, list[list[dict]]]:
+    font_size = initial_size
+    while font_size >= 34:
+        lines = wrap_segments(content, font_size, WIDTH - 150, theme_key)
+        widest = max((sum(segment["token_width"] for segment in line) for line in lines), default=0)
+        if len(lines) <= max_lines and widest <= WIDTH - 110:
+            return font_size, lines
+        font_size -= 4
+    final_lines = wrap_segments(content, 34, WIDTH - 120, theme_key)
+    return 34, final_lines[:max_lines]
+
+
 def rendered_content_for_style(content: str, style: str, progress: float) -> str:
     if not content:
         return ""
@@ -907,17 +1084,20 @@ def draw_text_block(frame: Image.Image, text_config: dict, scene_progress: float
     if style == "slam_in":
         zoom_progress = clamp(scene_progress / 0.18, 0.0, 1.0)
         base_size = int(68 * (1.55 - 0.55 * ease_out_back(zoom_progress)))
-    lines = wrap_segments(visible_text, base_size, WIDTH - 180, theme_key)
+    base_size, lines = fit_text_layout(visible_text, base_size, theme_key, max_lines=4 if position == "top" else 3)
     if not lines:
         return frame
 
     overlay = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
     draw = ImageDraw.Draw(overlay)
-    y_start = 180 if position == "top" else HEIGHT - 430
+    y_start = 150 if position == "top" else HEIGHT - 360
     line_spacing = int(base_size * 1.15)
+    block_height = len(lines) * line_spacing
+    if position == "bottom":
+        y_start = max(110, HEIGHT - block_height - 150)
     for line_index, line in enumerate(lines):
         line_width = sum(segment["token_width"] for segment in line)
-        x = (WIDTH - line_width) // 2
+        x = max(28, (WIDTH - line_width) // 2)
         line_y = y_start + line_index * line_spacing
         font_heights = [segment["font"].size if hasattr(segment["font"], "size") else base_size for segment in line]
         pill_height = int(max(font_heights) + 16)
@@ -970,8 +1150,8 @@ def draw_hook_screen(base_background: Image.Image, particles: dict, hook_text: s
     draw = ImageDraw.Draw(overlay)
     scale = 0.60 + 0.40 * ease_out_back(clamp(t / 0.4, 0.0, 1.0))
     font_size = int(92 * scale)
+    font_size, lines = fit_text_layout(hook_text, font_size, theme_key, max_lines=4)
     font = get_font(font_size)
-    lines = textwrap.wrap(hook_text, width=16)
     line_height = int(font_size * 1.12)
     block_height = len(lines) * line_height
     start_y = HEIGHT // 2 - block_height // 2 - 70
@@ -1018,11 +1198,19 @@ def render_scene_frame(
 ) -> Image.Image:
     frame = compose_background(base_background, particles, theme_key, local_t, scene_duration_value)
     progress = clamp(local_t / max(scene_duration_value, 0.01), 0.0, 1.0)
+    scene_effects = list(scene.get("screen_effects", []))
+    for effect in THEME_SCENE_EFFECTS.get(theme_key, []):
+        if effect not in scene_effects and random.Random(f"{theme_key}:{scene.get('time_start', 0)}").random() > 0.45:
+            scene_effects.append(effect)
+    if scene.get("dramatic_moment"):
+        for effect in ("lens_pulse", "energy_burst"):
+            if effect not in scene_effects:
+                scene_effects.append(effect)
     for layer in scene.get("layers", []):
         if layer.get("type") == "planet":
             frame.alpha_composite(render_planet(layer, theme_key, progress, local_t))
     frame = draw_text_block(frame, scene.get("text", {}), progress, theme_key)
-    frame = apply_screen_effects(frame, scene.get("screen_effects", []), int(local_t * FPS))
+    frame = apply_screen_effects(frame, scene_effects, int(local_t * FPS))
     draw_progress_bar(frame, global_progress, theme_key)
     return frame
 

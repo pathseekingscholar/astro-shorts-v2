@@ -92,7 +92,8 @@ def choose_local_fallback(mood: str, destination: Path) -> str | None:
     normalized = slugify(mood)
     ranked = [item for item in files if normalized in item.stem.lower()]
     candidates = ranked or files
-    pick = sorted(candidates)[0]
+    ordered = sorted(candidates)
+    pick = ordered[hash(normalized) % len(ordered)]
 
     if pick.resolve() == destination.resolve():
         return str(pick)
@@ -259,7 +260,9 @@ def try_pixabay(mood: str, duration_seconds: float, destination: Path, session: 
                 continue
             matches = mp3_pattern.findall(response.text)
             if matches:
-                return download_binary(matches[0], destination, session)
+                unique_matches = list(dict.fromkeys(matches))
+                selected = unique_matches[min(len(unique_matches) - 1, abs(hash(mood)) % min(len(unique_matches), 3))]
+                return download_binary(selected, destination, session)
         except Exception as exc:
             print(f"Warning: Pixabay provider failed for {search_url}: {exc}")
     return None

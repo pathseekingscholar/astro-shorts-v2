@@ -32,6 +32,9 @@ Make it VISUALLY DYNAMIC:
 - Match effects to emotions (shock = shake, huge = zoom)
 - Vary positions (don't always center)
 - Include BIG numbers that blow minds
+- Make the planets feel CARTOONY, expressive, and full of personality
+- Push richer color, motion, and dramatic composition like a premium animation
+- Use cooler effects when appropriate: speed lines, lens pulse, energy burst, orbit sparkles, star swirl
 
 Return ONLY valid JSON:
 
@@ -118,8 +121,8 @@ OPTIONS:
 - Positions: center, left, right, top, bottom, top_left, top_right, bottom_left, bottom_right
 - Sizes: tiny, small, medium, large, huge
 - Entry: pop_in, slide_from_left, slide_from_right, fade_in, zoom_in, bounce_in, spin_in, none
-- Object Effects: idle_bounce, shake, pulse, glow, wobble, vibrate, float
-- Screen Effects: camera_shake, flash, vignette_pulse, chromatic_aberration, glitch
+- Object Effects: idle_bounce, shake, pulse, glow, wobble, vibrate, float, orbit_sparkles
+- Screen Effects: camera_shake, flash, vignette_pulse, chromatic_aberration, glitch, speed_lines, energy_burst, lens_pulse, star_swirl
 - Text Styles: word_by_word, slam_in, typewriter
 - Moods: epic, dramatic, mind-blowing, intense, chill, horror
 - Music: epic, dramatic, cinematic, intense, chill
@@ -194,34 +197,68 @@ def load_strategy():
     return {}
 
 
-def get_topic_hint(strategy):
-    """Select topic based on strategy."""
-    
-    # Get winning and suggested topics from strategy
+def get_recent_topic_history(existing_ideas, window=16):
+    """Return recent topic strings and families for diversity filtering."""
+    recent = []
+    for idea in existing_ideas[-window:]:
+        status = idea.get("status")
+        if status not in ["pending", "formatted", "rendered", "uploaded"]:
+            continue
+
+        idea_obj = idea.get("idea", idea)
+        topic = str(idea_obj.get("topic", "")).strip()
+        family = str(idea_obj.get("topic_family", "")).strip()
+        if topic or family:
+            recent.append({"topic": topic, "family": family})
+    return recent
+
+
+def choose_candidate(candidates, existing_ideas):
+    """Pick a candidate that is not too close to recent history."""
+    shuffled = list(candidates)
+    random.shuffle(shuffled)
+    for topic, reason in shuffled:
+        if not is_duplicate(topic, existing_ideas):
+            return topic, reason
+    return shuffled[0] if shuffled else ("How big is the observable universe?", "Fallback topic")
+
+
+def get_topic_hint(strategy, existing_ideas=None):
+    """Select topic based on strategy while avoiding recent repetition."""
+    existing_ideas = existing_ideas or []
+    recent_history = get_recent_topic_history(existing_ideas)
+    recent_families = [item["family"] for item in recent_history if item["family"]]
+    blocked_topics = {item["topic"].lower() for item in recent_history if item["topic"]}
+
     top_families = strategy.get("top_performing_families", [])
     suggested = strategy.get("suggested_topics", [])
-    avoid = strategy.get("underperforming_topics", [])
-    
-    # Build weighted selection
-    options = []
-    
-    # 50% chance: Use a winning family
+    candidates = []
+
     if top_families and random.random() < 0.5:
-        family = random.choice(top_families[:3])
+        eligible_families = [family for family in top_families[:3] if recent_families.count(family) < 2]
+        family_pool = eligible_families or top_families[:3]
+        family = random.choice(family_pool)
         if family in TOPIC_FAMILIES:
-            topic = random.choice(TOPIC_FAMILIES[family])
-            return topic, f"Focus on {family} - your top performer!"
-    
-    # 30% chance: Use a suggested topic
+            for topic in TOPIC_FAMILIES[family]:
+                if topic.lower() not in blocked_topics:
+                    candidates.append((topic, f"Focus on {family} - your top performer!"))
+
     if suggested and random.random() < 0.6:
-        return random.choice(suggested), "Suggested by analytics"
-    
-    # 20% chance: Explore new territory
+        for topic in suggested:
+            if str(topic).lower() not in blocked_topics:
+                candidates.append((topic, "Suggested by analytics"))
+
     all_families = list(TOPIC_FAMILIES.keys())
-    family = random.choice(all_families)
-    topic = random.choice(TOPIC_FAMILIES[family])
-    
-    return topic, f"Exploring {family}"
+    low_cooldown = [family for family in all_families if recent_families.count(family) == 0]
+    medium_cooldown = [family for family in all_families if recent_families.count(family) <= 1]
+    family_pool = low_cooldown or medium_cooldown or all_families
+    random.shuffle(family_pool)
+    for family in family_pool:
+        for topic in TOPIC_FAMILIES[family]:
+            if topic.lower() not in blocked_topics:
+                candidates.append((topic, f"Exploring {family}"))
+
+    return choose_candidate(candidates, existing_ideas)
 
 
 def load_existing_ideas():
@@ -343,8 +380,11 @@ def main():
     else:
         print("📊 No strategy file, using default topics")
     
+    # Load existing ideas first so the selector can avoid recent repetition
+    existing_ideas = load_existing_ideas()
+
     # Get topic hint
-    topic_hint, reason = get_topic_hint(strategy)
+    topic_hint, reason = get_topic_hint(strategy, existing_ideas)
     print(f"💡 Topic: {topic_hint}")
     print(f"   Reason: {reason}")
     
@@ -358,9 +398,6 @@ def main():
         if avoid:
             strategy_context += f"Avoid topics like: {', '.join(avoid[:3])}."
     
-    # Load existing ideas
-    existing_ideas = load_existing_ideas()
-    
     # Generate idea
     idea_data = generate_idea(topic_hint, strategy_context)
     
@@ -373,7 +410,7 @@ def main():
     if is_duplicate(new_topic, existing_ideas):
         print(f"⚠️ Topic too similar to recent ideas, regenerating...")
         # Try once more with different topic
-        topic_hint, reason = get_topic_hint(strategy)
+        topic_hint, reason = get_topic_hint(strategy, existing_ideas)
         idea_data = generate_idea(topic_hint, strategy_context)
         
         if not idea_data:
