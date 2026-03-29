@@ -12,6 +12,7 @@ import math
 import os
 import random
 import re
+import sys
 import textwrap
 from datetime import datetime
 from pathlib import Path
@@ -501,11 +502,13 @@ def add_color_wash(frame: Image.Image, theme_key: str, t: float) -> Image.Image:
     overlay = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
     draw = ImageDraw.Draw(overlay)
     sweep = 0.5 + 0.5 * math.sin(t * 0.45)
-    top_alpha = int(28 + 22 * sweep)
-    bottom_alpha = int(36 + 18 * (1 - sweep))
-    draw.ellipse((-WIDTH * 0.18, -HEIGHT * 0.12, WIDTH * 0.65, HEIGHT * 0.42), fill=(*theme["accent"], top_alpha))
-    draw.ellipse((WIDTH * 0.35, HEIGHT * 0.45, WIDTH * 1.1, HEIGHT * 1.05), fill=(*theme["accent_secondary"], bottom_alpha))
-    overlay = overlay.filter(ImageFilter.GaussianBlur(90 if PREVIEW_MODE else 130))
+    top_alpha = int(34 + 24 * sweep)
+    mid_alpha = int(26 + 18 * (1 - sweep))
+    bottom_alpha = int(42 + 22 * (1 - sweep))
+    draw.ellipse((-WIDTH * 0.22, -HEIGHT * 0.16, WIDTH * 0.68, HEIGHT * 0.46), fill=(*theme["accent"], top_alpha))
+    draw.ellipse((WIDTH * 0.08, HEIGHT * 0.12, WIDTH * 0.92, HEIGHT * 0.72), fill=(*theme["star_tint"], mid_alpha))
+    draw.ellipse((WIDTH * 0.28, HEIGHT * 0.42, WIDTH * 1.08, HEIGHT * 1.04), fill=(*theme["accent_secondary"], bottom_alpha))
+    overlay = overlay.filter(ImageFilter.GaussianBlur(84 if PREVIEW_MODE else 120))
     return Image.alpha_composite(frame.convert("RGBA"), overlay)
 
 
@@ -843,9 +846,9 @@ def draw_highlight(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int) -> 
 
 
 def draw_eyes(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int, expression: str, name: str) -> None:
-    eye_y = cy - radius * 0.08
-    spacing = radius * 0.32
-    eye_radius = max(10, int(radius * 0.18))
+    eye_y = cy - radius * 0.10
+    spacing = radius * 0.31
+    eye_radius = max(10, int(radius * 0.22))
     pupil_radius = max(4, int(eye_radius * 0.46))
     white_color = (255, 255, 230) if name == "sun" else (255, 255, 255)
     offsets = {"looking_left": (-0.30, 0), "looking_right": (0.30, 0), "thinking": (0.18, -0.20), "smug": (0.18, 0.10)}
@@ -859,9 +862,9 @@ def draw_eyes(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int, expressi
             draw.line((ex - eye_radius, eye_y - eye_radius, ex + eye_radius, eye_y + eye_radius), fill=(0, 0, 0, 255), width=4)
             draw.line((ex - eye_radius, eye_y + eye_radius, ex + eye_radius, eye_y - eye_radius), fill=(0, 0, 0, 255), width=4)
             continue
-        scale = 1.5 if expression in {"scared", "shocked"} else 1.0
+        scale = 1.58 if expression in {"scared", "shocked"} else 1.0
         scaled_eye = eye_radius * scale
-        draw.ellipse((ex - scaled_eye, eye_y - scaled_eye, ex + scaled_eye, eye_y + scaled_eye), fill=white_color, outline=(0, 0, 0, 255), width=2)
+        draw.ellipse((ex - scaled_eye, eye_y - scaled_eye, ex + scaled_eye, eye_y + scaled_eye), fill=white_color, outline=(0, 0, 0, 255), width=max(2, int(radius * 0.025)))
         if expression == "angry":
             if idx == 0:
                 draw.line((ex - scaled_eye - 4, eye_y - scaled_eye + 4, ex + scaled_eye + 4, eye_y - scaled_eye - 8), fill=(0, 0, 0, 255), width=4)
@@ -873,17 +876,18 @@ def draw_eyes(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int, expressi
         draw.ellipse((px - pupil_size, py - pupil_size, px + pupil_size, py + pupil_size), fill=(0, 0, 0, 255))
         shine = max(2, int(pupil_size // 2))
         draw.ellipse((px - pupil_size * 0.55 - shine, py - pupil_size * 0.55 - shine, px - pupil_size * 0.55 + shine, py - pupil_size * 0.55 + shine), fill=(255, 255, 255, 255))
+        draw.ellipse((ex - scaled_eye * 0.92, eye_y - scaled_eye * 0.96, ex - scaled_eye * 0.40, eye_y - scaled_eye * 0.34), fill=(255, 255, 255, 82))
 
 
 def draw_face_features(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int, expression: str, name: str) -> None:
-    mouth_y = cy + radius * 0.28
-    mouth_w = radius * 0.52
+    mouth_y = cy + radius * 0.30
+    mouth_w = radius * 0.58
     if expression in {"happy", "excited", "smug"}:
-        draw.arc((cx - mouth_w * 0.5, mouth_y - radius * 0.12, cx + mouth_w * 0.5, mouth_y + radius * 0.18), 10, 170, fill=(30, 20, 20, 255), width=max(3, radius // 18))
+        draw.arc((cx - mouth_w * 0.5, mouth_y - radius * 0.14, cx + mouth_w * 0.5, mouth_y + radius * 0.20), 10, 170, fill=(30, 20, 20, 255), width=max(3, radius // 16))
     elif expression in {"scared", "shocked"}:
-        draw.ellipse((cx - radius * 0.12, mouth_y - radius * 0.10, cx + radius * 0.12, mouth_y + radius * 0.14), outline=(20, 15, 18, 255), width=max(3, radius // 18))
+        draw.ellipse((cx - radius * 0.13, mouth_y - radius * 0.11, cx + radius * 0.13, mouth_y + radius * 0.15), outline=(20, 15, 18, 255), width=max(3, radius // 16))
     elif expression == "angry":
-        draw.arc((cx - mouth_w * 0.45, mouth_y - radius * 0.02, cx + mouth_w * 0.45, mouth_y + radius * 0.12), 190, 350, fill=(30, 20, 20, 255), width=max(3, radius // 18))
+        draw.arc((cx - mouth_w * 0.45, mouth_y - radius * 0.02, cx + mouth_w * 0.45, mouth_y + radius * 0.12), 190, 350, fill=(30, 20, 20, 255), width=max(3, radius // 16))
     else:
         draw.arc((cx - mouth_w * 0.40, mouth_y, cx + mouth_w * 0.40, mouth_y + radius * 0.10), 205, 335, fill=(30, 20, 20, 220), width=max(2, radius // 22))
 
@@ -1150,8 +1154,9 @@ def draw_hook_screen(base_background: Image.Image, particles: dict, hook_text: s
     draw = ImageDraw.Draw(overlay)
     scale = 0.60 + 0.40 * ease_out_back(clamp(t / 0.4, 0.0, 1.0))
     font_size = int(92 * scale)
-    font_size, lines = fit_text_layout(hook_text, font_size, theme_key, max_lines=4)
+    font_size, segmented_lines = fit_text_layout(hook_text, font_size, theme_key, max_lines=4)
     font = get_font(font_size)
+    lines = [" ".join(segment["text"] for segment in line) for line in segmented_lines]
     line_height = int(font_size * 1.12)
     block_height = len(lines) * line_height
     start_y = HEIGHT // 2 - block_height // 2 - 70
@@ -1366,14 +1371,24 @@ def create_video(script_data: dict, output_path: Path) -> bool:
 
 
 def process_scripts(*, preview: bool = False) -> None:
+    return process_scripts_result(preview=preview)
+
+
+def process_scripts_result(*, preview: bool = False) -> bool:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     if not SCRIPTS_DIR.exists():
         print(f"No scripts directory: {SCRIPTS_DIR}")
-        return
+        return False
     scripts = sorted(path for path in SCRIPTS_DIR.glob("*.json"))
     if not scripts:
         print("No scripts to process.")
-        return
+        return False
+
+    if preview:
+        scripts = sorted(scripts, key=lambda path: path.stat().st_mtime, reverse=True)[:1]
+
+    rendered_any = False
+    failed_any = False
 
     for script_path in scripts:
         try:
@@ -1387,19 +1402,26 @@ def process_scripts(*, preview: bool = False) -> None:
                 output_path = OUTPUT_DIR / script_path.with_suffix(".mp4").name
             ok = create_video(script_data, output_path)
             if ok:
+                rendered_any = True
                 if preview:
                     script_data["preview_rendered_at"] = datetime.now().isoformat()
                     script_data["preview_video_path"] = str(output_path)
                 else:
                     script_data["rendered"] = True
+                    script_data["status"] = "rendered"
                     script_data["rendered_at"] = datetime.now().isoformat()
                     script_data["video_path"] = str(output_path)
                 script_path.write_text(json.dumps(script_data, indent=2), encoding="utf-8")
                 print(f"Rendered: {output_path}")
+            else:
+                failed_any = True
+                print(f"Renderer did not produce output for {script_path.name}")
         except Exception as exc:
+            failed_any = True
             print(f"Renderer failed for {script_path.name}: {exc}")
             import traceback
             traceback.print_exc()
+    return rendered_any and not failed_any
 
 
 def parse_args() -> argparse.Namespace:
@@ -1416,10 +1438,12 @@ def main() -> None:
     if PREVIEW_MODE:
         print("Preview mode enabled: 540x960 @ 12fps")
     print("=" * 60)
-    process_scripts(preview=PREVIEW_MODE)
+    ok = process_scripts_result(preview=PREVIEW_MODE)
     print("=" * 60)
     print("Render pass complete")
     print("=" * 60)
+    if not ok:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

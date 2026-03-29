@@ -96,8 +96,11 @@ jobs:
           COUNT=${VIDEO_COUNT:-2}
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.preview }}" = "true" ]; then
             RENDER_CMD="python scripts/video_renderer.py --preview"
+            SHOULD_UPLOAD="false"
+            COUNT=1
           else
             RENDER_CMD="python scripts/video_renderer.py"
+            SHOULD_UPLOAD="true"
           fi
           echo "🎬 Generating $COUNT video(s)..."
           for i in $(seq 1 $COUNT); do
@@ -108,7 +111,11 @@ jobs:
             python scripts/idea_generator.py
             python scripts/script_formatter.py
             eval "$RENDER_CMD"
-            python scripts/youtube_uploader.py
+            if [ "$SHOULD_UPLOAD" = "true" ]; then
+              python scripts/youtube_uploader.py
+            else
+              echo "Preview mode: skipping YouTube upload"
+            fi
             sleep 8
           done
 

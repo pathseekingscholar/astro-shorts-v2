@@ -71,6 +71,7 @@ jobs:
           fi
       
       - name: Upload to YouTube
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.preview == true) }}
         env:
           YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
