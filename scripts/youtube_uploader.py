@@ -188,6 +188,8 @@ def update_script_status(filepath, new_status, upload_info=None):
 
     data["status"] = new_status
     data["uploaded_at"] = datetime.now().isoformat()
+    if data.get("style_plan") and isinstance(data["style_plan"], dict):
+        data["style_id"] = data["style_plan"].get("style_id", data.get("style_id"))
     if upload_info:
         data["youtube"] = upload_info
 
@@ -220,9 +222,13 @@ def main():
     script_path = selected["script_path"]
     script_data = selected["script_data"]
     video_path = selected["video_path"]
+    style_plan = script_data.get("style_plan") or {}
+    style_id = style_plan.get("style_id") or script_data.get("style_id") or "planet_character"
+    style_label = style_plan.get("label") or style_id
 
     print()
     print(f"Selected for upload: {os.path.basename(video_path)}")
+    print(f"Style: {style_id} ({style_label})")
     print("-" * 60)
 
     idea = script_data.get("idea", {})
@@ -257,6 +263,8 @@ def main():
     )
 
     if result:
+        result["style_id"] = style_id
+        result["style_label"] = style_label
         update_script_status(script_path, "uploaded", result)
         print()
         print("=" * 60)

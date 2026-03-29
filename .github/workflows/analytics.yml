@@ -25,6 +25,12 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
       - name: Install system dependencies
         run: |
           sudo apt-get update -qq
@@ -38,6 +44,9 @@ jobs:
           pip install requests Pillow numpy
           pip install moviepy==1.0.3
           pip install google-auth google-auth-oauthlib google-api-python-client
+
+      - name: Install Node dependencies
+        run: npm ci
 
       - name: Download Montserrat fonts
         run: |
@@ -97,11 +106,11 @@ jobs:
           set -euo pipefail
           COUNT=${VIDEO_COUNT:-2}
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.preview }}" = "true" ]; then
-            RENDER_CMD="python scripts/video_renderer.py --preview"
+            RENDER_CMD="python scripts/render_video.py --preview"
             SHOULD_UPLOAD="false"
             COUNT=1
           else
-            RENDER_CMD="python scripts/video_renderer.py"
+            RENDER_CMD="python scripts/render_video.py"
             SHOULD_UPLOAD="true"
           fi
           echo "🎬 Generating $COUNT video(s)..."

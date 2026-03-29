@@ -23,6 +23,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
       
       - name: Install system dependencies
         run: |
@@ -37,6 +43,9 @@ jobs:
           pip install requests Pillow numpy
           pip install moviepy==1.0.3
           pip install google-auth google-auth-oauthlib google-api-python-client
+
+      - name: Install Node dependencies
+        run: npm ci
 
       - name: Download Montserrat ExtraBold
         run: |
@@ -65,9 +74,9 @@ jobs:
           SUNO_COOKIE: ${{ secrets.SUNO_COOKIE }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.preview }}" = "true" ]; then
-            python scripts/video_renderer.py --preview
+            python scripts/render_video.py --preview
           else
-            python scripts/video_renderer.py
+            python scripts/render_video.py
           fi
       
       - name: Upload to YouTube

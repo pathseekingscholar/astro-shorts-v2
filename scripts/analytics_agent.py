@@ -8,6 +8,11 @@ import json
 from datetime import datetime, timedelta
 
 try:
+    from style_selector import STYLE_LIBRARY, infer_topic_family_from_text, select_style
+except ImportError:
+    from scripts.style_selector import STYLE_LIBRARY, infer_topic_family_from_text, select_style
+
+try:
     from google.oauth2.credentials import Credentials
     from google.auth.transport.requests import Request
     from googleapiclient.discovery import build
@@ -24,6 +29,7 @@ except ImportError as e:
 ANALYTICS_FILE = "data/analytics.json"
 PERFORMANCE_FILE = "data/performance_history.json"
 STRATEGY_FILE = "data/strategy.json"
+SCRIPTS_DIR = "scripts_output"
 
 # Performance scoring weights
 WEIGHTS = {
@@ -273,6 +279,76 @@ def extract_topic_family(title, description=""):
         return 'general'
 
 
+def load_script_contexts(scripts_dir=SCRIPTS_DIR):
+    """Load style metadata from rendered script JSON files."""
+    if not os.path.exists(scripts_dir):
+        return {}
+
+    contexts = {}
+    for filename in os.listdir(scripts_dir):
+        if not filename.endswith(".json"):
+            continue
+
+        filepath = os.path.join(scripts_dir, filename)
+        try:
+            with open(filepath, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception:
+            continue
+
+        style_plan = data.get("style_plan") or {}
+        style_id = ""
+        if isinstance(style_plan, dict):
+            style_id = str(style_plan.get("style_id", "")).strip()
+        if not style_id:
+            style_id = str(data.get("style_id", "")).strip()
+        if not style_id:
+            style_id = str(data.get("render_style", "")).strip()
+
+        youtube = data.get("youtube") or {}
+        video_id = str(youtube.get("video_id", "")).strip()
+        topic = data.get("idea", {}).get("topic", "")
+        topic_family = data.get("idea", {}).get("topic_family") or infer_topic_family_from_text(topic)
+
+        entry = {
+            "script_path": filepath,
+            "style_id": style_id,
+            "style_plan": style_plan if isinstance(style_plan, dict) else {},
+            "topic_family": topic_family,
+            "topic": topic,
+        }
+
+        if video_id:
+            contexts[video_id] = entry
+        contexts[filename] = entry
+    return contexts
+
+
+def resolve_style_for_video(video, script_contexts):
+    """Resolve a video style from script metadata or a heuristic fallback."""
+    video_id = video.get("video_id")
+    title = video.get("title", "")
+    description = video.get("description", "")
+
+    for key in (video_id, f"{video_id}.mp4" if video_id else "", title):
+        if key and key in script_contexts:
+            context = script_contexts[key]
+            if context.get("style_id"):
+                return context["style_id"], context
+
+    topic_family = extract_topic_family(title, description)
+    fallback_plan = select_style(
+        topic_hint=f"{title} {description}",
+        topic_family=topic_family,
+        strategy={},
+        existing_ideas=[],
+    )
+    return fallback_plan.get("style_id", "planet_character"), {
+        "style_plan": fallback_plan,
+        "topic_family": topic_family,
+    }
+
+
 def analyze_performance_patterns(performance_history):
     """Analyze patterns in video performance."""
     if not performance_history:
@@ -300,22 +376,68 @@ def analyze_performance_patterns(performance_history):
     return topic_scores
 
 
+def analyze_style_patterns(performance_history):
+    """Analyze patterns in video performance by style."""
+    if not performance_history:
+        return {}
+
+    by_style = {}
+    for video in performance_history:
+        style = video.get("style_id", "unknown")
+        by_style.setdefault(style, []).append(video.get("performance_score", 0))
+
+    style_scores = {}
+    for style_id, scores in by_style.items():
+        if scores:
+            style_scores[style_id] = {
+                "avg_score": round(sum(scores) / len(scores), 3),
+                "count": len(scores),
+                "best": round(max(scores), 3),
+                "worst": round(min(scores), 3),
+                "label": STYLE_LIBRARY.get(style_id, {}).get("label", style_id),
+            }
+
+    return style_scores
+
+
 # =============================================================================
 # STRATEGY RECOMMENDATIONS
 # =============================================================================
-def generate_recommendations(topic_scores, performance_history):
+def generate_recommendations(topic_scores, performance_history, style_scores=None):
     """Generate content strategy recommendations."""
     recommendations = {
         'generated_at': datetime.now().isoformat(),
         'top_performing_topics': [],
         'avoid_topics': [],
         'suggested_next': [],
-        'insights': []
+        'insights': [],
+        'top_performing_families': [],
+        'suggested_topics': [],
+        'top_performing_styles': [],
+        'suggested_styles': [],
+        'style_insights': []
     }
     
     if not topic_scores:
         recommendations['insights'].append("Not enough data yet. Keep posting!")
         recommendations['suggested_next'] = ['scale_comparison', 'travel_time', 'planetary_facts']
+        recommendations['suggested_topics'] = list(recommendations['suggested_next'])
+        recommendations['suggested_styles'] = ['planet_character', 'educational_voiceless', 'character_explainer']
+        if style_scores:
+            sorted_styles = sorted(style_scores.items(), key=lambda x: x[1]['avg_score'], reverse=True)
+            recommendations['top_performing_styles'] = [
+                {
+                    'style_id': style_id,
+                    'label': stats.get('label', style_id),
+                    'avg_score': stats['avg_score'],
+                    'videos_count': stats['count']
+                }
+                for style_id, stats in sorted_styles[:3]
+            ]
+            recommendations['suggested_styles'] = [style_id for style_id, _ in sorted_styles[:3]] or recommendations['suggested_styles']
+            recommendations['style_insights'].append(
+                f"Analyzed {sum(stats['count'] for stats in style_scores.values())} uploads across {len(style_scores)} style types"
+            )
         return recommendations
     
     # Sort topics by performance
@@ -329,6 +451,7 @@ def generate_recommendations(topic_scores, performance_history):
                 'avg_score': stats['avg_score'],
                 'videos_count': stats['count']
             })
+            recommendations['top_performing_families'].append(topic)
     
     # Underperforming (if enough data)
     for topic, stats in sorted_topics[-2:]:
@@ -342,6 +465,7 @@ def generate_recommendations(topic_scores, performance_history):
     # Suggest next topics (prioritize top performers)
     for topic, stats in sorted_topics[:3]:
         recommendations['suggested_next'].append(topic)
+    recommendations['suggested_topics'] = list(recommendations['suggested_next'])
     
     # Generate insights
     if sorted_topics:
@@ -351,6 +475,27 @@ def generate_recommendations(topic_scores, performance_history):
     
     total_videos = sum(s['count'] for s in topic_scores.values())
     recommendations['insights'].append(f"Analyzed {total_videos} videos across {len(topic_scores)} topic types")
+
+    if style_scores:
+        sorted_styles = sorted(style_scores.items(), key=lambda x: x[1]['avg_score'], reverse=True)
+        for style_id, stats in sorted_styles[:3]:
+            recommendations['top_performing_styles'].append({
+                'style_id': style_id,
+                'label': stats.get('label', style_id),
+                'avg_score': stats['avg_score'],
+                'videos_count': stats['count']
+            })
+        recommendations['suggested_styles'] = [style_id for style_id, _ in sorted_styles[:3]]
+        if sorted_styles:
+            best_style, best_stats = sorted_styles[0]
+            recommendations['style_insights'].append(
+                f"'{STYLE_LIBRARY.get(best_style, {}).get('label', best_style)}' is your best style (score: {best_stats['avg_score']})"
+            )
+            recommendations['style_insights'].append(
+                f"Analyzed {sum(stats['count'] for stats in style_scores.values())} uploads across {len(style_scores)} style types"
+            )
+    else:
+        recommendations['suggested_styles'] = ['planet_character', 'educational_voiceless', 'character_explainer']
     
     return recommendations
 
@@ -422,6 +567,7 @@ def main():
     # Get statistics
     video_ids = [v['video_id'] for v in videos]
     stats = get_video_statistics(youtube, video_ids)
+    script_contexts = load_script_contexts()
     
     # Load existing performance history
     performance_history = load_json(PERFORMANCE_FILE, [])
@@ -450,6 +596,7 @@ def main():
         
         # Determine topic family
         topic_family = extract_topic_family(video['title'], video.get('description', ''))
+        style_id, style_context = resolve_style_for_video(video, script_contexts)
         
         # Create performance entry
         entry = {
@@ -457,13 +604,17 @@ def main():
             'title': video['title'],
             'published_at': video['published_at'],
             'topic_family': topic_family,
+            'style_id': style_id,
+            'style_label': STYLE_LIBRARY.get(style_id, {}).get('label', style_id),
             'metrics': video_stats,
             'performance_score': score,
             'analyzed_at': datetime.now().isoformat()
         }
+        if style_context.get("style_plan"):
+            entry["style_plan"] = style_context["style_plan"]
         
         print(f"  📊 {video['title'][:40]}...")
-        print(f"      Views: {video_stats.get('views', 0)} | Score: {score} | Type: {topic_family}")
+        print(f"      Views: {video_stats.get('views', 0)} | Score: {score} | Type: {topic_family} | Style: {style_id}")
         
         # Update or add to history
         if video_id in existing_ids:
@@ -486,7 +637,8 @@ def main():
     print("-" * 60)
     
     topic_scores = analyze_performance_patterns(performance_history)
-    recommendations = generate_recommendations(topic_scores, performance_history)
+    style_scores = analyze_style_patterns(performance_history)
+    recommendations = generate_recommendations(topic_scores, performance_history, style_scores)
     
     # Print insights
     print()
@@ -502,6 +654,10 @@ def main():
     if recommendations.get('suggested_next'):
         print()
         print(f"  🎯 Suggested next topics: {', '.join(recommendations['suggested_next'])}")
+
+    if recommendations.get('suggested_styles'):
+        print()
+        print(f"  🎨 Suggested next styles: {', '.join(recommendations['suggested_styles'])}")
     
     # Save data
     save_json(PERFORMANCE_FILE, performance_history)
@@ -510,7 +666,8 @@ def main():
         'last_run': datetime.now().isoformat(),
         'channel_id': channel_id,
         'videos_analyzed': len(videos),
-        'topic_scores': topic_scores
+        'topic_scores': topic_scores,
+        'style_scores': style_scores
     })
     
     print()

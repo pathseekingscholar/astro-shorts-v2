@@ -1,18 +1,21 @@
 """
-V5 Script Formatter
-====================
-Takes ideas from ideas.json and prepares them for video rendering.
-In V5, ideas already contain the full timeline, so this mainly:
-- Validates the script structure
-- Moves to scripts_output/
-- Fetches assets (music, images)
+V5 script formatter.
+
+Takes pending ideas from ideas.json, validates them, preserves the selected style,
+and writes renderer-ready JSON into scripts_output/.
 """
 
-import os
+from __future__ import annotations
+
 import json
+import os
 from datetime import datetime
 
-# Import music fetcher
+try:
+    from style_selector import infer_topic_family_from_text, load_strategy, select_style
+except ImportError:
+    from scripts.style_selector import infer_topic_family_from_text, load_strategy, select_style
+
 try:
     from music_generator import get_music_for_mood
 except ImportError:
@@ -21,198 +24,189 @@ except ImportError:
     except ImportError:
         get_music_for_mood = None
 
-# =============================================================================
-# CONFIG
-# =============================================================================
+
 IDEAS_FILE = "ideas.json"
 SCRIPTS_DIR = "scripts_output"
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-# =============================================================================
-# FUNCTIONS
-# =============================================================================
+
+def repo_relative_path(value):
+    absolute = os.path.abspath(value)
+    try:
+        relative = os.path.relpath(absolute, ROOT_DIR)
+    except ValueError:
+        return value.replace("\\", "/")
+    return relative.replace("\\", "/")
+
+
 def load_ideas():
-    """Load ideas from ideas.json."""
     if not os.path.exists(IDEAS_FILE):
         return []
-    
+
     try:
-        with open(IDEAS_FILE, 'r') as f:
-            return json.load(f)
-    except:
+        with open(IDEAS_FILE, "r", encoding="utf-8") as file_obj:
+            return json.load(file_obj)
+    except Exception:
         return []
 
 
 def save_ideas(ideas):
-    """Save ideas back to ideas.json."""
-    with open(IDEAS_FILE, 'w') as f:
-        json.dump(ideas, f, indent=2)
+    with open(IDEAS_FILE, "w", encoding="utf-8") as file_obj:
+        json.dump(ideas, file_obj, indent=2)
 
 
 def validate_script(script_data):
-    """Validate that script has required fields."""
-    
-    # Check for timeline
-    timeline = script_data.get('timeline', [])
+    timeline = script_data.get("timeline", [])
     if not timeline:
         return False, "No timeline"
-    
-    # Check each scene
-    for i, scene in enumerate(timeline):
-        if 'time_start' not in scene or 'time_end' not in scene:
-            return False, f"Scene {i+1} missing time_start/time_end"
-        
-        if 'layers' not in scene or not scene['layers']:
-            return False, f"Scene {i+1} missing layers"
-        
-        if 'text' not in scene:
-            return False, f"Scene {i+1} missing text"
-    
+
+    for index, scene in enumerate(timeline):
+        if "time_start" not in scene or "time_end" not in scene:
+            return False, f"Scene {index + 1} missing time_start/time_end"
+        if "layers" not in scene or not scene["layers"]:
+            return False, f"Scene {index + 1} missing layers"
+        if "text" not in scene:
+            return False, f"Scene {index + 1} missing text"
+
     return True, "Valid"
 
 
 def get_pending_ideas(ideas):
-    """Get ideas with status 'pending'."""
-    pending = [i for i in ideas if i.get('status') == 'pending']
-    return sorted(
-        pending,
-        key=lambda item: item.get('created_at', ''),
-        reverse=True,
+    pending = [idea for idea in ideas if idea.get("status") == "pending"]
+    return sorted(pending, key=lambda item: item.get("created_at", ""), reverse=True)
+
+
+def select_or_reuse_style(idea_data):
+    topic = idea_data.get("idea", {}).get("topic", "")
+    existing_style = idea_data.get("style_plan") or {}
+    if isinstance(existing_style, dict) and existing_style.get("style_id"):
+        return existing_style
+
+    return select_style(
+        strategy=load_strategy(),
+        topic_hint=topic,
+        topic_family=infer_topic_family_from_text(topic),
+        existing_ideas=[],
     )
 
 
 def format_script(idea_data):
-    """
-    Format/validate an idea for rendering.
-    V5 ideas already contain full timeline, so mainly validation.
-    """
-    
-    # Validate
-    valid, msg = validate_script(idea_data)
+    valid, message = validate_script(idea_data)
     if not valid:
-        print(f"❌ Invalid script: {msg}")
+        print(f"Invalid script: {message}")
         return None
-    
-    # The idea_data already has the full script structure
-    # Just ensure it has all needed fields
-    
-    formatted = {
+
+    style_plan = select_or_reuse_style(idea_data)
+    metadata = dict(idea_data.get("metadata", {}))
+    topic = idea_data.get("idea", {}).get("topic", "")
+
+    metadata["style_id"] = style_plan.get("style_id")
+    metadata["render_template"] = style_plan.get("render_template")
+    metadata["caption_font"] = style_plan.get("caption_font")
+
+    render_plan = {
+        "style_id": style_plan.get("style_id"),
+        "selected_style_id": style_plan.get("style_id"),
+        "render_template": style_plan.get("render_template"),
+        "background_mode": style_plan.get("background_mode"),
+        "background_query": metadata.get("background_search", topic),
+        "background_video_path": metadata.get("background_video_path", ""),
+        "caption_font": style_plan.get("caption_font"),
+        "music_style": style_plan.get("music_style"),
+    }
+    metadata["render_plan"] = render_plan
+
+    return {
         "idea": idea_data.get("idea", {}),
-        "metadata": idea_data.get("metadata", {}),
+        "metadata": metadata,
         "timeline": idea_data.get("timeline", []),
+        "style_plan": style_plan,
+        "style_id": style_plan.get("style_id"),
+        "render_plan": render_plan,
         "formatted_at": datetime.now().isoformat(),
     }
-    
-    return formatted
 
 
 def save_script(formatted_data, idea_id):
-    """Save formatted script to scripts_output/."""
-    
     os.makedirs(SCRIPTS_DIR, exist_ok=True)
-    
-    # Clear old scripts (keep only latest)
-    existing = [f for f in os.listdir(SCRIPTS_DIR) if f.endswith('.json')]
-    for old_file in existing:
-        old_path = os.path.join(SCRIPTS_DIR, old_file)
-        # Check if already rendered
-        try:
-            with open(old_path, 'r') as f:
-                old_data = json.load(f)
-            if old_data.get('rendered'):
-                os.remove(old_path)
-                print(f"🗑️ Removed old rendered script: {old_file}")
-        except:
-            pass
-    
-    # Save new script
     filename = f"script_{idea_id}.json"
     filepath = os.path.join(SCRIPTS_DIR, filename)
-    
-    with open(filepath, 'w') as f:
-        json.dump(formatted_data, f, indent=2)
-    
-    print(f"💾 Saved script: {filename}")
+
+    with open(filepath, "w", encoding="utf-8") as file_obj:
+        json.dump(formatted_data, file_obj, indent=2)
+
+    print(f"Saved script: {filename}")
     return filepath
 
 
 def fetch_music_for_script(formatted_data):
-    """Pre-fetch music for the script."""
-    
     if not get_music_for_mood:
-        return
-    
-    metadata = formatted_data.get('metadata', {})
-    mood = metadata.get('music_style') or metadata.get('mood') or 'cinematic'
-    timeline = formatted_data.get('timeline', [])
-    duration = sum(
-        max(0.0, scene.get('time_end', 0) - scene.get('time_start', 0))
-        for scene in timeline
-    ) + 2.5
-    
-    print(f"🎵 Fetching music for mood: {mood}")
-    get_music_for_mood(mood, max(duration, 10.0))
+        return None
+
+    metadata = formatted_data.get("metadata", {})
+    style_plan = formatted_data.get("style_plan", {})
+    mood = (
+        (style_plan or {}).get("music_style")
+        or metadata.get("music_style")
+        or metadata.get("mood")
+        or "cinematic"
+    )
+    timeline = formatted_data.get("timeline", [])
+    duration = sum(max(0.0, scene.get("time_end", 0) - scene.get("time_start", 0)) for scene in timeline) + 2.5
+
+    print(f"Fetching music for mood: {mood}")
+    music_path = get_music_for_mood(mood, max(duration, 10.0))
+    if music_path:
+        normalized_path = repo_relative_path(music_path)
+        formatted_data["music_path"] = normalized_path
+        formatted_data.setdefault("render_plan", {})["music_path"] = normalized_path
+        formatted_data.setdefault("metadata", {})["music_path"] = normalized_path
+    return music_path
 
 
-# =============================================================================
-# MAIN
-# =============================================================================
 def main():
     print("=" * 60)
-    print("📝 V5 Script Formatter")
+    print("V5 Script Formatter")
     print("=" * 60)
-    
-    # Load ideas
+
     ideas = load_ideas()
-    
     if not ideas:
-        print("📭 No ideas found")
+        print("No ideas found")
         return
-    
-    # Get pending ideas
+
     pending = get_pending_ideas(ideas)
-    
     if not pending:
-        print("📭 No pending ideas")
+        print("No pending ideas")
         return
-    
-    print(f"📋 Found {len(pending)} pending idea(s)")
-    
-    # Process first pending idea
+
+    print(f"Found {len(pending)} pending idea(s)")
     idea = pending[0]
-    idea_id = idea.get('id', datetime.now().strftime("%Y%m%d_%H%M%S"))
-    
-    print(f"\n📝 Processing: {idea.get('idea', {}).get('title', 'Untitled')}")
-    
-    # Format script
+    idea_id = idea.get("id", datetime.now().strftime("%Y%m%d_%H%M%S"))
+
+    print(f"\nProcessing: {idea.get('idea', {}).get('title', 'Untitled')}")
     formatted = format_script(idea)
-    
     if not formatted:
-        # Mark as failed
-        for i, item in enumerate(ideas):
-            if item.get('id') == idea_id:
-                ideas[i]['status'] = 'failed'
-                ideas[i]['error'] = 'Invalid script structure'
+        for index, item in enumerate(ideas):
+            if item.get("id") == idea_id:
+                ideas[index]["status"] = "failed"
+                ideas[index]["error"] = "Invalid script structure"
                 break
         save_ideas(ideas)
         return
-    
-    # Save script
-    save_script(formatted, idea_id)
-    
-    # Pre-fetch music
+
     fetch_music_for_script(formatted)
-    
-    # Update idea status
-    for i, item in enumerate(ideas):
-        if item.get('id') == idea_id:
-            ideas[i]['status'] = 'formatted'
-            ideas[i]['formatted_at'] = datetime.now().isoformat()
+    save_script(formatted, idea_id)
+
+    for index, item in enumerate(ideas):
+        if item.get("id") == idea_id:
+            ideas[index]["status"] = "formatted"
+            ideas[index]["formatted_at"] = datetime.now().isoformat()
+            ideas[index]["style_plan"] = formatted.get("style_plan", {})
+            ideas[index]["style_id"] = formatted.get("style_id")
             break
-    
+
     save_ideas(ideas)
-    
-    print()
-    print("✅ Done!")
+    print("\nDone.")
 
 
 if __name__ == "__main__":

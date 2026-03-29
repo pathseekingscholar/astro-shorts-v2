@@ -11,6 +11,11 @@ import random
 import requests
 from datetime import datetime
 
+try:
+    from style_selector import infer_topic_family_from_text, select_style, style_prompt_fragment
+except ImportError:
+    from scripts.style_selector import infer_topic_family_from_text, select_style, style_prompt_fragment
+
 # =============================================================================
 # CONFIG
 # =============================================================================
@@ -289,7 +294,32 @@ def is_duplicate(new_topic, existing_ideas):
     return False
 
 
-def generate_idea(topic_hint, strategy_context):
+def build_strategy_context(strategy, style_plan):
+    """Build a compact strategy context block for the model."""
+    context_bits = []
+    if strategy:
+        top = strategy.get("top_performing_families", [])
+        if top:
+            context_bits.append(f"Best performing families: {', '.join(top[:3])}.")
+        avoid = strategy.get("avoid_topics", []) or strategy.get("underperforming_topics", [])
+        if avoid:
+            avoid_topics = []
+            for item in avoid[:3]:
+                if isinstance(item, dict):
+                    avoid_topics.append(str(item.get("topic", "")).strip())
+                else:
+                    avoid_topics.append(str(item).strip())
+            avoid_topics = [topic for topic in avoid_topics if topic]
+            if avoid_topics:
+                context_bits.append(f"Avoid stale topics: {', '.join(avoid_topics)}.")
+
+    if style_plan:
+        context_bits.append(style_prompt_fragment(style_plan).strip())
+
+    return "\n".join(context_bits).strip()
+
+
+def generate_idea(topic_hint, strategy_context, style_plan=None):
     """Generate idea using Gemini."""
     
     if not GEMINI_API_KEY:
@@ -387,19 +417,21 @@ def main():
     topic_hint, reason = get_topic_hint(strategy, existing_ideas)
     print(f"💡 Topic: {topic_hint}")
     print(f"   Reason: {reason}")
+
+    topic_family = infer_topic_family_from_text(topic_hint)
+    style_plan = select_style(
+        strategy=strategy,
+        topic_hint=topic_hint,
+        topic_family=topic_family,
+        existing_ideas=existing_ideas,
+    )
+    print(f"🎨 Style: {style_plan.get('style_id')} ({style_plan.get('label', style_plan.get('style_id'))})")
     
     # Build strategy context for prompt
-    strategy_context = ""
-    if strategy:
-        top = strategy.get("top_performing_families", [])
-        if top:
-            strategy_context = f"Your best performing topics are: {', '.join(top[:3])}. "
-        avoid = strategy.get("underperforming_topics", [])
-        if avoid:
-            strategy_context += f"Avoid topics like: {', '.join(avoid[:3])}."
+    strategy_context = build_strategy_context(strategy, style_plan)
     
     # Generate idea
-    idea_data = generate_idea(topic_hint, strategy_context)
+    idea_data = generate_idea(topic_hint, strategy_context, style_plan=style_plan)
     
     if not idea_data:
         print("❌ Failed to generate idea")
@@ -411,12 +443,37 @@ def main():
         print(f"⚠️ Topic too similar to recent ideas, regenerating...")
         # Try once more with different topic
         topic_hint, reason = get_topic_hint(strategy, existing_ideas)
-        idea_data = generate_idea(topic_hint, strategy_context)
+        topic_family = infer_topic_family_from_text(topic_hint)
+        style_plan = select_style(
+            strategy=strategy,
+            topic_hint=topic_hint,
+            topic_family=topic_family,
+            existing_ideas=existing_ideas,
+        )
+        strategy_context = build_strategy_context(strategy, style_plan)
+        idea_data = generate_idea(topic_hint, strategy_context, style_plan=style_plan)
         
         if not idea_data:
             print("❌ Failed to generate unique idea")
             return
-    
+
+    idea_data["style_plan"] = style_plan
+    idea_data["style_id"] = style_plan.get("style_id")
+    idea_data.setdefault("metadata", {})
+    idea_data["metadata"]["style_id"] = style_plan.get("style_id")
+    idea_data["metadata"]["render_template"] = style_plan.get("render_template")
+    idea_data["metadata"]["caption_font"] = style_plan.get("caption_font")
+    idea_data["render_plan"] = {
+        "style_id": style_plan.get("style_id"),
+        "render_template": style_plan.get("render_template"),
+        "background_mode": style_plan.get("background_mode"),
+        "background_query": idea_data["metadata"].get("background_search", topic_hint),
+        "background_video_path": "",
+        "caption_font": style_plan.get("caption_font"),
+        "music_style": style_plan.get("music_style"),
+    }
+    idea_data["metadata"]["render_plan"] = idea_data["render_plan"]
+
     # Save
     save_idea(idea_data, existing_ideas)
     
@@ -427,6 +484,7 @@ def main():
     print(f"   Title: {idea_data.get('idea', {}).get('title', 'N/A')}")
     print(f"   Topic: {idea_data.get('idea', {}).get('topic', 'N/A')}")
     print(f"   Mood: {idea_data.get('metadata', {}).get('mood', 'N/A')}")
+    print(f"   Style: {idea_data.get('style_id', 'N/A')}")
     print(f"   Scenes: {len(idea_data.get('timeline', []))}")
     print("-" * 50)
     

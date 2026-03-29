@@ -3,4 +3,11 @@ node_modules/
 dist/
 out/
 *.log
-
+output/
+assets/audio/generated/
+assets/backgrounds/
+assets/videos/backgrounds/
+public/generated/
+scripts/__pycache__/
+videos_output/*_preview.mp4
+videos_output/*_remotion.mp4

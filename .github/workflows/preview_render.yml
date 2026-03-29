@@ -22,6 +22,12 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -35,6 +41,9 @@ jobs:
           pip install requests Pillow numpy
           pip install moviepy==1.0.3
           pip install google-auth google-auth-oauthlib google-api-python-client
+
+      - name: Install Node dependencies
+        run: npm ci
 
       - name: Download Montserrat fonts
         run: |
@@ -59,7 +68,7 @@ jobs:
           MUBERT_API_KEY: ${{ secrets.MUBERT_API_KEY }}
           SUNO_API_URL: ${{ secrets.SUNO_API_URL }}
           SUNO_COOKIE: ${{ secrets.SUNO_COOKIE }}
-        run: python scripts/video_renderer.py --preview
+        run: python scripts/render_video.py --preview
 
       - name: Inspect generated files
         run: |

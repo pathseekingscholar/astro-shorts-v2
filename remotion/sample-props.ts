@@ -8,7 +8,8 @@ export const sampleScriptData: AstroScriptData = {
   },
   metadata: {
     mood: "mind-blowing",
-    music_style: "epic"
+    music_style: "epic",
+    render_style: "auto"
   },
   timeline: [
     {
