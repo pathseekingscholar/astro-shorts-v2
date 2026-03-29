@@ -93,6 +93,7 @@ jobs:
           SUNO_COOKIE: ${{ secrets.SUNO_COOKIE }}
           VIDEO_COUNT: ${{ steps.strategy.outputs.count }}
         run: |
+          set -euo pipefail
           COUNT=${VIDEO_COUNT:-2}
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.preview }}" = "true" ]; then
             RENDER_CMD="python scripts/video_renderer.py --preview"
@@ -108,10 +109,14 @@ jobs:
             echo "=========================================="
             echo "▶ Video $i / $COUNT"
             echo "=========================================="
+            echo "Step: idea generation"
             python scripts/idea_generator.py
+            echo "Step: script formatting"
             python scripts/script_formatter.py
+            echo "Step: rendering"
             eval "$RENDER_CMD"
             if [ "$SHOULD_UPLOAD" = "true" ]; then
+              echo "Step: YouTube upload"
               python scripts/youtube_uploader.py
             else
               echo "Preview mode: skipping YouTube upload"
@@ -120,6 +125,7 @@ jobs:
           done
 
       - name: Commit data + outputs
+        if: ${{ success() }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -129,6 +135,7 @@ jobs:
             git push
 
       - name: Upload video artifact
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: rendered-videos-${{ github.run_number }}
