@@ -23,6 +23,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
       - name: Install system dependencies
         run: |
@@ -65,18 +66,18 @@ jobs:
         run: |
           python - <<'EOF'
           import json, os
-          count = 2
+          count = 1
           sf = "data/strategy.json"
           if os.path.exists(sf):
               try:
                   with open(sf) as f:
                       s = json.load(f)
-                  count = max(1, min(4, int(s.get("videos_per_run", 2))))
+                  count = max(1, min(2, int(s.get("videos_per_run", 1))))
                   print(f"📊 Strategy: {count} video(s) this run")
               except Exception as e:
                   print(f"⚠️ Strategy read error: {e}")
           else:
-              print("📊 No strategy yet, defaulting to 2")
+              print("📊 No strategy yet, defaulting to 1")
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
               f.write(f"count={count}\n")
           EOF
@@ -121,7 +122,7 @@ jobs:
             else
               echo "Preview mode: skipping YouTube upload"
             fi
-            sleep 8
+            sleep 2
           done
 
       - name: Commit data + outputs
