@@ -845,14 +845,41 @@ def draw_highlight(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int) -> 
         draw.ellipse((hx - idx * 2, hy - idx * 2, hx + idx * 2, hy + idx * 2), fill=(255, 255, 255, alpha))
 
 
-def draw_eyes(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int, expression: str, name: str) -> None:
+def blink_strength(name: str, t: float, expression: str) -> float:
+    seed = int(hashlib.md5(f"{name}:{expression}".encode("utf-8")).hexdigest()[:6], 16) / 0xFFFFFF
+    cycle = (t * 0.42 + seed) % 1.0
+    blink = 0.0
+    for center in (0.08, 0.46, 0.84):
+        distance = abs(cycle - center)
+        if distance < 0.045:
+            blink = max(blink, 1 - distance / 0.045)
+    return clamp(blink, 0.0, 1.0)
+
+
+def gaze_offset_for_planet(name: str, expression: str, t: float) -> tuple[float, float]:
+    base_offsets = {
+        "looking_left": (-0.30, 0.0),
+        "looking_right": (0.30, 0.0),
+        "thinking": (0.18, -0.20),
+        "smug": (0.18, 0.10),
+        "scared": (0.06, -0.06),
+        "shocked": (0.0, -0.04),
+    }
+    base_x, base_y = base_offsets.get(expression, (0.0, 0.0))
+    seed = int(hashlib.md5(f"gaze:{name}".encode("utf-8")).hexdigest()[:6], 16) / 0xFFFFFF
+    drift_x = math.sin(t * 0.9 + seed * math.pi * 2) * 0.08
+    drift_y = math.cos(t * 0.7 + seed * math.pi) * 0.05
+    return clamp(base_x + drift_x, -0.36, 0.36), clamp(base_y + drift_y, -0.24, 0.24)
+
+
+def draw_eyes(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int, expression: str, name: str, t: float) -> None:
     eye_y = cy - radius * 0.10
     spacing = radius * 0.31
     eye_radius = max(10, int(radius * 0.22))
     pupil_radius = max(4, int(eye_radius * 0.46))
     white_color = (255, 255, 230) if name == "sun" else (255, 255, 255)
-    offsets = {"looking_left": (-0.30, 0), "looking_right": (0.30, 0), "thinking": (0.18, -0.20), "smug": (0.18, 0.10)}
-    pupil_offset = offsets.get(expression, (0, 0))
+    pupil_offset = gaze_offset_for_planet(name, expression, t)
+    blink = blink_strength(name, t, expression)
 
     for idx, ex in enumerate((cx - spacing, cx + spacing)):
         if expression == "happy":
@@ -864,23 +891,27 @@ def draw_eyes(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int, expressi
             continue
         scale = 1.58 if expression in {"scared", "shocked"} else 1.0
         scaled_eye = eye_radius * scale
-        draw.ellipse((ex - scaled_eye, eye_y - scaled_eye, ex + scaled_eye, eye_y + scaled_eye), fill=white_color, outline=(0, 0, 0, 255), width=max(2, int(radius * 0.025)))
+        eyelid = max(3, scaled_eye * (1 - 0.90 * blink))
+        draw.ellipse((ex - scaled_eye, eye_y - eyelid, ex + scaled_eye, eye_y + eyelid), fill=white_color, outline=(0, 0, 0, 255), width=max(2, int(radius * 0.025)))
         if expression == "angry":
             if idx == 0:
                 draw.line((ex - scaled_eye - 4, eye_y - scaled_eye + 4, ex + scaled_eye + 4, eye_y - scaled_eye - 8), fill=(0, 0, 0, 255), width=4)
             else:
                 draw.line((ex - scaled_eye - 4, eye_y - scaled_eye - 8, ex + scaled_eye + 4, eye_y - scaled_eye + 4), fill=(0, 0, 0, 255), width=4)
+        if blink > 0.72:
+            draw.line((ex - scaled_eye * 0.92, eye_y, ex + scaled_eye * 0.92, eye_y), fill=(0, 0, 0, 255), width=max(3, int(radius * 0.03)))
+            continue
         pupil_size = pupil_radius * (0.45 if expression in {"scared", "shocked"} else 1.0)
         px = ex + pupil_offset[0] * scaled_eye
-        py = eye_y + pupil_offset[1] * scaled_eye
+        py = eye_y + pupil_offset[1] * eyelid
         draw.ellipse((px - pupil_size, py - pupil_size, px + pupil_size, py + pupil_size), fill=(0, 0, 0, 255))
         shine = max(2, int(pupil_size // 2))
         draw.ellipse((px - pupil_size * 0.55 - shine, py - pupil_size * 0.55 - shine, px - pupil_size * 0.55 + shine, py - pupil_size * 0.55 + shine), fill=(255, 255, 255, 255))
         draw.ellipse((ex - scaled_eye * 0.92, eye_y - scaled_eye * 0.96, ex - scaled_eye * 0.40, eye_y - scaled_eye * 0.34), fill=(255, 255, 255, 82))
 
 
-def draw_face_features(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int, expression: str, name: str) -> None:
-    mouth_y = cy + radius * 0.30
+def draw_face_features(draw: ImageDraw.ImageDraw, cx: int, cy: int, radius: int, expression: str, name: str, t: float) -> None:
+    mouth_y = cy + radius * 0.30 + math.sin(t * 1.8 + cx * 0.01) * radius * 0.02
     mouth_w = radius * 0.58
     if expression in {"happy", "excited", "smug"}:
         draw.arc((cx - mouth_w * 0.5, mouth_y - radius * 0.14, cx + mouth_w * 0.5, mouth_y + radius * 0.20), 10, 170, fill=(30, 20, 20, 255), width=max(3, radius // 16))
@@ -967,12 +998,14 @@ def render_planet(layer: dict, theme_key: str, scene_progress: float, global_t: 
         elif entry_animation == "bounce_in":
             scale *= 0.70 + 0.30 * ease_out_back(p)
     effects = layer.get("effects", [])
+    scale *= 1.0 + 0.025 * math.sin(global_t * 1.9 + cx * 0.008)
     if "pulse" in effects:
         scale *= 1.0 + 0.05 * math.sin(global_t * 4.0)
     if "shake" in effects:
         rng = random.Random(int(global_t * FPS * 9))
         offset_x += rng.randint(-8, 8)
         offset_y += rng.randint(-8, 8)
+    offset_x += int(math.sin(global_t * 0.7 + cy * 0.01) * (5 if ("idle_bounce" in effects or "float" in effects) else 2))
     offset_y += int(math.sin(global_t * 1.6 + cx * 0.01) * (16 if ("idle_bounce" in effects or "float" in effects) else 10))
     cx += offset_x
     cy += offset_y
@@ -995,8 +1028,8 @@ def render_planet(layer: dict, theme_key: str, scene_progress: float, global_t: 
     draw_planet_body(body_draw, cx, cy, radius, name)
     draw_planet_outline(body_draw, cx, cy, radius)
     draw_highlight(body_draw, cx, cy, radius)
-    draw_eyes(body_draw, cx, cy, radius, expression, name)
-    draw_face_features(body_draw, cx, cy, radius, expression, name)
+    draw_eyes(body_draw, cx, cy, radius, expression, name, global_t)
+    draw_face_features(body_draw, cx, cy, radius, expression, name, global_t)
     body = body.filter(ImageFilter.GaussianBlur(0.15))
     planet_layer.alpha_composite(body)
     draw_planet_stickers(planet_layer, cx, cy, radius, name, theme_key, global_t)
@@ -1032,34 +1065,49 @@ def wrap_segments(content: str, base_size: int, max_width: int, theme_key: str) 
     lines: list[list[dict]] = []
     current: list[dict] = []
     current_width = 0
+    space_width = max(10, int(base_size * 0.22))
     for word in words:
         font, color, glow = segment_style(word, base_size, theme_key)
-        token = f"{word} "
-        bbox = measure.textbbox((0, 0), token, font=font)
+        bbox = measure.textbbox((0, 0), word, font=font)
         width = bbox[2] - bbox[0]
-        segment = {"text": word, "token_width": width, "font": font, "color": color, "glow": glow}
-        if current and current_width + width > max_width:
+        leading_space = 0 if not current else space_width
+        segment = {
+            "text": word,
+            "width": width,
+            "leading_space": leading_space,
+            "token_width": leading_space + width,
+            "font": font,
+            "color": color,
+            "glow": glow,
+        }
+        if current and current_width + segment["token_width"] > max_width:
             lines.append(current)
+            segment["leading_space"] = 0
+            segment["token_width"] = width
             current = [segment]
             current_width = width
         else:
             current.append(segment)
-            current_width += width
+            current_width += segment["token_width"]
     if current:
         lines.append(current)
     return lines
 
 
+def line_width(line: list[dict]) -> int:
+    return sum(segment["token_width"] for segment in line)
+
+
 def fit_text_layout(content: str, initial_size: int, theme_key: str, *, max_lines: int = 4) -> tuple[int, list[list[dict]]]:
     font_size = initial_size
-    while font_size >= 34:
-        lines = wrap_segments(content, font_size, WIDTH - 150, theme_key)
-        widest = max((sum(segment["token_width"] for segment in line) for line in lines), default=0)
-        if len(lines) <= max_lines and widest <= WIDTH - 110:
+    while font_size >= 26:
+        lines = wrap_segments(content, font_size, WIDTH - 120, theme_key)
+        widest = max((line_width(line) for line in lines), default=0)
+        if len(lines) <= max_lines and widest <= WIDTH - 80:
             return font_size, lines
-        font_size -= 4
-    final_lines = wrap_segments(content, 34, WIDTH - 120, theme_key)
-    return 34, final_lines[:max_lines]
+        font_size -= 2
+    final_lines = wrap_segments(content, 26, WIDTH - 96, theme_key)
+    return 26, final_lines[:max_lines]
 
 
 def rendered_content_for_style(content: str, style: str, progress: float) -> str:
@@ -1088,7 +1136,7 @@ def draw_text_block(frame: Image.Image, text_config: dict, scene_progress: float
     if style == "slam_in":
         zoom_progress = clamp(scene_progress / 0.18, 0.0, 1.0)
         base_size = int(68 * (1.55 - 0.55 * ease_out_back(zoom_progress)))
-    base_size, lines = fit_text_layout(visible_text, base_size, theme_key, max_lines=4 if position == "top" else 3)
+    base_size, lines = fit_text_layout(visible_text, base_size, theme_key, max_lines=5 if position == "top" else 4)
     if not lines:
         return frame
 
@@ -1099,19 +1147,24 @@ def draw_text_block(frame: Image.Image, text_config: dict, scene_progress: float
     block_height = len(lines) * line_spacing
     if position == "bottom":
         y_start = max(110, HEIGHT - block_height - 150)
+    entrance = ease_out_cubic(clamp(scene_progress / 0.22, 0.0, 1.0))
+    y_offset = int((1 - entrance) * 30)
     for line_index, line in enumerate(lines):
-        line_width = sum(segment["token_width"] for segment in line)
-        x = max(28, (WIDTH - line_width) // 2)
-        line_y = y_start + line_index * line_spacing
+        current_line_width = line_width(line)
+        x = max(36, min((WIDTH - current_line_width) // 2, WIDTH - current_line_width - 36))
+        line_y = y_start + line_index * line_spacing + y_offset
         font_heights = [segment["font"].size if hasattr(segment["font"], "size") else base_size for segment in line]
         pill_height = int(max(font_heights) + 16)
-        draw.rounded_rectangle((x - 8, line_y - 8, x + line_width + 8, line_y + pill_height), radius=18, fill=PILL_DARK)
+        pill_left = max(18, x - 10)
+        pill_right = min(WIDTH - 18, x + current_line_width + 10)
+        draw.rounded_rectangle((pill_left, line_y - 8, pill_right, line_y + pill_height), radius=18, fill=PILL_DARK)
         cursor_x = x
         for segment in line:
             font = segment["font"]
             text = segment["text"]
             color = segment["color"]
             glow = segment["glow"]
+            cursor_x += segment["leading_space"]
             glow_layer = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
             glow_draw = ImageDraw.Draw(glow_layer)
             for offset in (5, 3):
@@ -1126,8 +1179,25 @@ def draw_text_block(frame: Image.Image, text_config: dict, scene_progress: float
                 for dy in (-2, -1, 0, 1, 2):
                     shadow_draw.text((cursor_x + dx, line_y + dy), text, font=font, fill=(0, 0, 0, 255))
             shadow_draw.text((cursor_x, line_y), text, font=font, fill=(*color, 255))
-            cursor_x += segment["token_width"]
+            cursor_x += segment["width"]
     return Image.alpha_composite(frame.convert("RGBA"), overlay)
+
+
+def apply_cinematic_camera(frame: Image.Image, scene: dict, progress: float, global_progress: float) -> Image.Image:
+    seed = float(scene.get("time_start", 0.0)) * 0.37 + len(scene.get("layers", [])) * 0.19
+    scale = 1.025 + 0.018 * math.sin(math.pi * progress)
+    if scene.get("dramatic_moment"):
+        scale += 0.02
+    target_width = max(WIDTH + 2, int(WIDTH * scale))
+    target_height = max(HEIGHT + 2, int(HEIGHT * scale))
+    zoomed = frame.resize((target_width, target_height), Image.Resampling.LANCZOS)
+    max_left = max(0, target_width - WIDTH)
+    max_top = max(0, target_height - HEIGHT)
+    left = int((max_left / 2) + math.sin(global_progress * 5.0 + seed) * max_left * 0.18)
+    top = int((max_top / 2) + math.cos(global_progress * 4.1 + seed * 1.7) * max_top * 0.18)
+    left = int(clamp(left, 0, max_left))
+    top = int(clamp(top, 0, max_top))
+    return zoomed.crop((left, top, left + WIDTH, top + HEIGHT)).convert("RGBA")
 
 
 def draw_progress_bar(frame: Image.Image, progress: float, theme_key: str) -> None:
@@ -1215,6 +1285,7 @@ def render_scene_frame(
         if layer.get("type") == "planet":
             frame.alpha_composite(render_planet(layer, theme_key, progress, local_t))
     frame = draw_text_block(frame, scene.get("text", {}), progress, theme_key)
+    frame = apply_cinematic_camera(frame, scene, progress, global_progress)
     frame = apply_screen_effects(frame, scene_effects, int(local_t * FPS))
     draw_progress_bar(frame, global_progress, theme_key)
     return frame
