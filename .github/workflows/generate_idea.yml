@@ -1,8 +1,6 @@
-name: Generate Short Idea
+name: Generate Short Utility
 
 on:
-  schedule:
-    - cron: '0 */6 * * *'
   workflow_dispatch:
     inputs:
       preview:
@@ -11,14 +9,18 @@ on:
         default: false
         type: boolean
 
+concurrency:
+  group: astro-shorts-manual-utility
+  cancel-in-progress: false
+
 jobs:
   generate:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -29,14 +31,14 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      
+
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg imagemagick wget fonts-dejavu
           sudo sed -i 's/rights="none" pattern="@\*"/rights="read|write" pattern="@*"/' /etc/ImageMagick-6/policy.xml || true
           sudo sed -i '/<policy domain="path" rights="none" pattern="@\*"/d' /etc/ImageMagick-6/policy.xml || true
-      
+
       - name: Install Python dependencies
         run: |
           pip install --upgrade pip
@@ -47,24 +49,24 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      - name: Download Montserrat ExtraBold
+      - name: Download Montserrat fonts
         run: |
           mkdir -p assets/fonts
           wget -q "https://github.com/JulietaUla/Montserrat/raw/master/fonts/ttf/Montserrat-ExtraBold.ttf" \
             -O assets/fonts/Montserrat-ExtraBold.ttf || true
           wget -q "https://github.com/JulietaUla/Montserrat/raw/master/fonts/ttf/Montserrat-Regular.ttf" \
             -O assets/fonts/Montserrat-Regular.ttf || true
-      
+
       - name: Generate idea
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/idea_generator.py
-      
+
       - name: Format script
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/script_formatter.py
-      
+
       - name: Render video
         env:
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
@@ -78,21 +80,28 @@ jobs:
           else
             python scripts/render_video.py
           fi
-      
+
       - name: Upload to YouTube
         if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.preview == true) }}
         env:
           YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
         run: python scripts/youtube_uploader.py
-      
+
       - name: Save to repository
+        continue-on-error: true
         run: |
+          set -euo pipefail
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
-          git diff --quiet && git diff --staged --quiet || (git commit -m "🚀 Generated + uploaded new Short" && git push)
-      
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No repository changes to commit."
+            exit 0
+          fi
+          git commit -m "Generated and uploaded new Short"
+          git push || echo "Repository push failed after successful utility run"
+
       - name: Upload video artifact
         uses: actions/upload-artifact@v4
         with:

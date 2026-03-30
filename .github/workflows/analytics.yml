@@ -1,4 +1,4 @@
-name: Generate Shorts — Cinema Edition
+name: Generate Shorts - Cinema Edition
 
 on:
   schedule:
@@ -10,6 +10,10 @@ on:
         required: false
         default: false
         type: boolean
+
+concurrency:
+  group: astro-shorts-production
+  cancel-in-progress: false
 
 jobs:
   generate:
@@ -50,51 +54,48 @@ jobs:
       - name: Download Montserrat fonts
         run: |
           mkdir -p assets/fonts
-          # Download Montserrat ExtraBold from Google Fonts CDN
-          wget -q "https://fonts.gstatic.com/s/montserrat/v26/JTUSjIg1_i6t8kCHKm459Wlhyw.woff2" \
-            -O /tmp/montserrat_check.woff2 || true
-          # Use direct TTF from GitHub mirror (reliable in CI)
           wget -q "https://github.com/JulietaUla/Montserrat/raw/master/fonts/ttf/Montserrat-ExtraBold.ttf" \
             -O assets/fonts/Montserrat-ExtraBold.ttf || \
           wget -q "https://github.com/google/fonts/raw/main/ofl/montserrat/static/Montserrat-ExtraBold.ttf" \
             -O assets/fonts/Montserrat-ExtraBold.ttf || \
-          echo "⚠️ Montserrat download failed, will use DejaVu fallback"
+          echo "Montserrat ExtraBold download failed; using fallback fonts"
           wget -q "https://github.com/JulietaUla/Montserrat/raw/master/fonts/ttf/Montserrat-Regular.ttf" \
             -O assets/fonts/Montserrat-Regular.ttf || true
           ls -la assets/fonts/ || true
 
-      - name: Run analytics (learn from YouTube)
+      - name: Run analytics
         env:
           YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
-        run: python scripts/analytics_agent.py || echo "⚠️ Analytics skipped"
+        run: python scripts/analytics_agent.py || echo "Analytics skipped"
 
       - name: Determine video count from strategy
         id: strategy
         run: |
-          python - <<'EOF'
-          import json, os
-          count = 1
-          sf = "data/strategy.json"
-          if os.path.exists(sf):
-              try:
-                  with open(sf) as f:
-                      s = json.load(f)
-                  count = max(1, min(2, int(s.get("videos_per_run", 1))))
-                  print(f"📊 Strategy: {count} video(s) this run")
-              except Exception as e:
-                  print(f"⚠️ Strategy read error: {e}")
-          else:
-              print("📊 No strategy yet, defaulting to 1")
-          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-              f.write(f"count={count}\n")
-          EOF
+          python - <<'PY'
+          import json
+          import os
 
-      - name: Generate, render and upload videos
+          count = 1
+          strategy_path = "data/strategy.json"
+          if os.path.exists(strategy_path):
+              try:
+                  with open(strategy_path, "r", encoding="utf-8") as handle:
+                      strategy = json.load(handle)
+                  count = max(1, min(2, int(strategy.get("videos_per_run", 1))))
+                  print(f"Strategy selected {count} video(s)")
+              except Exception as exc:
+                  print(f"Strategy read error: {exc}")
+          else:
+              print("No strategy file yet, defaulting to 1 video")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+              handle.write(f"count={count}\n")
+          PY
+
+      - name: Generate, format, and render videos
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
-          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           MUBERT_API_KEY: ${{ secrets.MUBERT_API_KEY }}
@@ -103,45 +104,56 @@ jobs:
           VIDEO_COUNT: ${{ steps.strategy.outputs.count }}
         run: |
           set -euo pipefail
-          COUNT=${VIDEO_COUNT:-2}
+          COUNT=${VIDEO_COUNT:-1}
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.preview }}" = "true" ]; then
             RENDER_CMD="python scripts/render_video.py --preview"
-            SHOULD_UPLOAD="false"
             COUNT=1
           else
             RENDER_CMD="python scripts/render_video.py"
-            SHOULD_UPLOAD="true"
           fi
-          echo "🎬 Generating $COUNT video(s)..."
-          for i in $(seq 1 $COUNT); do
-            echo ""
-            echo "=========================================="
-            echo "▶ Video $i / $COUNT"
-            echo "=========================================="
+
+          echo "Generating $COUNT video(s)"
+          for i in $(seq 1 "$COUNT"); do
+            echo "Video $i / $COUNT"
             echo "Step: idea generation"
             python scripts/idea_generator.py
             echo "Step: script formatting"
             python scripts/script_formatter.py
             echo "Step: rendering"
             eval "$RENDER_CMD"
-            if [ "$SHOULD_UPLOAD" = "true" ]; then
-              echo "Step: YouTube upload"
-              python scripts/youtube_uploader.py
-            else
-              echo "Preview mode: skipping YouTube upload"
-            fi
             sleep 2
           done
 
-      - name: Commit data + outputs
-        if: ${{ success() }}
+      - name: Upload rendered videos to YouTube
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.preview == true) }}
+        env:
+          YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          VIDEO_COUNT: ${{ steps.strategy.outputs.count }}
         run: |
+          set -euo pipefail
+          COUNT=${VIDEO_COUNT:-1}
+          echo "Uploading $COUNT rendered video(s)"
+          for i in $(seq 1 "$COUNT"); do
+            echo "Step: YouTube upload $i / $COUNT"
+            python scripts/youtube_uploader.py
+            sleep 2
+          done
+
+      - name: Commit data and outputs
+        if: ${{ success() }}
+        continue-on-error: true
+        run: |
+          set -euo pipefail
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
-          git diff --quiet && git diff --staged --quiet || \
-            git commit -m "🚀 Generated + uploaded new Short(s) | $(date +'%Y-%m-%d %H:%M')" && \
-            git push
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No repository changes to commit."
+            exit 0
+          fi
+          git commit -m "Generated and uploaded new Short(s) | $(date +'%Y-%m-%d %H:%M')"
+          git push || echo "Repository push failed after successful pipeline run"
 
       - name: Upload video artifact
         if: ${{ always() }}
